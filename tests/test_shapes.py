@@ -1,0 +1,39 @@
+import numpy as np
+import pytest
+
+from tinycast.data import shapes as S
+
+
+@pytest.mark.parametrize("name", S.SHAPE_NAMES)
+@pytest.mark.parametrize("randomize", [False, True])
+def test_deterministic_per_seed(name, randomize):
+    a = S.make_shape(name, seed=7, randomize=randomize)
+    b = S.make_shape(name, seed=7, randomize=randomize)
+    np.testing.assert_array_equal(a.context, b.context)
+    np.testing.assert_array_equal(a.future, b.future)
+    c = S.make_shape(name, seed=8, randomize=randomize)
+    assert not np.array_equal(np.nan_to_num(a.context), np.nan_to_num(c.context))
+
+
+@pytest.mark.parametrize("name", S.SHAPE_NAMES)
+def test_shapes_dtypes_and_meta(name):
+    s = S.make_shape(name, seed=1, context_length=512, horizon=64)
+    assert (
+        s.context.shape == (512,) and s.future.shape == (64,) and s.future_noiseless.shape == (64,)
+    )
+    assert s.context.dtype == s.future.dtype == np.float32
+    assert np.isfinite(s.future).all() and np.isfinite(s.future_noiseless).all()
+    assert "period" in s.meta and "params" in s.meta and s.meta["name"] == name
+    assert np.abs(s.future).sum() > 0 or name == "intermittent"
+
+
+def test_only_gap_shape_has_nan():
+    for name in S.SHAPE_NAMES:
+        s = S.make_shape(name, seed=3)
+        assert np.isnan(s.context).any() == (name == "missing_gaps"), name
+
+
+def test_gallery_size_and_seeds():
+    g = S.gallery()
+    assert len(g) >= 18
+    assert all(s.meta["seed"] >= S.GALLERY_SEED_OFFSET for s in g)

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+wandb/
+data/*
+!data/LICENSES.md
+runs/
+*.onnx
+!web/public/models/*.onnx
+*.ckpt
+*.pt
+node_modules/
+web/dist/
+.DS_Store

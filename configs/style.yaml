@@ -1,0 +1,32 @@
+# Single source of truth for colours (matplotlib figures + web/src/lib/palette.ts via build_web_data.py).
+# Models are coloured by ROLE, not individually: the first 3 categorical slots of the
+# reference palette validate all-pairs (scatter/Pareto) in both modes; baselines are neutral.
+# Validated with dataviz validate_palette.js --pairs all (light worst CVD dE 9.2, dark 9.4).
+# Aqua is < 3:1 on the light surface -> every Pareto point is direct-labelled.
+roles:
+  student:    {light: "#2a78d6", dark: "#3987e5"}
+  teacher:    {light: "#eb6834", dark: "#d95926"}
+  comparator: {light: "#1baf7a", dark: "#199e70"}
+  baseline:   {light: "#898781", dark: "#898781"}
+ink:
+  surface:   {light: "#fcfcfb", dark: "#1a1a19"}
+  page:      {light: "#f9f9f7", dark: "#0d0d0d"}
+  primary:   {light: "#0b0b0b", dark: "#f0efec"}
+  secondary: {light: "#52514e", dark: "#c3c2b7"}
+  muted:     {light: "#898781", dark: "#898781"}
+  grid:      {light: "#e1e0d9", dark: "#2c2c2a"}
+  axis:      {light: "#c3c2b7", dark: "#383835"}
+# model name prefix -> role
+model_roles:
+  student: student
+  toto-2.0-313m: teacher
+  toto-2.0-1b: teacher
+  t0: teacher
+  toto-2.0-4m: comparator
+  toto-2.0-22m: comparator
+  chronos-2: comparator
+  timestral: comparator
+  seasonal_naive: baseline
+  ets: baseline
+# fan bands: (lo, hi, opacity)
+bands: [[0.01, 0.99, 0.15], [0.1, 0.9, 0.28], [0.3, 0.7, 0.45]]

@@ -1,0 +1,125 @@
+"""Honest baselines: seasonal naive (empirical residual quantiles) and ETS (statsforecast).
+
+Both estimate the season from the context (ACF) unless `season` is given, because the
+student never sees the period either (drawn series have no time unit). NaNs in the context
+are linearly interpolated for these classical models (they cannot take missing values).
+"""
+
+from __future__ import annotations
+
+import warnings
+
+import numpy as np
+from scipy.stats import norm
+
+from tinycast.config import QUANTILE_LEVELS
+from tinycast.models.base import check_output
+
+
+def interpolate_nans(x: np.ndarray) -> np.ndarray:
+    x = np.asarray(x, dtype=np.float64).copy()
+    bad = np.isnan(x)
+    if bad.all():
+        raise ValueError("context is entirely missing")
+    if bad.any():
+        idx = np.arange(len(x))
+        x[bad] = np.interp(idx[bad], idx[~bad], x[~bad])
+    return x
+
+
+def estimate_season(x: np.ndarray, max_period: int | None = None, threshold: float = 0.3) -> int:
+    """Seasonal period = lag of the highest local ACF peak above `threshold`, else 1."""
+    x = interpolate_nans(x)
+    x = x - np.linspace(x[0], x[-1], len(x))  # remove a linear trend first
+    x = x - x.mean()
+    n = len(x)
+    max_period = max_period or n // 3
+    denom = (x * x).sum()
+    if denom <= 0 or max_period < 3:
+        return 1
+    acf = np.array([(x[: n - k] * x[k:]).sum() / denom for k in range(max_period + 1)])
+    peaks = [k for k in range(2, max_period) if acf[k] > acf[k - 1] and acf[k] >= acf[k + 1]]
+    peaks = [k for k in peaks if acf[k] > threshold]
+    if not peaks:
+        return 1
+    best = max(acf[k] for k in peaks)
+    # prefer the shortest lag that is nearly as good as the best (avoids picking 2x the period)
+    return min(k for k in peaks if acf[k] >= 0.9 * best)
+
+
+class SeasonalNaive:
+    """y_{T+h} = y_{T+h-m*ceil(h/m)}; quantiles from in-sample seasonal-naive residuals,
+    scaled by sqrt(ceil(h/m)) (random-walk-in-seasons error growth)."""
+
+    native_levels = QUANTILE_LEVELS
+    quantile_levels = QUANTILE_LEVELS
+
+    def __init__(self, name: str = "seasonal_naive", season: int | str = "auto"):
+        self.name = name
+        self.season = season
+
+    def _one(self, ctx: np.ndarray, h: int) -> np.ndarray:
+        x = interpolate_nans(ctx)
+        m = estimate_season(x) if self.season == "auto" else int(self.season)
+        steps = np.arange(1, h + 1)
+        k = np.ceil(steps / m).astype(int)
+        point = (
+            x[len(x) - m * k + (steps - 1) % m - (m - 1) + (m - 1)] if m > 1 else np.full(h, x[-1])
+        )
+        if m > 1:
+            point = np.array(
+                [x[len(x) - m * kk + (s - 1) % m] for s, kk in zip(steps, k, strict=True)]
+            )
+        resid = x[m:] - x[:-m]
+        rq = np.quantile(resid, QUANTILE_LEVELS)  # (K,)
+        return point[None, :] + rq[:, None] * np.sqrt(k)[None, :]
+
+    def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
+        q = np.stack([self._one(c, horizon) for c in context])
+        q = np.sort(q, axis=1)
+        return check_output(q, len(context), horizon, self.name)
+
+
+class ETS:
+    """statsforecast AutoETS; its Gaussian prediction intervals -> quantiles."""
+
+    native_levels = QUANTILE_LEVELS
+    quantile_levels = QUANTILE_LEVELS
+
+    def __init__(self, name: str = "ets", season: int | str = "auto", max_season: int = 24):
+        self.name = name
+        self.season = season
+        self.max_season = max_season
+
+    def _one(self, ctx: np.ndarray, h: int) -> np.ndarray:
+        from statsforecast.models import AutoETS
+
+        x = interpolate_nans(ctx)
+        m = estimate_season(x) if self.season == "auto" else int(self.season)
+        if m > self.max_season:
+            m = 1  # statsforecast's ETS does not fit long seasons; record it in docs
+        # integer interval levels (statsforecast keys are 'lo-80', 'hi-98', ...)
+        lvls = sorted({int(round(abs(2 * t - 1) * 100)) for t in QUANTILE_LEVELS if t != 0.5})
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            try:
+                fc = AutoETS(season_length=m).forecast(y=x, h=h, level=lvls)
+            except Exception:
+                fc = AutoETS(season_length=1).forecast(y=x, h=h, level=lvls)
+        out = []
+        for t in QUANTILE_LEVELS:
+            if t == 0.5:
+                out.append(fc["mean"])
+            else:
+                lv = int(round(abs(2 * t - 1) * 100))
+                key = f"lo-{lv}" if t < 0.5 else f"hi-{lv}"
+                out.append(fc[key])
+        q = np.stack(out)
+        if not np.isfinite(q).all():  # e.g. a degenerate fit: Gaussian around the mean
+            sd = np.nanstd(np.diff(x)) * np.sqrt(np.arange(1, h + 1))
+            q = fc["mean"][None] + norm.ppf(QUANTILE_LEVELS)[:, None] * sd[None]
+        return q
+
+    def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
+        q = np.stack([self._one(c, horizon) for c in context])
+        return check_output(q, len(context), horizon, self.name)

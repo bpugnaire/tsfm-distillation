@@ -1,0 +1,16 @@
+# Gallery benchmark: 20 canonical shapes, context 512, horizon 64, CPU.
+suite: shapes
+horizon: 64
+context_length: 512
+n_seeds: 10
+latency: true
+models:
+  - {kind: seasonal_naive, name: seasonal_naive}
+  - {kind: ets, name: ets}
+  - {kind: toto, name: toto-2.0-4m, checkpoint: Datadog/Toto-2.0-4m}
+  - {kind: toto, name: toto-2.0-22m, checkpoint: Datadog/Toto-2.0-22m}
+  - {kind: toto, name: toto-2.0-313m, checkpoint: Datadog/Toto-2.0-313m}
+  - {kind: t0, name: t0-gamma, checkpoint: theforecastingcompany/t0-gamma}
+  - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
+  - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
+  # Timestral (comparator) disabled pending licence confirmation by the owner.
