@@ -51,10 +51,21 @@ class RobustScaler(nn.Module):
 
     def scale(self, x, loc, scale):
         z = (x - loc) / scale
-        return torch.asinh(z) if self.use_asinh else z
+        return _asinh(z) if self.use_asinh else z
 
     def unscale(self, z, loc, scale):
-        return (torch.sinh(z) if self.use_asinh else z) * scale + loc
+        return (_sinh(z) if self.use_asinh else z) * scale + loc
+
+
+# Written from basic ops: the TorchScript ONNX exporter has no symbolic for aten::asinh/sinh.
+# sign(z) * log(|z| + sqrt(z^2 + 1)) avoids the cancellation of log(z + sqrt(z^2+1)) for z << 0.
+def _asinh(z: torch.Tensor) -> torch.Tensor:
+    a = z.abs()
+    return torch.sign(z) * torch.log(a + torch.sqrt(a * a + 1.0))
+
+
+def _sinh(z: torch.Tensor) -> torch.Tensor:
+    return 0.5 * (torch.exp(z) - torch.exp(-z))
 
 
 class MonotoneQuantileHead(nn.Module):

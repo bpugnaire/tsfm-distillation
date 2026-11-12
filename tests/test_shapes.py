@@ -37,3 +37,19 @@ def test_gallery_size_and_seeds():
     g = S.gallery()
     assert len(g) >= 18
     assert all(s.meta["seed"] >= S.GALLERY_SEED_OFFSET for s in g)
+
+
+def test_synthetic_deterministic_and_finite_future():
+    import time
+
+    from tinycast.data.synthetic import synthetic_batch
+
+    seeds = np.arange(64)
+    t0 = time.time()
+    c1, f1 = synthetic_batch(seeds)
+    elapsed = time.time() - t0
+    c2, f2 = synthetic_batch(seeds)
+    np.testing.assert_array_equal(np.nan_to_num(c1), np.nan_to_num(c2))
+    assert c1.shape == (64, 512) and f1.shape == (64, 64)
+    assert np.isfinite(f1).all()
+    assert elapsed < 10, f"synthetic generation too slow: {elapsed:.1f}s / 64"

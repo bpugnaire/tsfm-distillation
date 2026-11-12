@@ -147,12 +147,20 @@ def bootstrap_ci(
     n_boot: int = 2000,
     alpha: float = 0.05,
     seed: int = 0,
+    groups: np.ndarray | None = None,
 ) -> tuple[float, float, float]:
-    """(point, lo, hi) of `stat` with a percentile bootstrap over series."""
+    """(point, lo, hi) of `stat` with a percentile bootstrap.
+
+    Without `groups`, resamples items. With `groups` (e.g. the series id of each window),
+    resamples whole groups (cluster bootstrap): windows of the same series are correlated
+    (overlapping targets, shared regime), so resampling them independently gives CIs that
+    are far too narrow.
+    """
     x = np.asarray(x, dtype=np.float64)
-    x = x[np.isfinite(x)]
+    keep = np.isfinite(x) & ((x > 0) if stat == "geomean" else True)
+    x = x[keep]
+    g = None if groups is None else np.asarray(groups)[keep]
     if stat == "geomean":
-        x = x[x > 0]
         f = geometric_mean
     elif stat == "mean":
 
@@ -163,6 +171,16 @@ def bootstrap_ci(
     if x.size == 0:
         return (float("nan"),) * 3
     rng = np.random.default_rng(seed)
-    idx = rng.integers(0, x.size, size=(n_boot, x.size))
-    boots = np.array([f(x[i]) for i in idx])
+    if g is None:
+        idx = rng.integers(0, x.size, size=(n_boot, x.size))
+        boots = np.array([f(x[i]) for i in idx])
+    else:
+        members = [np.flatnonzero(g == u) for u in np.unique(g)]
+        k = len(members)
+        boots = np.array(
+            [
+                f(x[np.concatenate([members[j] for j in rng.integers(0, k, k)])])
+                for _ in range(n_boot)
+            ]
+        )
     return f(x), float(np.quantile(boots, alpha / 2)), float(np.quantile(boots, 1 - alpha / 2))

@@ -1,0 +1,7 @@
+# Local debug KD run (<= 5 min): pipeline check only, NOT a result.
+name: debug_kd_t0_s
+seed: 0
+student: {d_model: 64, n_layers: 3, n_heads: 4}
+loss: {alpha: 0.5, kd: pinball_teacher}
+data: {n_train_windows: 4000, n_val_windows: 400, synthetic_share: 0.5, teacher: t0-gamma}
+optim: {lr: 0.001, batch_size: 128, max_steps: 300, warmup_steps: 30, eval_every: 100, patience: 3}

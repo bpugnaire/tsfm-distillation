@@ -1,0 +1,9 @@
+# PREVIEW student for building the export + web pipeline. GT-only, single seed, ~4 min on Apple MPS.
+# Not a study result: the GT-only floor (Phase 3) and KD runs (Phase 4) use larger corpora + 3 seeds.
+name: preview_gt_m
+seed: 0
+device: mps
+student: {d_model: 128, n_layers: 4, n_heads: 4}
+loss: {alpha: 0.0}
+data: {n_train_windows: 24000, n_val_windows: 1000, synthetic_share: 0.5}
+optim: {lr: 0.001, batch_size: 256, max_steps: 3000, warmup_steps: 150, eval_every: 250, patience: 4}

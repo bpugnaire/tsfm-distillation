@@ -14,3 +14,7 @@ models:
   - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
   - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
   # Timestral (comparator) disabled pending licence confirmation by the owner.
+  # PREVIEW student (GT-only, 3000 steps, single seed): pipeline preview, NOT the study result.
+  - {kind: student, name: student-preview-gt-m, checkpoint: runs/2026-11-12_preview_gt_m}
+  - {kind: student_onnx, name: student-preview-gt-m-onnx-fp32, checkpoint: web/public/models/preview_gt_m.fp32.onnx}
+  - {kind: student_onnx, name: student-preview-gt-m-onnx-int8, checkpoint: web/public/models/preview_gt_m.int8.onnx}

@@ -1,0 +1,19 @@
+# Headline benchmark: RTE consumption, 13 series, targets >= fresh_start (configs/data/splits.yaml), daily origins 00:00 UTC.
+suite: fresh_fr_power
+horizon: 64
+context_length: 512
+latency: true
+models:
+  - {kind: seasonal_naive, name: seasonal_naive}
+  - {kind: ets, name: ets}
+  - {kind: toto, name: toto-2.0-4m, checkpoint: Datadog/Toto-2.0-4m}
+  - {kind: toto, name: toto-2.0-22m, checkpoint: Datadog/Toto-2.0-22m}
+  - {kind: toto, name: toto-2.0-313m, checkpoint: Datadog/Toto-2.0-313m}
+  - {kind: t0, name: t0-gamma, checkpoint: theforecastingcompany/t0-gamma}
+  - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
+  - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
+  # Timestral (comparator) disabled pending licence confirmation by the owner.
+  # PREVIEW student (GT-only, 3000 steps, single seed): pipeline preview, NOT the study result.
+  - {kind: student, name: student-preview-gt-m, checkpoint: runs/2026-11-12_preview_gt_m}
+  - {kind: student_onnx, name: student-preview-gt-m-onnx-fp32, checkpoint: web/public/models/preview_gt_m.fp32.onnx}
+  - {kind: student_onnx, name: student-preview-gt-m-onnx-int8, checkpoint: web/public/models/preview_gt_m.int8.onnx}

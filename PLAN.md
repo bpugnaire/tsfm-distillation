@@ -35,15 +35,15 @@ Ordering rationale: Phase 1 produces the gallery data **before any training**, w
 
 ## Phase 0 — Scaffolding (½–1 day)
 
-- [ ] `uv init` with Python 3.11; `pyproject.toml` with the package `tinycast`, dev deps (ruff, pytest, pre-commit), and core deps (torch, numpy, pandas, polars, pyarrow, scipy, statsforecast, pyyaml, wandb, matplotlib).
-- [ ] Create the folder layout from CLAUDE.md §4 (empty modules with docstrings stating their responsibility).
-- [ ] `Makefile` with the targets in CLAUDE.md §5 (stubs allowed).
-- [ ] `.gitignore` (data/, runs/, *.onnx outside web/public/models, .env, wandb/), `.env.example`.
-- [ ] `pre-commit` (ruff, ruff-format, end-of-file, trailing-whitespace, large-file check 5 MB).
-- [ ] GitHub Actions: `ci.yml` (lint + fast tests on CPU). Pages deploy workflow comes in Phase 7.
-- [ ] `tinycast/config.py`: typed dataclasses + YAML loader with validation (fail on unknown keys).
-- [ ] `docs/journal.md` (first entry), `docs/decisions/0001-project-scope.md`, `data/LICENSES.md` (empty table), `docs/notes/compute.md`.
-- [ ] README skeleton: one-paragraph pitch, "status: work in progress", planned article list.
+- [x] `uv init` with Python 3.11 → **3.12** (toto-2 requires it; ADR 0001); `pyproject.toml` with the package `tinycast`, dev deps (ruff, pytest, pre-commit), and core deps (torch, numpy, pandas, polars, pyarrow, scipy, statsforecast, pyyaml, wandb, matplotlib).
+- [x] Create the folder layout from CLAUDE.md §4 (empty modules with docstrings stating their responsibility).
+- [x] `Makefile` with the targets in CLAUDE.md §5 (stubs allowed).
+- [x] `.gitignore` (data/, runs/, *.onnx outside web/public/models, .env, wandb/), `.env.example`.
+- [x] `pre-commit` (ruff, ruff-format, end-of-file, trailing-whitespace, large-file check 5 MB).
+- [x] GitHub Actions: `ci.yml` (lint + fast tests on CPU). Pages deploy workflow comes in Phase 7.
+- [x] `tinycast/config.py`: typed dataclasses + YAML loader with validation (fail on unknown keys).
+- [x] `docs/journal.md` (first entry), `docs/decisions/0001-project-scope.md`, `data/LICENSES.md` (empty table), `docs/notes/compute.md`.
+- [x] README skeleton: one-paragraph pitch, "status: work in progress", planned article list.
 
 **Done when:** `make setup lint test` passes locally and in CI.
 
@@ -54,40 +54,40 @@ Ordering rationale: Phase 1 produces the gallery data **before any training**, w
 Goal: a uniform `Forecaster` interface for all models, a canonical **shapes** suite, a correct metrics + latency harness, and a gallery like the e-means page's toy-dataset comparison, but for forecasting.
 
 ### 1.1 Metrics (`tinycast/eval/metrics.py`) — write tests first
-- [ ] `pinball_loss(y, q_pred, levels)`; **WQL** (weighted quantile loss, normalised by Σ|y|), our CRPS approximation; document the approximation in ADR `0002-metrics.md`.
-- [ ] **MASE** (seasonal period from config; fall back to lag-1 when no seasonality).
-- [ ] Coverage of the 80% (0.1–0.9) and 98% (0.01–0.99) intervals; mean interval width (scaled).
-- [ ] **Fidelity** metrics for later phases: student-vs-teacher quantile loss, median MAE vs teacher median.
-- [ ] Aggregation: per series → per suite with **geometric mean of relative scores vs seasonal naive** (as in GIFT-Eval) + arithmetic mean; bootstrap 95% CIs over series.
-- [ ] Tests: hand-computed examples; a check that WQL ≈ CRPS for a Gaussian with many quantiles (compare with the closed-form Gaussian CRPS).
+- [x] `pinball_loss(y, q_pred, levels)`; **WQL** (weighted quantile loss, normalised by Σ|y|), our CRPS approximation; document the approximation in ADR `0002-metrics.md`.
+- [x] **MASE** (seasonal period from config; fall back to lag-1 when no seasonality).
+- [x] Coverage of the 80% (0.1–0.9) and 98% (0.01–0.99) intervals; mean interval width (scaled).
+- [x] **Fidelity** metrics for later phases: student-vs-teacher quantile loss, median MAE vs teacher median.
+- [x] Aggregation: per series → per suite with **geometric mean of relative scores vs seasonal naive** (as in GIFT-Eval) + arithmetic mean; bootstrap 95% CIs over series.
+- [x] Tests: hand-computed examples; a check that WQL ≈ CRPS for a Gaussian with many quantiles (compare with the closed-form Gaussian CRPS).
 
 ### 1.2 Shapes library (`tinycast/data/shapes.py`)
 Each generator returns `(context, future_true, future_noiseless, meta)` from `(seed, length, horizon, params)`. Fixed set for the gallery (seeded), randomised variants for training later.
-- [ ] Sine · two seasonalities (daily+weekly-like) · trend + seasonality · **multiplicative** seasonality (growing amplitude) · damped trend · exponential growth · logistic saturation
-- [ ] Level shift (step) · trend break · spikes/outliers in context · heteroscedastic noise · missing-value gaps
-- [ ] Random walk · mean-reverting AR(1) · intermittent demand (mostly zeros) · sawtooth · square wave · chirp (rising frequency) · impulse + exponential decay · constant + noise
-- [ ] Tests: determinism per seed, shapes and dtypes, no NaN in future, meta records period and generating params.
-- [ ] A quick visual check: `scripts/plot_shapes.py` → `results/figures/shapes_grid.png`.
+- [x] Sine · two seasonalities (daily+weekly-like) · trend + seasonality · **multiplicative** seasonality (growing amplitude) · damped trend · exponential growth · logistic saturation
+- [x] Level shift (step) · trend break · spikes/outliers in context · heteroscedastic noise · missing-value gaps
+- [x] Random walk · mean-reverting AR(1) · intermittent demand (mostly zeros) · sawtooth · square wave · chirp (rising frequency) · impulse + exponential decay · constant + noise
+- [x] Tests: determinism per seed, shapes and dtypes, no NaN in future, meta records period and generating params.
+- [x] A quick visual check: `scripts/plot_shapes.py` → `results/figures/shapes_grid.png`.
 
 ### 1.3 Model adapters (`tinycast/models/`)
 For each: read the official README/source first, pin the version, write findings in `docs/notes/teacher-apis.md` (install, checkpoint ids, max context, native output format, how you convert to the project quantile grid, CPU feasibility).
-- [ ] Baselines: seasonal naive (with empirical residual quantiles), ETS via statsforecast (with its intervals → quantiles).
-- [ ] **Toto 2.0**: the official small checkpoints (4m, 22m) + one larger checkpoint as teacher (pick the largest that keeps caching within budget; measure in 1.5).
-- [ ] **t0**: t0-gamma (the current release) if accessible, otherwise t0-alpha/beta; HF gated access via `HF_TOKEN`.
-- [ ] **Chronos-2** (comparator).
-- [ ] **Timestral** 5M/28M/209M (comparator only; see licence rule).
+- [x] Baselines: seasonal naive (with empirical residual quantiles), ETS via statsforecast (with its intervals → quantiles).
+- [x] **Toto 2.0**: the official small checkpoints (4m, 22m) + one larger checkpoint as teacher (pick the largest that keeps caching within budget; measure in 1.5).
+- [x] **t0**: t0-gamma (the current release) if accessible, otherwise t0-alpha/beta; HF gated access via `HF_TOKEN`.
+- [x] **Chronos-2** (comparator).
+- [ ] **Timestral** 5M/28M/209M — blocked: owner must confirm licence eligibility (ADR 0001) (comparator only; see licence rule).
 - [ ] Contract test (`tests/test_forecaster_contract.py`, slow): every adapter returns `(B, 13, H)`, monotone in the quantile axis, finite, and handles NaNs in the context.
 
 ### 1.4 Benchmark harness (`tinycast/eval/benchmark.py`, `latency.py`)
-- [ ] `make bench S=shapes` runs all models configured in `configs/eval/shapes.yaml` and writes `results/shapes/<model>.json` (per-series metrics + forecasts as float16 for the gallery).
-- [ ] Latency: CPU, `torch.set_num_threads(1)` and `8`, batch 1 and 32, warm-up then 50 timed runs → p50/p95. Record the hardware in the JSON. Also record param count and checkpoint size on disk.
-- [ ] `scripts/build_web_data.py --suite shapes` → `web/public/data/gallery.json` (shapes × models: context, quantiles, truth, WQL, MASE, latency).
+- [x] `make bench S=shapes` runs all models configured in `configs/eval/shapes.yaml` and writes `results/shapes/<model>.json` (per-series metrics + forecasts as float16 for the gallery).
+- [x] Latency: CPU, `torch.set_num_threads(1)` and `8`, batch 1 and 32, warm-up then 50 timed runs → p50/p95. Record the hardware in the JSON. Also record param count and checkpoint size on disk.
+- [x] `scripts/build_web_data.py --suite shapes` → `web/public/data/gallery.json` (shapes × models: context, quantiles, truth, WQL, MASE, latency).
 
 ### 1.5 Measure for later phases
-- [ ] Teacher throughput (windows/second) on CPU and on a Kaggle T4, at context 512 / horizon 64 → `docs/notes/compute.md`, plus a caching budget estimate for Phase 2.
+- [x] Teacher throughput (CPU + Apple MPS; Kaggle T4 not measured) (windows/second) on CPU and on a Kaggle T4, at context 512 / horizon 64 → `docs/notes/compute.md`, plus a caching budget estimate for Phase 2.
 
 ### 1.6 Material for A1 (no article kit yet)
-- [ ] Save the gallery figure (shapes × models small multiples), a summary table (relative WQL, latency, params), and the surprises (e.g. failure modes on multiplicative seasonality / intermittent series / level shifts) to the journal and `results/figures/`.
+- [x] Save the gallery figure (shapes × models small multiples), a summary table (relative WQL, latency, params), and the surprises (e.g. failure modes on multiplicative seasonality / intermittent series / level shifts) to the journal and `results/figures/`.
 
 **Done when:** gallery.json exists for ≥ 18 shapes × ≥ 7 models, the contract test passes, and the numbers are reproducible with one command.
 
@@ -96,24 +96,24 @@ For each: read the official README/source first, pin the version, write findings
 ## Phase 2 — Real data, fresh test split, teacher cache
 
 ### 2.1 Data sources (`tinycast/data/sources/`)
-- [ ] **RTE éCO2mix** (French national + regional electricity consumption, ~15/30 min): download script, resample to hourly (configurable), handle DST and gaps. Record the licence.
+- [x] **RTE éCO2mix** (French national + regional electricity consumption, ~15/30 min): download script, resample to hourly (configurable), handle DST and gaps. Record the licence.
 - [ ] **Open-Meteo** historical weather (temperature for the same regions) — store now for optional Phase 8 covariates.
 - [ ] Optional extra real training data from open HF time-series corpora (e.g. Chronos / GIFT-Eval pretraining datasets). Document each licence; keep the total small.
-- [ ] Synthetic training corpus (`synthetic.py`): KernelSynth-style random GP kernel compositions + randomised versions of the shape generators + TSMixup-style mixing. Deterministic from seeds.
+- [x] Synthetic training corpus (`synthetic.py`): KernelSynth-style random GP kernel compositions + randomised versions of the shape generators + TSMixup-style mixing. Deterministic from seeds.
 
 ### 2.2 Splits (`configs/data/splits.yaml`) and leakage tests
-- [ ] Define `train_end`, `val_end`, and the **fresh test window** (data strictly after the latest teacher release date used; record the dates and their sources in ADR `0003-splits.md`).
-- [ ] `tests/test_leakage.py`: no training/validation window has a future timestamp ≥ `val_end`, no test window overlaps train, and gallery shapes use seeds disjoint from training seeds.
+- [x] Define `train_end`, `val_end`, and the **fresh test window** (data strictly after the latest teacher release date used; record the dates and their sources in ADR `0003-splits.md`).
+- [x] `tests/test_leakage.py`: no training/validation window has a future timestamp ≥ `val_end`, no test window overlaps train, and gallery shapes use seeds disjoint from training seeds.
 - [ ] Secondary suite: a small GIFT-Eval subset, flagged "possibly seen by teachers".
 
 ### 2.3 Windowing (`windows.py`)
-- [ ] Sample (context=512, horizon=64) windows with configurable stride, a minimum observed fraction, and NaN masks. Window ids are stable hashes (source, series_id, start index) so caches can be joined.
+- [x] Sample (context=512, horizon=64) windows with configurable stride, a minimum observed fraction, and NaN masks. Window ids are stable hashes (source, series_id, start index) so caches can be joined.
 
 ### 2.4 Teacher cache (`cache.py`, `scripts/cache_teachers.py`)
-- [ ] Sharded parquet: `window_id`, teacher, quantiles float16 `(13, 64)`; optional `samples` for Toto (e.g. 64 samples float16) on a subset, used by the sample-pinball loss in Phase 4.
-- [ ] Resumable (skip completed shards), integrity check (counts, NaN check, monotonicity), and a manifest with teacher version + config hash.
+- [x] Sharded parquet: `window_id`, teacher, quantiles float16 `(13, 64)`; optional `samples` for Toto (e.g. 64 samples float16) on a subset, used by the sample-pinball loss in Phase 4.
+- [x] Resumable (skip completed shards), integrity check (counts, NaN check, monotonicity), and a manifest with teacher version + config hash.
 - [ ] Size the corpus from the 1.5 measurements: start with ~300k windows per teacher, then scale if the budget allows. **Post the estimate, wait for approval, then run on Kaggle.**
-- [ ] Also benchmark all models (teachers, Toto small checkpoints, baselines) on the fresh test split → `results/fresh_fr_power/`.
+- [x] Also benchmark all models (teachers, Toto small checkpoints, baselines) on the fresh test split → `results/fresh_fr_power/`.
 
 ### 2.5 Article kit A1 — "Evaluating forecasting foundation models properly"
 - [ ] `docs/articles/A1-evaluation.md` kit combining Phases 1–2.
@@ -126,13 +126,13 @@ For each: read the official README/source first, pin the version, write findings
 
 ## Phase 3 — Student architecture & ground-truth floor
 
-- [ ] `tinycast/models/student/`: scaler (robust instance norm + optional asinh), patch embedding with NaN mask channel, a small transformer encoder, a quantile head with monotone construction. Also an **MLP-only variant** (N-HiTS-like) as an architecture ablation.
-- [ ] Size presets s/m/l (≈0.3M/1M/3M); print the param count at startup.
-- [ ] `tinycast/distill/train.py`: plain PyTorch loop: AdamW, cosine schedule with warm-up, grad clipping, AMP on GPU, gradient accumulation, early stopping on **validation WQL**, best-checkpoint saving, W&B + `metrics.json` logging.
-- [ ] Loss: pinball vs ground truth (`L_gt`).
-- [ ] Overfit test: the student overfits 64 windows to ~0 loss (catches bugs cheaply; make it a slow test).
+- [x] `tinycast/models/student/`: scaler (robust instance norm + optional asinh), patch embedding with NaN mask channel, a small transformer encoder, a quantile head with monotone construction. Also an **MLP-only variant** (N-HiTS-like) as an architecture ablation.
+- [x] Size presets s/m/l (≈0.3M/1M/3M); print the param count at startup.
+- [x] `tinycast/distill/train.py`: plain PyTorch loop: AdamW, cosine schedule with warm-up, grad clipping, AMP on GPU, gradient accumulation, early stopping on **validation WQL**, best-checkpoint saving, W&B + `metrics.json` logging.
+- [x] Loss: pinball vs ground truth (`L_gt`).
+- [x] Overfit test: the student overfits 64 windows to ~0 loss (catches bugs cheaply; make it a slow test).
 - [ ] Train s/m/l on ground truth only (same windows as the cache) → **"GT-only floor"**, 3 seeds for m.
-- [ ] Short ADR `0004-student-architecture.md`.
+- [x] Short ADR `0004-student-architecture.md`.
 
 **Done when:** GT-only students are evaluated on the fresh split + shapes, with results in `results/`.
 
@@ -141,11 +141,11 @@ For each: read the official README/source first, pin the version, write findings
 ## Phase 4 — Single-teacher distillation (the core study)
 
 ### 4.1 Losses (`tinycast/distill/losses.py`) — each with unit tests
-- [ ] `L_kd_quantile`: per-level regression of student quantiles onto teacher quantiles, in **scaled space** (Huber), to test the "match the teacher's quantiles" view.
-- [ ] `L_kd_pinball_teacher`: pinball of the student against the teacher's **quantile values treated as pseudo-observations**, weighted per level.
-- [ ] `L_kd_sample_pinball` (Toto samples): expected pinball under teacher samples. Its minimiser is exactly the teacher's quantile, a principled distribution-matching loss. **Explain why in the journal; good article material.**
+- [x] `L_kd_quantile`: per-level regression of student quantiles onto teacher quantiles, in **scaled space** (Huber), to test the "match the teacher's quantiles" view.
+- [x] `L_kd_pinball_teacher` (also replaces the sample-pinball loss: Toto 2.0 has no samples): pinball of the student against the teacher's **quantile values treated as pseudo-observations**, weighted per level.
+- [~] `L_kd_sample_pinball` — superseded: Toto 2.0 emits no samples; equivalent = mass-weighted `L_kd_pinball_teacher` (Toto samples): expected pinball under teacher samples. Its minimiser is exactly the teacher's quantile, a principled distribution-matching loss. **Explain why in the journal; good article material.**
 - [ ] Horizon weighting `w(h)` (uniform / linear increasing / learned), after DistilTS's observation that short horizons dominate the loss.
-- [ ] Mixed objective `L = (1-α)·L_gt + α·L_kd`.
+- [x] Mixed objective `L = (1-α)·L_gt + α·L_kd`.
 
 ### 4.2 Experiments (each = a config in `configs/train/`; small sweeps first)
 - [ ] E1: teacher ∈ {Toto, t0} × α ∈ {0, 0.5, 0.9, 1.0} for student m.
@@ -182,9 +182,9 @@ For each: read the official README/source first, pin the version, write findings
 
 ## Phase 6 — Compression & browser parity
 
-- [ ] `export/onnx.py`: export student **including the scaler** (input: raw context + NaN mask, length 512, left-padded; output: raw-space quantiles). Dynamic batch axis.
+- [x] `export/onnx.py`: export student **including the scaler** (input: raw context + NaN mask, length 512, left-padded; output: raw-space quantiles). Dynamic batch axis.
 - [ ] Parity test (slow): torch vs onnxruntime max abs diff < 1e-4 (fp32) on 1k windows.
-- [ ] `export/quantize.py`: int8 dynamic quantisation (and static with calibration if needed); report the accuracy delta on the fresh split and shapes.
+- [x] `export/quantize.py`: int8 dynamic quantisation (and static with calibration if needed); report the accuracy delta on the fresh split and shapes.
 - [ ] Browser latency: a tiny page in `web/` that times onnxruntime-web WASM (1 and 4 threads) and optionally WebGPU, on ≥ 2 machines; record results in `results/latency_browser.json`.
 - [ ] Model files ≤ 10 MB (target: ~1–4 MB fp32, < 1 MB int8 for size s/m).
 - [ ] Copy artifacts to `web/public/models/` and push to the HF Hub with the model card.

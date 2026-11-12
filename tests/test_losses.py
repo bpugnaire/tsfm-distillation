@@ -74,3 +74,12 @@ def test_mixed_objective():
     assert float(L.mixed_objective(a, None, 0.0)) == pytest.approx(1.0)
     with pytest.raises(ValueError):
         L.mixed_objective(a, None, 0.5)
+
+
+def test_manual_asinh_sinh_match_torch():
+    from tinycast.models.student import _asinh, _sinh
+
+    z = torch.cat([torch.linspace(-1e4, 1e4, 2001), torch.linspace(-3, 3, 601)])
+    torch.testing.assert_close(_asinh(z), torch.asinh(z), rtol=1e-6, atol=1e-6)
+    w = torch.linspace(-15, 15, 601)
+    torch.testing.assert_close(_sinh(w), torch.sinh(w), rtol=1e-5, atol=1e-6)

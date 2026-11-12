@@ -15,3 +15,8 @@ runs/
 node_modules/
 web/dist/
 .DS_Store
+# raw per-model benchmark outputs (tens of MB; regenerate with `make bench S=<suite>`);
+# only the aggregated summary.json per suite is committed
+results/*/*.json
+!results/*/summary.json
+!results/export/*.json

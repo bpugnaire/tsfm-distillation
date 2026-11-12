@@ -1,0 +1,27 @@
+{
+ "run": "runs/2026-11-12_preview_gt_m",
+ "n_matmuls": 27,
+ "metric": "abs error / max(scale, |q - loc|)",
+ "variants": {
+  "all MatMuls int8": {
+   "p99": 0.05810122564435005,
+   "max": 0.2301265001296997,
+   "size_mb": 1.121
+  },
+  "keep head fp32": {
+   "p99": 0.05810122564435005,
+   "max": 0.2301265001296997,
+   "size_mb": 1.121
+  },
+  "keep embedding + head fp32": {
+   "p99": 0.03387484699487686,
+   "max": 0.10463313013315201,
+   "size_mb": 1.242
+  },
+  "keep embedding + head fp32, per-channel weights": {
+   "p99": 0.02827039174735546,
+   "max": 0.0838790237903595,
+   "size_mb": 1.269
+  }
+ }
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Draw</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Draw a time series, get a probabilistic forecast</h1>
+    <p class="lede">Draw left to right in the grey area. A ~1M-parameter student network forecasts the next 64 steps
+      <strong>in your browser</strong> (onnxruntime-web, WASM), with quantile bands: 40% (dark), 80%, 98% (light).</p>
+    <p class="warn" id="banner">This is the <strong>preview student</strong>: trained on ground truth only for ~3 minutes, one seed.
+      It exists to build and test the export + browser pipeline. The distilled student comes later.</p>
+    <div class="card">
+      <div class="row" style="margin-bottom:10px">
+        <button id="clear">Clear</button>
+        <button id="undo">Undo</button>
+        <button id="noise">Add noise</button>
+        <button id="repeat" title="Tile your drawing so a seasonal pattern emerges">Repeat my pattern</button>
+        <select id="preset" aria-label="Load a gallery shape"><option value="">Load a shape…</option></select>
+        <label class="small row" style="gap:6px"><input type="checkbox" id="compare" disabled /> show Toto 2.0 313m median (precomputed)</label>
+      </div>
+      <svg id="pad" style="touch-action:none; cursor:crosshair; display:block; border-radius:8px"></svg>
+      <div class="row small" style="margin-top:10px; justify-content:space-between">
+        <div class="row">
+          <span>Model</span>
+          <button id="m-fp32" aria-pressed="true">fp32</button>
+          <button id="m-int8" aria-pressed="false">int8</button>
+          <label class="row" style="gap:6px">Horizon <input id="horizon" type="range" min="8" max="64" step="8" value="64" /> <span id="hval">64</span></label>
+        </div>
+        <div id="hud" class="muted" style="font-variant-numeric:tabular-nums">loading model…</div>
+      </div>
+    </div>
+    <h2>What happens when you lift the pen</h2>
+    <ol class="small" style="color:var(--ink-2); max-width:75ch">
+      <li>Your stroke becomes 512 numbers (one per x pixel column of the context area). Columns you did not draw are <code>NaN</code>: the model treats them as missing.</li>
+      <li>The ONNX graph normalises them itself: location = median, scale = mean absolute deviation, then <code>asinh</code>. So the units of your drawing do not matter.</li>
+      <li>A 4-layer transformer reads 32 patches of 16 steps and predicts a median plus 12 positive gaps, so the 13 quantiles can never cross.</li>
+      <li>The graph un-normalises, and you get quantiles in your drawing's units. Latency above is measured around <code>session.run</code> only.</li>
+    </ol>
+    <p class="small"><a href="notes.html">Lab notes</a> explain each step.</p>
+  </main>
+  <script type="module" src="/src/pages/draw.ts"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --student: #2a78d6; --teacher: #eb6834; --comparator: #1baf7a; --baseline: #898781;
+  --accent-wash: rgba(42,120,214,0.08);
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --student: #3987e5; --teacher: #d95926; --comparator: #199e70; --baseline: #898781;
+    --accent-wash: rgba(57,135,229,0.12);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --student: #3987e5; --teacher: #d95926; --comparator: #199e70; --baseline: #898781;
+  --accent-wash: rgba(57,135,229,0.12);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.55 var(--font); }
+a { color: var(--student); }
+header.site { display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+header.site .brand { font-weight: 650; letter-spacing: -0.01em; }
+header.site nav { display: flex; gap: 16px; flex-wrap: wrap; }
+header.site nav a { color: var(--ink-2); text-decoration: none; }
+header.site nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+main.narrow { max-width: 760px; }
+h1 { font-size: 26px; line-height: 1.2; margin: 6px 0 6px; letter-spacing: -0.015em; }
+h2 { font-size: 19px; margin: 34px 0 8px; }
+h3 { font-size: 15px; margin: 22px 0 6px; }
+p.lede { color: var(--ink-2); margin-top: 0; max-width: 70ch; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+button, select, input[type=range] { font: inherit; }
+button, select { background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; cursor: pointer; }
+button:hover, select:hover { background: var(--accent-wash); }
+button[aria-pressed="true"] { border-color: var(--student); background: var(--accent-wash); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { display: inline-block; font-size: 12px; padding: 1px 7px; border-radius: 99px; border: 1px solid var(--border); color: var(--ink-2); }
+.warn { border-left: 3px solid var(--teacher); padding: 8px 12px; background: var(--surface); border-radius: 0 8px 8px 0; color: var(--ink-2); font-size: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+svg text { fill: var(--muted); font: 11px var(--font); }
+.axis path, .axis line { stroke: var(--axis); }
+.gridline line { stroke: var(--grid); }
+.tooltip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 12px; color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,0.12); display: none; z-index: 10; }
+code, pre { font-family: var(--mono); font-size: 13px; }
+pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.kpi .v { font-size: 22px; font-weight: 600; }
+.kpi .l { font-size: 12px; color: var(--muted); }

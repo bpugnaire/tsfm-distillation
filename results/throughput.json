@@ -1,0 +1,74 @@
+{
+ "toto-2.0-22m@cpu:Apple M1 Pro": {
+  "windows_per_s": 376.9,
+  "batch": 64,
+  "device": "cpu",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ },
+ "toto-2.0-313m@cpu:Apple M1 Pro": {
+  "windows_per_s": 53.5,
+  "batch": 64,
+  "device": "cpu",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ },
+ "t0-gamma@cpu:Apple M1 Pro": {
+  "windows_per_s": 82.8,
+  "batch": 64,
+  "device": "cpu",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ },
+ "toto-2.0-22m@mps:Apple M1 Pro": {
+  "windows_per_s": 1376.8,
+  "batch": 64,
+  "device": "mps",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ },
+ "toto-2.0-313m@mps:Apple M1 Pro": {
+  "windows_per_s": 179.1,
+  "batch": 64,
+  "device": "mps",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ },
+ "t0-gamma@mps:Apple M1 Pro": {
+  "windows_per_s": 206.4,
+  "batch": 64,
+  "device": "mps",
+  "hardware": {
+   "cpu": "Apple M1 Pro",
+   "machine": "arm64",
+   "system": "Darwin",
+   "n_cpus": 10,
+   "torch": "2.15.0"
+  }
+ }
+}

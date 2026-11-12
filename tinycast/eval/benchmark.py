@@ -132,6 +132,7 @@ def run_model(model, entry, suite: Suite, cfg: BenchConfig, out_dir: Path) -> di
         "config": to_dict(cfg),
         "per_series": {k: _clean(v) for k, v in mets.items()},
         "ids": suite.ids,
+        "groups": [m.get("series_id", i) for m, i in zip(suite.meta, suite.ids, strict=True)],
         "forecasts_f16": np.asarray(q, dtype=np.float16).tolist(),
     }
     if cfg.latency:
@@ -163,6 +164,10 @@ def summarize(out_dir: Path, baseline: str = "seasonal_naive") -> dict:
     runs = {json.loads(p.read_text())["model"]: json.loads(p.read_text()) for p in files}
     if baseline not in runs:
         raise ValueError(f"baseline {baseline} missing from {out_dir}")
+    suite_meta = json.loads((out_dir / "_suite.json").read_text())
+    suite_groups = [
+        m.get("series_id", i) for m, i in zip(suite_meta["meta"], suite_meta["ids"], strict=True)
+    ]
     base = np.array(runs[baseline]["per_series"]["wql"], dtype=float)
     base_mase = np.array(runs[baseline]["per_series"]["mase"], dtype=float)
     rows = []
@@ -173,8 +178,9 @@ def summarize(out_dir: Path, baseline: str = "seasonal_naive") -> dict:
         }
         rel = M.relative_scores(ps["wql"], base)
         rel_mase = M.relative_scores(ps["mase"], base_mase)
-        g, lo, hi = M.bootstrap_ci(rel, "geomean")
-        gm, lom, him = M.bootstrap_ci(rel_mase, "geomean")
+        groups = r.get("groups") or suite_groups  # cluster bootstrap over series
+        g, lo, hi = M.bootstrap_ci(rel, "geomean", groups=groups)
+        gm, lom, him = M.bootstrap_ci(rel_mase, "geomean", groups=groups)
         lat = r.get("latency", {})
         rows.append(
             {
@@ -193,7 +199,8 @@ def summarize(out_dir: Path, baseline: str = "seasonal_naive") -> dict:
                 "tails_extrapolated": len(r["native_levels"]) < len(QUANTILE_LEVELS),
                 "latency_ms_t1_b1": lat.get("threads1_batch1", {}).get("p50_ms"),
                 "latency_ms_t8_b32": lat.get("threads8_batch32", {}).get("p50_ms"),
-                "n_series": int(np.isfinite(rel).sum()),
+                "n_windows": int(np.isfinite(rel).sum()),
+                "n_clusters": len(set(groups)),
             }
         )
     rows.sort(key=lambda r: r["rel_wql"])

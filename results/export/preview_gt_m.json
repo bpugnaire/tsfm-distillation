@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-12_preview_gt_m",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 6.0,
+  "max_rel_diff": 9.642777149565518e-05,
+  "p99_rel_diff": 1.399095481247059e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 305145.0,
+  "max_rel_diff": 0.08834678679704666,
+  "p99_rel_diff": 0.02649354562163353,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}

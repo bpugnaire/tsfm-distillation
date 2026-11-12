@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Results</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Results so far</h1>
+    <p class="lede">Every number here is read from <code>results/*.json</code>, produced by committed scripts and configs.
+      Scores are <strong>relative WQL</strong>: each window's weighted quantile loss divided by seasonal naive's, aggregated
+      with a geometric mean (lower is better; 0.5 = half the error of "repeat the last season").
+      Brackets and whiskers are 95% bootstrap intervals, resampling whole series.</p>
+    <p class="warn">No distillation results yet. The only student here is the <strong>preview</strong> (ground truth only, 3 minutes, one seed),
+      and it was trained on these 13 series' history while the foundation models forecast zero-shot. It is not a fair comparison yet.</p>
+
+    <h2>Accuracy vs CPU latency: fresh French electricity data</h2>
+    <p class="small muted" id="pareto-sub"></p>
+    <div class="card"><svg id="pareto"></svg></div>
+
+    <h2>Leaderboards</h2>
+    <div class="row" style="align-items:flex-start; gap:16px">
+      <div class="card" style="flex:1 1 440px"><h3 style="margin-top:0">Fresh FR power (headline)</h3><div class="small muted" id="fresh-sub"></div><div class="table-wrap" id="t-fresh"></div></div>
+      <div class="card" style="flex:1 1 440px"><h3 style="margin-top:0">Shapes (20 shapes × 10 seeds)</h3><div class="small muted">200 independent synthetic series</div><div class="table-wrap" id="t-shapes"></div></div>
+    </div>
+
+    <h2>Where each model wins and fails</h2>
+    <p class="small muted">Relative WQL per shape (geometric mean over 10 seeds). Blue: better than seasonal naive, red: worse, gray: about the same.</p>
+    <div class="card table-wrap" id="heat"></div>
+
+    <h2>The fresh split</h2>
+    <div class="card small" id="splits"></div>
+  </main>
+  <div class="tooltip" id="tip"></div>
+  <script type="module" src="/src/pages/results.ts"></script>
+</body>
+</html>

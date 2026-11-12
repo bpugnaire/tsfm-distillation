@@ -1,0 +1,31 @@
+{
+  "name": "tinycast-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "d3-array": "3.2.4",
+    "d3-axis": "3.0.0",
+    "d3-scale": "4.0.2",
+    "d3-selection": "3.0.0",
+    "d3-shape": "3.2.0",
+    "onnxruntime-web": "1.31.1"
+  },
+  "devDependencies": {
+    "@types/d3-array": "3.2.1",
+    "@types/d3-axis": "3.0.6",
+    "@types/d3-scale": "4.0.8",
+    "@types/d3-selection": "3.0.11",
+    "@types/d3-shape": "3.1.6",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-darwin-arm64": "1.2.19"
+  }
+}

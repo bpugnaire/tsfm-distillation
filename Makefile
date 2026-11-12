@@ -23,9 +23,9 @@ test-all:
 data:
 	$(UV) python scripts/download_data.py
 
-# make cache T=toto-22m [N=...]
-cache:
-	$(UV) python scripts/cache_teachers.py --teacher $(T) $(if $(N),--max-windows $(N),)
+
+cache:  # make cache T=t0-gamma C=configs/train/<recipe>.yaml
+	$(UV) python scripts/cache_teachers.py --teacher $(T) --train-config $(C)
 
 # make train C=configs/train/gt_only_m.yaml
 train:

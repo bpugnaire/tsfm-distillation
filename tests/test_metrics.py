@@ -121,3 +121,14 @@ def test_aggregation():
     assert point == lo == hi == pytest.approx(3.0)
     point, lo, hi = M.bootstrap_ci(np.random.default_rng(0).lognormal(size=200))
     assert lo < point < hi
+
+
+def test_cluster_bootstrap_is_wider_for_correlated_items():
+    rng = np.random.default_rng(0)
+    # 5 clusters, 40 near-identical items each: effective sample size is 5, not 200
+    cluster_level = rng.lognormal(0, 0.5, 5)
+    x = np.repeat(cluster_level, 40) * rng.lognormal(0, 0.01, 200)
+    groups = np.repeat(np.arange(5), 40)
+    _, lo_i, hi_i = M.bootstrap_ci(x)
+    _, lo_c, hi_c = M.bootstrap_ci(x, groups=groups)
+    assert (hi_c - lo_c) > 3 * (hi_i - lo_i)

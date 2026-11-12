@@ -1,0 +1,14 @@
+# Time cutoffs (UTC) on the *forecast target* timestamps. Enforced by tests/test_leakage.py.
+# Rationale and dates: docs/decisions/0003-splits.md
+train_end: "2025-12-31T23:00:00Z"   # last hour a training target may cover
+val_start: "2026-01-01T00:00:00Z"
+val_end: "2026-08-31T23:00:00Z"     # last hour a validation target may cover
+fresh_start: "2026-10-15T00:00:00Z" # day after the latest model release used (Timestral 2026-10-14)
+# releases (HF createdAt) the fresh_start must exceed
+model_releases:
+  chronos-2: "2025-10-30"
+  toto-2.0: "2026-04-14"
+  t0-gamma: "2026-10-12"
+  timestral: "2026-10-14"
+# training seeds for synthetic/shape data must be < this; gallery seeds are >= it
+gallery_seed_offset: 1000000
