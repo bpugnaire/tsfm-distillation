@@ -90,6 +90,41 @@
   On the multi-domain test it is much closer: <b data-arm="stage_a|multidomain_test|kd_multidomain"></b> vs Toto 2.0 4M at <b data-zoo="stage_a|multidomain_test|toto-2.0-4m"></b>.
   A 0.22M-parameter student trained for 2 minutes on 30,000 windows does not generalise to a domain it never saw. Two levers remain: <b>scale</b> (Stage C) and <b>fine-tuning on the target domain</b> (Stage D).</p>
 
+<h2 id="stage-c">Stage C-lite: does scale close the gap?</h2>
+<p>Stage A left a big gap on electricity. Stage C-lite changes three things at once compared with Stage A: <b>10× more data</b> (300,000 windows),
+  <b>mixed sources</b> (half synthetic, half real, since each source won on its own ground), and a <b>4× bigger student</b> (0.95M parameters), trained for 15,000 steps.
+  To know which change did what, it also trains three <b>one-factor-off</b> arms: the same recipe with ground truth instead of teacher labels, with the small student, and with only 30,000 windows.</p>
+<div class="callout pitfall"><b>Fair scaling</b>
+  More data only helps if the model actually sees it. The 30,000-window arm is trained for 1,500 steps instead of 15,000, so both make the same number of passes over their data (about 13).
+  Otherwise "300k vs 30k" would really measure "trained 10× longer".</div>
+
+<h3>The levers, ranked</h3>
+<div class="card widget">
+  <svg id="w-levers"></svg>
+  <p class="small muted">Each bar: the paired ratio between the full recipe and the arm with that lever removed (below 1 = the lever helps), on each test suite, with its 95% interval.
+    Source: <code>results/study/stage_c_lite/table.json</code>.</p>
+</div>
+<ul>
+  <li><b>Data is the biggest lever</b>: 300k vs 30k windows gives <b data-pair="stage_c_lite|shapes|kd_mix_m_300k|kd_mix_m_30k"></b> on shapes and <b data-pair="stage_c_lite|fresh_fr_power|kd_mix_m_300k|kd_mix_m_30k"></b> on electricity.
+    The student only learns its teacher where it is shown inputs (chapter 4). Ten times more, and more varied, contexts cover more of what it will meet at test time: less covariate shift.</li>
+  <li><b>Teacher labels still beat ground truth at scale</b>: <b data-pair="stage_c_lite|shapes|kd_mix_m_300k|gt_mix_m_300k"></b> (shapes), <b data-pair="stage_c_lite|multidomain_test|kd_mix_m_300k|gt_mix_m_300k"></b> (multi-domain), <b data-pair="stage_c_lite|fresh_fr_power|kd_mix_m_300k|gt_mix_m_300k"></b> (electricity).
+    This matters: a skeptic could have said "distillation only helps when data is scarce". But the target-noise argument of the widget above does not depend on the number of contexts.
+    Each context still comes with one noisy future, however many contexts you have.</li>
+  <li><b>Size helps, but least</b>: 0.95M vs 0.22M gives <b data-pair="stage_c_lite|shapes|kd_mix_m_300k|kd_mix_s_300k"></b> (shapes) and <b data-pair="stage_c_lite|fresh_fr_power|kd_mix_m_300k|kd_mix_s_300k"></b> (electricity).
+    At this data scale, the small model is limited more by what it sees than by its capacity. Scaling laws for language models say the same: data and size must grow together.</li>
+</ul>
+
+<h3>The student next to the giants (zero-shot, no fine-tuning)</h3>
+<div class="card widget"><svg id="w-vsbig"></svg>
+  <p class="small muted">Paired ratio student / model (below 1 = the student is better), each model used as-is. Multi-domain test flagged: the big models may have seen those public datasets in pretraining.</p></div>
+<p>The 0.95M student scores <b data-arm="stage_c_lite|fresh_fr_power|kd_mix_m_300k"></b> on electricity, a domain it never saw (Stage A's best: <b data-arm="stage_a|fresh_fr_power|kd_multidomain"></b>, i.e. no better than repeating the last season).
+  It <b>beats Toto 2.0 4m</b> (4.3× bigger) on shapes, <b data-pair="stage_c_lite|shapes|kd_mix_m_300k|zoo:toto-2.0-4m"></b>, and <b>ties it</b> on the multi-domain test, <b data-pair="stage_c_lite|multidomain_test|kd_mix_m_300k|zoo:toto-2.0-4m"></b>.
+  It still trails its own teacher everywhere, <b data-pair="stage_c_lite|fresh_fr_power|kd_mix_m_300k|zoo:timestral-209m"></b> on electricity, and Toto 4m on electricity, <b data-pair="stage_c_lite|fresh_fr_power|kd_mix_m_300k|zoo:toto-2.0-4m"></b>.
+  Closing that last gap is what fine-tuning on your own data (final Stage D) is for.</p>
+<div class="callout pitfall"><b>How sure are we?</b>
+  One seed. The intervals cover the randomness of the <em>test windows</em>, not of training: a second seed could move each arm by a few percent.
+  Effects of 10–25% (data, teacher labels on shapes) are safe; the 3% size effect on the multi-domain test needs more seeds before it can be trusted (Stage B uses 3 seeds, but for other factors).</div>
+
 <h2 id="sanity">Sanity checks that saved the study</h2>
 <p>Experiments fail silently far more often than they crash. What caught our bugs:</p>
 <ul>
@@ -107,5 +142,9 @@
   <p>No detectable difference: the paired interval includes 1. (These are the Stage A numbers for teacher vs ground truth on the multi-domain test.)</p></details>
 <details class="check"><summary>3. Using the bias–variance widget: when would ground truth beat a teacher even with one observation per context?</summary>
   <p>When the outcome is nearly noise-free (the real future is already the right target) or when the teacher is badly biased on that kind of data, as on unusual synthetic shapes.</p></details>
-<details class="check"><summary>4. Why is a 1-seed result called a "pilot"?</summary>
+<details class="check"><summary>4. Why does the 30k-window arm of Stage C-lite train for 1,500 steps and not 15,000?</summary>
+  <p>To compare data amounts at the same number of passes over the data. With 15,000 steps on 30k windows it would see each window ten times more often: the comparison would mix "more data" with "less overfitting control".</p></details>
+<details class="check"><summary>5. Teacher labels beat ground truth by 15% at 30k windows. Should we expect the gain to vanish at 300k?</summary>
+  <p>Not if the gain comes from target noise: each context still has a single observed future at any scale. Stage C-lite measured 4–15%, consistent with that.</p></details>
+<details class="check"><summary>6. Why is a 1-seed result called a "pilot"?</summary>
   <p>Training randomness (initialisation, batch order) moves scores too. An effect smaller than the seed-to-seed spread can be noise; headline results use 3 seeds (Stage B onwards).</p></details>

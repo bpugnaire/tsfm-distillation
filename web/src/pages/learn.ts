@@ -583,3 +583,38 @@ if ($("w-target")) {
   for (const id of ["tg-bias", "tg-spread"]) $(id)!.addEventListener("input", draw);
   draw();
 }
+
+// ch6: Stage C-lite levers and comparison with the big models ---------------------------------------------------------
+if ($("w-levers") || $("w-vsbig")) {
+  interface SC { a: string; b: string; ratio: [number, number, number] }
+  type St = Record<string, { suites: Record<string, { pairs?: SC[] }> }>;
+  loadJSON<St>("study.json").then((st) => {
+    const suites: [string, string][] = [["shapes", "shapes"], ["multidomain_test", "multi-domain"], ["fresh_fr_power", "electricity"]];
+    const chart = (id: string, rows: [string, string][]) => {
+      const c = st.stage_c_lite;
+      if (!c) { $(id)!.outerHTML = `<p class="muted">Stage C-lite results not available yet.</p>`; return; }
+      const W = 720, rowH = 18, groupH = suites.length * rowH + 16, H = rows.length * groupH + 26, ml = 230;
+      const svg = svgOf(id, W, H)!;
+      const x = scaleLinear().domain([Math.log(0.6), Math.log(1.5)]).range([ml, W - 60]);
+      const lx = (v: number) => x(Math.log(Math.min(1.5, Math.max(0.6, v))));
+      svg.append("line").attr("x1", lx(1)).attr("x2", lx(1)).attr("y1", 4).attr("y2", H - 20).attr("stroke", cssVar("--ink")).attr("stroke-dasharray", "3 3");
+      for (const t of [0.6, 0.8, 1, 1.25, 1.5]) svg.append("text").attr("x", lx(t)).attr("y", H - 5).attr("text-anchor", "middle").text(t);
+      rows.forEach(([b, label], g) => {
+        const y0 = 12 + g * groupH;
+        svg.append("text").attr("x", 8).attr("y", y0 + rowH).style("fill", cssVar("--ink")).text(label);
+        suites.forEach(([s, sl], k) => {
+          const p = c.suites[s]?.pairs?.find((q) => q.a === "kd_mix_m_300k" && q.b === b);
+          const y = y0 + k * rowH + 6;
+          svg.append("text").attr("x", ml - 8).attr("y", y + 4).attr("text-anchor", "end").text(sl);
+          if (!p) return;
+          const [r, lo, hi] = p.ratio, col = hi < 1 ? cssVar("--student") : lo > 1 ? cssVar("--teacher") : cssVar("--baseline");
+          svg.append("line").attr("x1", lx(lo)).attr("x2", lx(hi)).attr("y1", y).attr("y2", y).attr("stroke", col).attr("stroke-width", 3);
+          svg.append("circle").attr("cx", lx(r)).attr("cy", y).attr("r", 4.5).attr("fill", col);
+          svg.append("text").attr("x", lx(hi) + 6).attr("y", y + 4).text(r.toFixed(2));
+        });
+      });
+    };
+    if ($("w-levers")) chart("w-levers", [["kd_mix_m_30k", "10× more data (300k vs 30k)"], ["gt_mix_m_300k", "teacher labels vs ground truth"], ["kd_mix_s_300k", "4× bigger student (0.95M vs 0.22M)"]]);
+    if ($("w-vsbig")) chart("w-vsbig", [["zoo:toto-2.0-4m", "vs Toto 2.0 4m (4.1M)"], ["zoo:timestral-5m", "vs Timestral 5M (5.2M)"], ["zoo:timestral-209m", "vs its teacher Timestral 209M"]]);
+  });
+}
