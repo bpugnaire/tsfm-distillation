@@ -4,5 +4,8 @@
  "gt_s2": "runs/2026-11-13_stage_b_gt_s2",
  "kd_timestral_s0": "runs/2026-11-13_stage_b_kd_timestral_s0",
  "kd_timestral_s1": "runs/2026-11-13_stage_b_kd_timestral_s1",
- "kd_timestral_s2": "runs/2026-11-13_stage_b_kd_timestral_s2"
+ "kd_timestral_s2": "runs/2026-11-13_stage_b_kd_timestral_s2",
+ "kd_timestral_a05_s0": "runs/2026-11-13_stage_b_kd_timestral_a05_s0",
+ "kd_timestral_a05_s1": "runs/2026-11-13_stage_b_kd_timestral_a05_s1",
+ "kd_timestral_a05_s2": "runs/2026-11-13_stage_b_kd_timestral_a05_s2"
 }

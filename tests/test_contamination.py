@@ -38,3 +38,17 @@ def test_tail_share_only_counts_the_end():
     r = C.check_dataset(fp, [np.concatenate([a[:1000], b[:1000]])])
     assert r["seen_share"] == pytest.approx(0.5, abs=0.05)
     assert r["seen_share_tail"] == pytest.approx(0.0)
+
+
+def test_sparse_spike_chunks_do_not_match_unrelated_series():
+    """Regression (GIFT-Eval car_parts): a lone spike on a flat line looks the same in any series once z-normalised."""
+    rng = np.random.default_rng(0)
+    train = np.zeros(5000)
+    train[rng.choice(5000, 40, replace=False)] = rng.uniform(1, 50, 40)  # occupancy-like blips
+    bench = np.zeros(3000)
+    bench[rng.choice(3000, 30, replace=False)] = 1.0  # intermittent demand counts
+    fp = C.Fingerprint.build({"ours": [train, _series(0)]})
+    assert C.check_dataset(fp, [bench])["seen_share"] == 0.0
+    assert C.check_dataset(fp, [_series(0)])["seen_share"] == pytest.approx(
+        1.0
+    )  # real content still detected

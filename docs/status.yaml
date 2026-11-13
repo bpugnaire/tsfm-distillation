@@ -4,6 +4,9 @@ current_focus: >-
   Study queue running on the Mac (no overlap): Stage D pilot (fine-tuning on your data) -> Stage C-lite (scale) ->
   Stage B (teachers x alpha, 3 seeds) -> final Stage D (warm + cold start). Log: runs/queue.log. Results appear on the Study page as each stage ends.
 pending_decisions:
+  - id: clean-retrain
+    question: Retrain the final student without the 4 datasets that are GIFT-Eval test sets, then evaluate on GIFT-Eval short-term + fev (zero-overlap tasks only)?
+    note: docs/decisions/0006-benchmarks-and-contamination.md (~1.5 h retrain + evaluation harness)
   - id: after-queue
     question: After D, C-lite and B, which recipe goes to the full Stage C (scale) and the final Stage D (3 seeds)?
     note: decided on validation; results on the Study page

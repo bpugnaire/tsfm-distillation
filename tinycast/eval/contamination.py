@@ -13,6 +13,8 @@ sometimes rescaled. So we compare *content*:
 
 False positives need 32 consecutive z-normalised values to agree to 0.01: negligible for real series. Exactly periodic
 patterns can collide across unrelated series; they are rare in real data and show up as small shares, not as ~100%.
+Low-information chunks (fewer than MIN_DISTINCT distinct values: spikes on a flat line, steps) are skipped: on sparse /
+intermittent series they matched unrelated data.
 """
 
 from __future__ import annotations
@@ -26,7 +28,12 @@ _P = np.uint64(1_000_003)
 _POW = np.array([pow(1_000_003, L - 1 - j, 2**64) for j in range(L)], dtype=np.uint64)
 
 
-def chunk_hashes(x: np.ndarray, stride: int = 1, min_std: float = 1e-6) -> np.ndarray:
+MIN_DISTINCT = 8  # a chunk must take >= 8 distinct values to count as evidence
+
+
+def chunk_hashes(
+    x: np.ndarray, stride: int = 1, min_std: float = 1e-6, min_distinct: int = MIN_DISTINCT
+) -> np.ndarray:
     """Hashes of all z-normalised L-chunks of a 1-D series at the given stride (uint64, flat/NaN chunks dropped)."""
     x = np.asarray(x, dtype=np.float64)
     if len(x) < L:
@@ -38,6 +45,12 @@ def chunk_hashes(x: np.ndarray, stride: int = 1, min_std: float = 1e-6) -> np.nd
     keep = sd > min_std * (1 + np.abs(w.mean(axis=1)))
     w, sd = w[keep], sd[keep]
     z = np.round((w - w.mean(axis=1, keepdims=True)) / sd[:, None], 2)
+    # Low-information chunks (e.g. 31 equal values + one spike in intermittent or night-zero series) have the same
+    # z-normalised shape in unrelated series: false matches. Require enough distinct values (found on GIFT-Eval:
+    # car_parts 23% "seen" before this filter).
+    zs = np.sort(z, axis=1)
+    n_distinct = 1 + (np.diff(zs, axis=1) != 0).sum(axis=1)
+    z = z[n_distinct >= min_distinct]
     q = (
         (z * 100).astype(np.int64).view(np.uint64)
     )  # two's complement view: stable integer code per value

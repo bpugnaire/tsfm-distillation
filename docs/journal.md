@@ -173,3 +173,16 @@ KD vs GT, m vs s (0.22M), 300k vs 30k windows (same number of passes), vs Stage-
 
 **Next:** Stage B (teachers × α, s-size, running) and final Stage D (fine-tuning; its init is chosen on validation and will very
 likely be this run: val WQL 0.1377, the best so far).
+
+## 2026-11-13 — Contamination check against GIFT-Eval and fev
+
+**Did:** content-level check (`tinycast/eval/contamination.py`, `scripts/contamination_check.py`): 18.2M chunk hashes of every
+training / fine-tuning series vs every GIFT-Eval and fev series. ADR 0006.
+
+**Result (`results/contamination/`):** overlap in GIFT-Eval covid_deaths / kdd_cup_2018 / saugeenday (100%), temperature_rain (3.4%),
+m4_hourly (9.2%, from our pedestrian counts), m4_monthly (0.08%); fev fred_md_2025 (53%). Zero overlap: 50/56 GIFT-Eval, 99/100 fev datasets.
+
+**Surprise / learned:** (1) first version flagged car_parts at 23% and solar at 3%: false positives from low-information chunks
+(a spike on a flat line looks identical in any series once z-normalised) → require ≥ 8 distinct values (+ regression test).
+(2) M4-hourly contains pedestrian-count series: a dataset we treated as a clean "held-out domain" is partly inside a famous benchmark.
+(3) 4 of our 11 training datasets are GIFT-Eval *test* sets: name-level checks would have caught those, but not (2).

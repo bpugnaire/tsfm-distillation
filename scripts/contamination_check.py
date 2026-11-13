@@ -43,6 +43,11 @@ def _series_from_table(t: pa.Table) -> list[np.ndarray]:
         typ = t.schema.field(col).type
         if not (pa.types.is_list(typ) or pa.types.is_large_list(typ)):
             continue
+        inner = typ.value_type
+        while pa.types.is_list(inner) or pa.types.is_large_list(inner):
+            inner = inner.value_type
+        if not (pa.types.is_floating(inner) or pa.types.is_integer(inner)):
+            continue  # text / categorical sequences (e.g. holiday names in fev)
         for row in t.column(col).to_pylist():
             if row is None or len(row) == 0:
                 continue
