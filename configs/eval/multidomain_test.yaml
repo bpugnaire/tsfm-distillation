@@ -1,0 +1,20 @@
+# Held-out multi-domain test (last 15% of each series, 9 datasets, balanced). Flagged: teachers may have seen these public datasets.
+suite: multidomain_test
+season: freq  # per-series season from each dataset's sampling frequency
+horizon: 64
+context_length: 512
+latency: true
+models:
+  - {kind: seasonal_naive, name: seasonal_naive}
+  - {kind: ets, name: ets}
+  - {kind: toto, name: toto-2.0-4m, checkpoint: Datadog/Toto-2.0-4m}
+  - {kind: toto, name: toto-2.0-22m, checkpoint: Datadog/Toto-2.0-22m}
+  - {kind: toto, name: toto-2.0-313m, checkpoint: Datadog/Toto-2.0-313m}
+  - {kind: t0, name: t0-gamma, checkpoint: theforecastingcompany/t0-gamma}
+  - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
+  - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
+  # Timestral: comparator only (owner confirmed licence eligibility 2026-11-13, personal project)
+  - {kind: timestral, name: timestral-5m, checkpoint: mistralai/Timestral-5M}
+  - {kind: timestral, name: timestral-28m, checkpoint: mistralai/Timestral-28M}
+  - {kind: timestral, name: timestral-209m, checkpoint: mistralai/Timestral-209M}
+  # PREVIEW student (GT-only, 3000 steps, single seed): pipeline preview, NOT the study result.

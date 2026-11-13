@@ -57,9 +57,17 @@ class SeasonalNaive:
         self.name = name
         self.season = season
 
-    def _one(self, ctx: np.ndarray, h: int) -> np.ndarray:
+    def _season(self, i: int, x: np.ndarray) -> int:
+        if isinstance(
+            self.season, list | tuple
+        ):  # per-series seasons (from each dataset's frequency)
+            return int(self.season[i])
+        return estimate_season(x) if self.season == "auto" else int(self.season)
+
+    def _one(self, ctx: np.ndarray, h: int, i: int = 0) -> np.ndarray:
         x = interpolate_nans(ctx)
-        m = estimate_season(x) if self.season == "auto" else int(self.season)
+        m = self._season(i, x)
+        m = m if len(x) > m else 1  # context shorter than one season: plain naive
         steps = np.arange(1, h + 1)
         k = np.ceil(steps / m).astype(int)  # seasons we must step back to reach an observed value
         # most recent observation with the same phase: x_{T-1+s-m*ceil(s/m)} (m=1 -> last value)
@@ -69,7 +77,7 @@ class SeasonalNaive:
         return point[None, :] + rq[:, None] * np.sqrt(k)[None, :]
 
     def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
-        q = np.stack([self._one(c, horizon) for c in context])
+        q = np.stack([self._one(c, horizon, i) for i, c in enumerate(context)])
         q = np.sort(q, axis=1)
         return check_output(q, len(context), horizon, self.name)
 
@@ -86,11 +94,11 @@ class ETS:
         self.max_season = max_season
         self.fallbacks: list[str] = []  # written to the results JSON: never silent
 
-    def _one(self, ctx: np.ndarray, h: int) -> np.ndarray:
+    def _one(self, ctx: np.ndarray, h: int, i: int = 0) -> np.ndarray:
         from statsforecast.models import AutoETS
 
         x = interpolate_nans(ctx)
-        m = estimate_season(x) if self.season == "auto" else int(self.season)
+        m = SeasonalNaive._season(self, i, x)  # type: ignore[arg-type]
         if m > self.max_season:
             self.fallbacks.append(f"season {m} > {self.max_season}: non-seasonal ETS")
             m = 1
@@ -114,5 +122,5 @@ class ETS:
         return np.stack(out)  # non-finite values are rejected by check_output (no silent fix)
 
     def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
-        q = np.stack([self._one(c, horizon) for c in context])
+        q = np.stack([self._one(c, horizon, i) for i, c in enumerate(context)])
         return check_output(q, len(context), horizon, self.name)

@@ -23,18 +23,12 @@ pending_decisions:
     question: How many seeds, and which effect size can the fresh split detect?
   - id: fresh-split
     question: Review ADR 0003 (fresh test starts 2026-10-15, ~4 weeks of data).
-  - id: baseline-seasons
-    question: Fix the baselines' season on electricity instead of auto-detecting it?
-    options: [ETS m=24 + seasonal naive m=24, seasonal naive m=168 (weekly), keep auto]
-    note: >-
-      Auto-detection picks 168 h on some fresh windows; statsforecast ETS cannot fit seasons > 24 and silently
-      went non-seasonal (now recorded in results/fresh_fr_power/ets.json "fallbacks"). That makes ETS a weak
-      baseline on real data. Changing the denominator changes every relative score.
 decided:
   - {date: "2026-11-12", what: "Python 3.12 (toto-2 requires it)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-12", what: "Headline metric = 9-level WQL relative to seasonal naive, cluster bootstrap over series", ref: docs/decisions/0002-metrics.md}
   - {date: "2026-11-12", what: "Vendor post-processing tricks off for every model (raw model policy)", ref: docs/notes/teacher-apis.md}
   - {date: "2026-11-13", what: "Timestral enabled as a comparator (owner: personal project, licence clause does not apply)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Ask the owner before any long run on the Mac; learn step by step", ref: docs/journal.md}
+  - {date: "2026-11-13", what: "Baseline season from sampling frequency on real data (hourly -> 24); auto only for synthetic shapes", ref: configs/eval/fresh_fr_power.yaml}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}

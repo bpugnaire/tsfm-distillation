@@ -22,6 +22,8 @@ if __name__ == "__main__":
     for entry in cfg.models:
         if wanted and entry.name not in wanted:
             continue
+        if cfg.season and entry.kind in ("seasonal_naive", "ets"):
+            entry.season = list(suite.season) if cfg.season == "freq" else cfg.season
         print(f"[{entry.name}] building", flush=True)
         model = build_model(entry)
         r = run_model(model, entry, suite, cfg, out)

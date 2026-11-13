@@ -1,5 +1,6 @@
 # Headline benchmark: RTE consumption, 13 series, targets >= fresh_start (configs/data/splits.yaml), daily origins 00:00 UTC.
 suite: fresh_fr_power
+season: 24  # hourly data -> daily season for the baselines (owner decision 2026-11-13)
 horizon: 64
 context_length: 512
 latency: true

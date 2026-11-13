@@ -20,3 +20,6 @@ web/dist/
 results/*/*.json
 !results/*/summary.json
 !results/export/*.json
+# study: raw per-model outputs ignored; summaries, tables and run index committed
+results/study/*/*/*.json
+!results/study/*/*/summary.json

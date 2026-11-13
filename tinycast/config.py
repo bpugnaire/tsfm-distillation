@@ -56,8 +56,13 @@ def _build(tp: Any, value: Any, where: str) -> Any:
         args = typing.get_args(tp)
         if value is None and type(None) in args:
             return None
-        non_none = [a for a in args if a is not type(None)]
-        return _build(non_none[0], value, where)
+        errors = []
+        for a in (a for a in args if a is not type(None)):  # first type that accepts the value wins
+            try:
+                return _build(a, value, where)
+            except ConfigError as e:
+                errors.append(str(e))
+        raise ConfigError(f"{where}: {value!r} matches none of {args}: {errors}")
     if origin in (list, tuple):
         args = typing.get_args(tp)
         inner = args[0] if args else Any
@@ -125,6 +130,11 @@ class DataConfig:
     synthetic_share: float = 1.0
     seed: int = 0
     teacher: str | None = None  # name of a teacher cache, required when alpha > 0
+    # Explicit input-source mix (overrides n_*_windows / synthetic_share when non-empty), e.g.
+    # {multidomain: 30000}. val_mix: a validation set shared by all arms of a study (comparable selection).
+    mix: dict[str, int] = dataclasses.field(default_factory=dict)
+    val_mix: dict[str, int] = dataclasses.field(default_factory=dict)
+    rollout_max_blocks: int = 3
 
 
 @dataclasses.dataclass
@@ -160,6 +170,9 @@ class ModelEntry:
     checkpoint: str | None = None
     batch_size: int = 32
     device: str = "cpu"
+    season: int | str | list[int] = (
+        "auto"  # baselines only; from the suite's sampling frequency when known
+    )
 
 
 @dataclasses.dataclass
@@ -171,5 +184,10 @@ class BenchConfig:
         1_000_000  # gallery seeds are disjoint from training seeds (< 1e6), see test_leakage
     )
     n_seeds: int = 1  # instances per shape (shapes suite); gallery shows the first
+    # Baseline season from the data's sampling frequency (GIFT-Eval convention: hourly -> 24, daily -> 7...).
+    # None = auto-detect from the context (used for synthetic shapes, which have no time unit).
+    season: int | str | None = (
+        None  # int, "freq" (per-series from the dataset's frequency), or None (auto)
+    )
     models: list[ModelEntry] = dataclasses.field(default_factory=list)
     latency: bool = True

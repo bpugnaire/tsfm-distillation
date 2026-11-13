@@ -33,6 +33,13 @@ def _decode(blobs, K: int, H: int) -> np.ndarray:
     return np.stack([np.frombuffer(b, dtype=np.float16).reshape(K, H) for b in blobs])
 
 
+def ids_fingerprint(ids: np.ndarray) -> str:
+    """Hash of the window ids, in order: a cache is only valid for exactly this corpus content."""
+    import hashlib
+
+    return hashlib.sha1("\n".join(map(str, ids)).encode()).hexdigest()[:16]
+
+
 def write_cache(
     teacher: str,
     corpus_key: str,
@@ -47,9 +54,10 @@ def write_cache(
     d = cache_dir(teacher, corpus_key)
     d.mkdir(parents=True, exist_ok=True)
     man_path = d / "manifest.json"
+    meta = {**meta, "ids_sha": ids_fingerprint(ids)}
     man = json.loads(man_path.read_text()) if man_path.exists() else {**meta, "shards": {}}
     if man_path.exists():
-        for k in ("checkpoint", "levels", "horizon"):
+        for k in ("checkpoint", "levels", "horizon", "ids_sha"):
             if man.get(k) != meta.get(k):
                 raise ValueError(
                     f"cache {d} was built with a different {k}: {man.get(k)} != {meta.get(k)}"
@@ -107,3 +115,52 @@ def check_cache(teacher: str, corpus_key: str, expected_n: int) -> dict:
     if report["n"] != expected_n or report["nan"]:
         raise ValueError(f"cache integrity failed: {report}")
     return report
+
+
+def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = print) -> Path:
+    """Run teacher `entry` (a ModelEntry) over `corpus` (built from CorpusSpec `spec`); resumable."""
+    import importlib.metadata as md
+
+    from tinycast.config import QUANTILE_LEVELS
+    from tinycast.eval.benchmark import git_sha
+    from tinycast.models import build_model
+
+    pkg = {
+        "toto": "toto-2",
+        "t0": "tfc-t0",
+        "chronos2": "chronos-forecasting",
+        "timestral": "timestral",
+    }[entry.kind]
+    d = cache_dir(entry.name, spec.key())
+    man = d / "manifest.json"
+    if (
+        man.exists()
+        and json.loads(man.read_text()).get("ids_sha") == ids_fingerprint(corpus.ids)
+        and sum(json.loads(man.read_text())["shards"].values()) == len(corpus.ids)
+    ):
+        log(f"[{entry.name}] cache complete: {d}")
+        return d
+    model = build_model(entry)
+    meta = {
+        "teacher": entry.name,
+        "checkpoint": entry.checkpoint,
+        "package": f"{pkg}=={md.version(pkg)}",
+        "levels": list(QUANTILE_LEVELS),
+        "native_levels": list(model.native_levels),
+        "horizon": spec.horizon,
+        "context_length": spec.context_length,
+        "corpus_key": spec.key(),
+        "device": entry.device,
+        "git_sha": git_sha(),
+    }
+    out = write_cache(
+        entry.name,
+        spec.key(),
+        corpus.ids,
+        corpus.context,
+        lambda c: model.forecast(c, spec.horizon),
+        meta,
+        log=log,
+    )
+    log(str(check_cache(entry.name, spec.key(), len(corpus.ids))))
+    return out

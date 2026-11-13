@@ -1,0 +1,13 @@
+# SMOKE TEST of the study runner (not a result). Stage A (ADR 0005): which INPUTS should a teacher label? One teacher, alpha = 1, student s, 30k windows/arm, 1 seed (pilot).
+name: smoke
+base: configs/train/study_base_s.yaml
+teacher: timestral-209m          # configs/teachers/<name>.yaml
+reference_arm: kd_multidomain    # paired comparisons are against this arm
+eval_suites: [shapes]
+arms:
+  - {name: kd_multidomain, mix: {multidomain: 300}, alpha: 1.0, override: {optim: {max_steps: 50, eval_every: 25}}}
+  - {name: kd_synth,       mix: {synth: 300},       alpha: 1.0, override: {optim: {max_steps: 50, eval_every: 25}}}
+  - {name: kd_rollout,     mix: {rollout: 300},     alpha: 1.0, override: {optim: {max_steps: 50, eval_every: 25}}}
+  - {name: kd_noise,       mix: {noise: 300},       alpha: 1.0, override: {optim: {max_steps: 50, eval_every: 25}}}
+  - {name: gt_multidomain, mix: {multidomain: 300}, alpha: 0.0, override: {optim: {max_steps: 50, eval_every: 25}}}
+  - {name: gt_synth,       mix: {synth: 300},       alpha: 0.0, override: {optim: {max_steps: 50, eval_every: 25}}}

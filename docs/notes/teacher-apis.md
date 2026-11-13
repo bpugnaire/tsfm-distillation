@@ -40,3 +40,5 @@ All installed together in one Python 3.12 env (`uv sync --extra teachers`).
 - **Defaults differ from t0:** `symmetric_averaging=True` (also forecasts −context and averages; 2× cost) and `clip_nonnegative=True`.
   We pass both `False` (raw-model policy, like t0). Ablation candidate.
 - Block-autoregressive decoding with median feedback beyond 32 patches (1024 steps); horizon 64 is one shot.
+- **Does not run on Apple MPS** (uses float64 internally; MPS has no float64). CPU throughput (M1 Pro, batch 128):
+  209M ≈ 124 windows/s, 28M ≈ 524 windows/s; faster than Toto-313m (54) and t0-gamma (83) on CPU.

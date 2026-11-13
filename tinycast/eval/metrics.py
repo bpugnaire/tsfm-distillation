@@ -141,6 +141,21 @@ def relative_scores(model: np.ndarray, baseline: np.ndarray) -> np.ndarray:
         return np.asarray(model, dtype=np.float64) / np.asarray(baseline, dtype=np.float64)
 
 
+def paired_ratio_ci(
+    a: np.ndarray,
+    b: np.ndarray,
+    groups: np.ndarray | None = None,
+    n_boot: int = 2000,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """Geometric mean of per-window ratios a/b (same windows) with a (cluster) bootstrap CI.
+
+    Paired: both models are scored on the same windows, so window difficulty cancels out. This is far
+    more sensitive than comparing two separately bootstrapped scores. < 1 means a is better.
+    """
+    return bootstrap_ci(relative_scores(a, b), "geomean", n_boot=n_boot, seed=seed, groups=groups)
+
+
 def bootstrap_ci(
     x: np.ndarray,
     stat: str = "geomean",

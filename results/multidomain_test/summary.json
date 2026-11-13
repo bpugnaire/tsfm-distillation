@@ -1,0 +1,120 @@
+{
+ "suite": "multidomain_test",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "timestral-28m",
+   "kind": "timestral",
+   "n_params": 27821184,
+   "size_mb": 111.3,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.6362939651168228,
+   "rel_wql_ci": [
+    0.6030928882987207,
+    0.6709972859577018
+   ],
+   "rel_mase": 0.7010607859602296,
+   "rel_mase_ci": [
+    0.6654956614115277,
+    0.7339129357713284
+   ],
+   "mean_wql": 0.22119878006872853,
+   "mean_cov80": 0.8107484020618556,
+   "mean_cov98": 0.9882445189003437,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 582,
+   "n_clusters": 412
+  },
+  {
+   "model": "toto-2.0-4m",
+   "kind": "toto",
+   "n_params": 4144448,
+   "size_mb": 16.58,
+   "native_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+   ],
+   "rel_wql": 0.7190785249322227,
+   "rel_wql_ci": [
+    0.6854622696597277,
+    0.753686659686138
+   ],
+   "rel_mase": 0.7866217943361788,
+   "rel_mase_ci": [
+    0.7548662027387497,
+    0.8170599250090695
+   ],
+   "mean_wql": 0.24606575601374572,
+   "mean_cov80": 0.8098668556701031,
+   "mean_cov98": 0.9807147766323026,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 582,
+   "n_clusters": 412
+  },
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.4564665807560137,
+   "mean_cov80": 0.8128058762886597,
+   "mean_cov98": 0.9616180068728521,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 582,
+   "n_clusters": 412
+  }
+ ],
+ "git_sha": "23ecaa9e850da0d4128a0634e443ef9dc6079be2-dirty"
+}

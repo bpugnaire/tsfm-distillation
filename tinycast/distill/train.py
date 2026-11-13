@@ -47,6 +47,16 @@ def lr_at(step: int, base: float, warmup: int, total: int) -> float:
 
 def specs(cfg: TrainConfig) -> tuple[CorpusSpec, CorpusSpec]:
     d, s = cfg.data, cfg.student
+    if d.mix:
+        common = dict(
+            seed=d.seed,
+            context_length=s.context_length,
+            horizon=s.horizon,
+            rollout_max_blocks=d.rollout_max_blocks,
+        )
+        tr = CorpusSpec("train", mix=tuple(sorted(d.mix.items())), **common)
+        va = CorpusSpec("val", mix=tuple(sorted((d.val_mix or d.mix).items())), **common)
+        return tr, va
     n_syn = int(round(d.n_train_windows * d.synthetic_share))
     n_syn_val = int(round(d.n_val_windows * d.synthetic_share))
     tr = CorpusSpec("train", d.n_train_windows - n_syn, n_syn, d.seed, s.context_length, s.horizon)

@@ -71,3 +71,25 @@ def test_real_data_splits_if_present():
     assert fresh and all(w.target_start >= SP.fresh_start for w in fresh)
     val = sample_windows(series, "val", SP, n_windows=200, seed=0)
     assert all(SP.val_start <= w.target_start and w.target_end <= SP.val_end for w in val)
+
+
+def test_multidomain_windows_exact_count_and_split_positions():
+    from tinycast.data.sources import hf_datasets as H
+
+    try:
+        series = H.load_all()
+    except FileNotFoundError:
+        pytest.skip("multidomain data not downloaded")
+    for split in ("train", "val", "test"):
+        ctx, fut, ids, _ = H.windows(series, split, 500, seed=1)
+        assert len(ctx) == len(ids) == 500
+        assert (np.isfinite(fut).mean(1) >= 0.9).all()
+        lo, hi = H.SPLITS[split]
+        lengths = {f"{s.dataset}/{s.series_id}": len(s.values) for s in series}
+        for i in ids:
+            key, start = i.rsplit("@", 1)
+            L = lengths[key]
+            assert int(start) >= int(lo * L) and int(start) + 64 <= int(
+                hi * L
+            )  # target inside the split
+    assert not any(s.dataset in H.HELD_OUT for s in series)

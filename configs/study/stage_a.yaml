@@ -1,0 +1,13 @@
+# Stage A (ADR 0005): which INPUTS should a teacher label? One teacher, alpha = 1, student s, 30k windows/arm, 1 seed (pilot).
+name: stage_a
+base: configs/train/study_base_s.yaml
+teacher: timestral-209m          # configs/teachers/<name>.yaml
+reference_arm: kd_multidomain    # paired comparisons are against this arm
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: kd_multidomain, mix: {multidomain: 30000}, alpha: 1.0}
+  - {name: kd_synth,       mix: {synth: 30000},       alpha: 1.0}
+  - {name: kd_rollout,     mix: {rollout: 30000},     alpha: 1.0}
+  - {name: kd_noise,       mix: {noise: 30000},       alpha: 1.0}
+  - {name: gt_multidomain, mix: {multidomain: 30000}, alpha: 0.0}
+  - {name: gt_synth,       mix: {synth: 30000},       alpha: 0.0}

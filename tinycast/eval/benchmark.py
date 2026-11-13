@@ -43,6 +43,19 @@ def load_suite(name: str, cfg: BenchConfig) -> Suite:
             [s.meta["period"] for s in g],
             [dict(s.meta, future_noiseless=s.future_noiseless.tolist()) for s in g],
         )
+    if name in ("multidomain_test", "pedestrian_test"):
+        from tinycast.data.sources import hf_datasets as H
+
+        held = name == "pedestrian_test"
+        series = [s for s in H.load_all(include_held_out=True) if (s.dataset in H.HELD_OUT) == held]
+        ctx, fut, ids, seasons = H.windows(
+            series, "test", 600, seed=12345, context_length=cfg.context_length, horizon=cfg.horizon
+        )
+        return Suite(
+            name, ids, ctx, fut, list(seasons),
+            [dict(series_id=i.split("@")[0], dataset=i.split("/")[0]) for i in ids],
+            flag="public datasets: teachers may have seen them in pretraining",
+        )  # fmt: skip
     if name == "fresh_fr_power":
         from tinycast.data.sources.rte_eco2mix import fresh_suite
 

@@ -146,3 +146,14 @@ def test_seasonal_naive_uses_most_recent_season():
     )
     q1 = SeasonalNaive(season=1).forecast(x, 3)  # m=1: random-walk naive = last value
     assert q1[0, QUANTILE_LEVELS.index(0.5), 0] == pytest.approx(22 + np.median(np.diff(x[0])))
+
+
+def test_paired_ratio_ci():
+    rng = np.random.default_rng(0)
+    difficulty = rng.lognormal(0, 1.0, 300)  # huge window-to-window variation
+    a, b = 0.9 * difficulty, difficulty  # a is uniformly 10% better
+    point, lo, hi = M.paired_ratio_ci(a, b)
+    assert point == pytest.approx(0.9) and hi < 1.0  # paired: clearly detected
+    _, lo_a, hi_a = M.bootstrap_ci(a)
+    _, lo_b, hi_b = M.bootstrap_ci(b)
+    assert lo_b < hi_a  # unpaired intervals overlap: the difference would look inconclusive

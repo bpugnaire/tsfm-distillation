@@ -38,3 +38,5 @@ def test_roundtrip_resume_and_alignment(tmp_root):
         C.write_cache(
             "t", "k", ids, ctx, _fn(calls), {**meta, "checkpoint": "y"}, log=lambda s: None
         )
+    with pytest.raises(ValueError):  # same key, different corpus content -> refuse to mix
+        C.write_cache("t", "k", ids[::-1], ctx, _fn(calls), meta, log=lambda s: None)

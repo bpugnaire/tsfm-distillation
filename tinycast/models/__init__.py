@@ -10,11 +10,11 @@ def build_model(entry: ModelEntry):
     if kind == "seasonal_naive":
         from tinycast.models.baselines import SeasonalNaive
 
-        return SeasonalNaive(entry.name)
+        return SeasonalNaive(entry.name, season=entry.season)
     if kind == "ets":
         from tinycast.models.baselines import ETS
 
-        return ETS(entry.name)
+        return ETS(entry.name, season=entry.season)
     if kind in ("toto", "t0", "chronos2", "timestral"):
         from tinycast.models import teachers as T
 
