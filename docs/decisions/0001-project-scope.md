@@ -16,7 +16,8 @@ rigorous study + demo. Constraints: free GPUs only, no fabricated numbers, fresh
   user's company or employer has > $20M monthly revenue. The owner must confirm eligibility before we
   even run it as a comparator. ~~The adapter raises `PermissionError` until then.~~
   **Update 2026-11-13:** owner confirmed this is a personal project, so the revenue clause does not apply. Timestral is
-  enabled as a **comparator** (5M/28M/209M). Distilling *from* Timestral still needs an explicit owner decision (CLAUDE.md §2.4).
+  enabled as a **comparator** (5M/28M/209M). **Update 2026-11-13 (later):** the owner also approved Timestral as a
+  distillation **teacher**.
 - Chronos-2: comparator only (Apache-2.0).
 
 ## Consequences

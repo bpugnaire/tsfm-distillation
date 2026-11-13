@@ -72,3 +72,22 @@ better relative to it. Found when the Learn page extracted the function's source
 
 **Next:** owner decisions in `docs/status.yaml`; the input-family result suggests an experiment: same student, teacher labels on
 {real, KernelSynth, shapes, white noise} contexts, evaluated on fresh + shapes.
+
+## 2026-11-13 — Teacher rollouts, data sources, study design
+
+**Did:** prototype of owner's idea "start the teacher on real data and loop back to generate long series"
+(`scripts/rollout_study.py`, 24 series × 2 sources × 2 teachers × 3 path strategies × 16 blocks of 64, 24 s on CPU).
+Surveyed open multi-domain sources. Wrote ADR 0005 (proposed study design).
+
+**Result (`results/rollouts.json`, median over series; 1 = like the real context):**
+- median feedback: spread 0.90–0.96 at block 1 → 0.36–0.83 at block 16; roughness down to 0.17 (shapes): series get smooth and flat.
+- independent per-step sampling: roughness ×1.9–2.0 from block 1, ×2.5–7 at block 16: jagged, self-amplifying.
+- correlated (Gaussian copula, ρ = 0.9): block 1 spread 1.00–1.01, roughness 0.92–1.09 (realistic); block 16 spread ×3.6–9.5, drift 0.9–3.4 std.
+- Data sources (HF, checked 2026-11-13): Monash (CC BY 4.0), LOTSA (174 configs, Apache-2.0 declared, per-dataset licences
+  underneath), GiftEvalPretrain (Apache-2.0), BOOM (Apache-2.0), chronos_datasets (67 subsets, licence "other": per subset).
+
+**Surprise / learned:** the "path" choice decides whether rollouts collapse or explode; neither median feedback (what TSFMs do
+internally for long horizons) nor independent sampling produces realistic long series. Short correlated rollouts are a plausible generator.
+Public corpora are likely in the teachers' pretraining: fine for *training* the student, not for headline *evaluation*.
+
+**Next:** owner approval of ADR 0005 Stage A.

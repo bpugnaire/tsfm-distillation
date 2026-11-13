@@ -1,9 +1,12 @@
 # Hand-maintained project status for the website Status page (web/status.html).
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
-  Experiment design for distillation (Phases 3-4), together with the owner. The pipeline is ready and tested;
-  no distillation experiment has been run yet.
+  Distillation study design (ADR 0005, proposed): which inputs (real multi-domain, synthetic, teacher rollouts) and
+  which teachers give the best small student. Stage A (~30 min) waits for approval. Electricity is the final demonstrator only.
 pending_decisions:
+  - id: approve-stage-a
+    question: Approve Stage A of the distillation study (input sources, ~30 min on the Mac GPU)?
+    note: docs/decisions/0005-distillation-study-design.md
   - id: fair-comparison
     question: How do we compare an in-domain student with zero-shot teachers fairly?
     options: [report both explicitly, also train a synthetic-only student, evaluate on a held-out domain]
@@ -27,11 +30,11 @@ pending_decisions:
       Auto-detection picks 168 h on some fresh windows; statsforecast ETS cannot fit seasons > 24 and silently
       went non-seasonal (now recorded in results/fresh_fr_power/ets.json "fallbacks"). That makes ETS a weak
       baseline on real data. Changing the denominator changes every relative score.
-  - id: distill-from-timestral
-    question: Use Timestral as a teacher too, or keep it as a comparator only?
 decided:
   - {date: "2026-11-12", what: "Python 3.12 (toto-2 requires it)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-12", what: "Headline metric = 9-level WQL relative to seasonal naive, cluster bootstrap over series", ref: docs/decisions/0002-metrics.md}
   - {date: "2026-11-12", what: "Vendor post-processing tricks off for every model (raw model policy)", ref: docs/notes/teacher-apis.md}
   - {date: "2026-11-13", what: "Timestral enabled as a comparator (owner: personal project, licence clause does not apply)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Ask the owner before any long run on the Mac; learn step by step", ref: docs/journal.md}
+  - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
+  - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}

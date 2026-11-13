@@ -442,3 +442,47 @@ if ($("w-quant")) {
   for (const id of ["q-outlier", "q-bits", "q-perch"]) $(id)!.addEventListener("input", draw);
   draw();
 }
+
+// ch4: teacher rollouts
+if ($("w-rollout")) {
+  interface Roll { stats: Record<string, Record<string, number[]>>; examples: Record<string, number[][]>; blocks: number }
+  loadJSON<Roll>("rollouts.json").then((r) => {
+    const teachers = [...new Set(Object.keys(r.stats).map((k) => k.split("|")[0]))];
+    const sel = $("r-teacher") as HTMLSelectElement;
+    for (const t of teachers) sel.add(new Option(t, t));
+    const strategies = ["median", "independent", "copula"];
+    const names: Record<string, string> = { median: "median", independent: "independent", copula: "correlated" };
+    const cols = () => [cssVar("--teacher"), cssVar("--baseline"), cssVar("--student")];
+    const draw = () => {
+      const src = (ctrl("r-src") as unknown as HTMLSelectElement).value, metric = (ctrl("r-metric") as unknown as HTMLSelectElement).value;
+      const W = 720, H = 220, ml = 40;
+      const svg = svgOf("w-rollout", W, H)!;
+      svg.selectAll("*").remove();
+      const series = strategies.map((s) => r.stats[`${sel.value}|${src}|${s}`][metric]);
+      const all = series.flat();
+      const xs = scaleLinear().domain([1, r.blocks]).range([ml, W - 110]);
+      const ys = scaleLinear().domain([0, Math.max(...all, metric === "drift" ? 1 : 1.2)]).nice().range([H - 24, 10]);
+      grid(svg, ys, ys.ticks(5), ml, W - 110, (v) => v.toFixed(1));
+      if (metric !== "drift") svg.append("line").attr("x1", ml).attr("x2", W - 110).attr("y1", ys(1)).attr("y2", ys(1)).attr("stroke", cssVar("--ink")).attr("stroke-dasharray", "4 3");
+      series.forEach((v, k) => {
+        svg.append("path").attr("d", line<number>().x((_, i) => xs(i + 1)).y((d) => ys(d))(v)).attr("fill", "none").attr("stroke", cols()[k]).attr("stroke-width", 2);
+        svg.append("text").attr("x", W - 104).attr("y", ys(v[v.length - 1]) + 4).style("fill", cssVar("--ink-2")).text(names[strategies[k]]);
+      });
+      for (const t of [1, 4, 8, 12, 16]) svg.append("text").attr("x", xs(t)).attr("y", H - 8).attr("text-anchor", "middle").text(`block ${t}`);
+      const ex = $("w-rollout-ex")!;
+      ex.innerHTML = strategies.map((s) => `<div><div class="small muted">${names[s]}</div><svg data-s="${s}"></svg></div>`).join("");
+      strategies.forEach((s, k) => {
+        const v = r.examples[`${src}|${s}`]?.[0];
+        if (!v) return;
+        const real = 128; // examples start 256 steps into the 512-step real context, every 2nd step
+        const e = select(ex.querySelector(`svg[data-s="${s}"]`) as SVGSVGElement).attr("viewBox", "0 0 220 80").attr("width", "100%");
+        const fin = v.filter(Number.isFinite), lo = Math.min(...fin), hi = Math.max(...fin);
+        const xe = scaleLinear().domain([0, v.length]).range([2, 218]), ye = scaleLinear().domain([lo, hi]).range([76, 4]);
+        e.append("path").attr("d", line<number>().x((_, i) => xe(i)).y((d) => ye(d))(v.slice(0, real))).attr("fill", "none").attr("stroke", cssVar("--ink-2")).attr("stroke-width", 1);
+        e.append("path").attr("d", line<number>().x((_, i) => xe(real + i)).y((d) => ye(d))(v.slice(real))).attr("fill", "none").attr("stroke", cols()[k]).attr("stroke-width", 1);
+      });
+    };
+    for (const id of ["r-teacher", "r-src", "r-metric"]) $(id)!.addEventListener("input", draw);
+    draw();
+  });
+}

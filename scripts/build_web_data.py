@@ -273,8 +273,9 @@ if __name__ == "__main__":
     (data / "results.json").write_text(json.dumps(results(), separators=(",", ":")))
     (data / "code.json").write_text(json.dumps(code_snippets(), separators=(",", ":")))
     (data / "status.json").write_text(json.dumps(status(), separators=(",", ":")))
-    ifp = ROOT / "results" / "input_families.json"
-    if ifp.exists():
-        (data / "input_families.json").write_text(ifp.read_text())
+    for name in ("input_families.json", "rollouts.json"):
+        src = ROOT / "results" / name
+        if src.exists():
+            (data / name).write_text(src.read_text())
     for f in ("gallery.json", "results.json", "status.json"):
         print(f, f"{(data / f).stat().st_size / 1e3:.0f} kB")

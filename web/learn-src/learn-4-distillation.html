@@ -66,6 +66,21 @@
   <li>In between: the truth corrects the teacher's mistakes, and the teacher smooths the truth's noise. Where the best α lies is an experiment, not something to assume.</li>
 </ul>
 
+<h2 id="inputs-targets">Inputs and targets are two different questions</h2>
+<div class="callout intuition"><b>Intuition</b>
+  Every training example is a pair: an <b>input</b> (the context the student reads) and a <b>target</b> (what it should output).
+  "Distillation" is a statement about the <em>target</em>: it comes from a teacher. "Synthetic" is a statement about the <em>input</em>: it does not come from the real world.
+  The two are independent, so there are four combinations.</div>
+<div class="table-wrap"><table>
+  <thead><tr><th></th><th>target = the real future</th><th>target = a teacher's forecast</th></tr></thead>
+  <tbody>
+    <tr><th>input = a real series</th><td><b>ordinary supervised training</b> (our L<sub>gt</sub> floor)</td><td><b>classic distillation</b>: the teacher labels real contexts</td></tr>
+    <tr><th>input = generated (KernelSynth, shapes, rollouts)</th><td><b>synthetic pretraining</b>: the generator knows the true continuation (how Chronos used KernelSynth)</td><td><b>data-free / synthetic-input distillation</b>: no real data at all</td></tr>
+  </tbody></table></div>
+<p>So yes: in distillation the target is <em>always</em> a teacher's output, a model-made label, whether the input was real or not. A teacher's forecast on real data is not "real data". It is a real input with a synthetic label.
+  What changes between the rows is <b>where in input space</b> the student is taught, and that decides where it will be good.
+  With α &lt; 1 you mix the two columns: the teacher's label and the true future of the same input, which only exists in the top row or for generators that know the continuation.</p>
+
 <h2 id="data">Which data do we distil on? (and: can it be pure noise?)</h2>
 <div class="callout intuition"><b>Intuition</b>
   Distillation teaches the student the teacher's <em>function</em>: context → forecast. A function is only learned where you show it inputs. The question is not "is the data real?" but
@@ -91,13 +106,34 @@
   <svg id="w-ks"></svg>
   <p class="small muted"><code id="k-formula"></code> · three independent draws from the same Gaussian process, computed in your browser (Cholesky factorisation of a 200 × 200 covariance matrix).</p></div>
 <figure class="code" data-ref="tinycast.data.synthetic.kernel_synth"></figure>
+<h3>Teacher rollouts: let the teacher write the data</h3>
+<p>Start a teacher on a real context, take one plausible continuation of its forecast, append it, forecast again, and repeat. You get very long series whose start is real and whose rest is "what the teacher believes could happen next".
+  The catch: a forecast is a distribution, and to continue the series you must <em>choose one path</em> from it. We measured three choices on 24 real electricity contexts and 24 random shapes, with two teachers, over 16 blocks of 64 steps:</p>
+<ul>
+  <li><b>median</b>: feed back the median (what Toto and Timestral do internally for long horizons);</li>
+  <li><b>independent</b>: draw each step's value at random from its quantiles, independently of its neighbours;</li>
+  <li><b>correlated</b>: draw a random path whose randomness is correlated from step to step (Gaussian copula, AR(1) with ρ = 0.9), like real noise.</li>
+</ul>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>teacher <select id="r-teacher"></select></label>
+    <label>start from <select id="r-src"><option value="real_electricity">real electricity</option><option value="shapes">random shapes</option></select></label>
+    <label>measure <select id="r-metric"><option value="spread">spread (variability vs real)</option><option value="amplitude">roughness (step-to-step changes vs real)</option><option value="drift">drift (distance from real level, in std)</option></select></label>
+  </div>
+  <svg id="w-rollout"></svg>
+  <div id="w-rollout-ex" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px"></div>
+  <p class="small muted">Top: median over series, per generated block (1 = like the real data). Bottom: one example per strategy (Timestral-28M), real part in grey, generated part in colour. Source: <code>scripts/rollout_study.py</code> → <code>results/rollouts.json</code>.</p></div>
+<p><b>What it shows.</b> Median feedback makes the series progressively <b>smoother and flatter</b> (no noise is ever fed back). Independent sampling makes it <b>jagged</b> at once, and the teacher reads the jitter as noise and widens its bands, a feedback loop.
+  Correlated sampling is <b>realistic for the first blocks</b>, then <b>wanders off</b>: every random excursion is read as signal and compounds.
+  So rollouts are a promising generator if they stay <b>short</b> (a few blocks from many real starts). The rollout length is a parameter to test, not to guess. Alternating teachers between blocks is another way to diversify.</p>
+
 <h3>The options, from cheapest to most realistic</h3>
 <div class="table-wrap"><table>
   <thead><tr><th>input source</th><th>pros</th><th>cons</th></tr></thead>
   <tbody>
     <tr><td>white noise</td><td>free, infinite</td><td>the teacher shows no behaviour worth copying (measured above)</td></tr>
     <tr><td>structured synthetic (KernelSynth, randomised shapes, mixtures)</td><td>infinite, licence- and leakage-free, covers rare patterns; makes Draw-mode inputs familiar</td><td>its distribution differs from real data; missing real quirks (holidays, outages)</td></tr>
-    <tr><td>teacher-generated series (sample a future, append it, repeat)</td><td>realistic-looking, infinite</td><td>needs samples (Toto 2.0 has none; you would sample from quantiles); drift and "model collapse" over long rollouts</td></tr>
+    <tr><td>teacher rollouts (sample a path, append it, repeat)</td><td>realistic for a few blocks, infinite, starts from any real series</td><td>collapses (median) or drifts (sampling) over long rollouts, as measured above; the student learns the teacher's own habits</td></tr>
     <tr><td>optimised inputs ("data-free" distillation, as in vision with DeepInversion)</td><td>targets what the student does not yet know</td><td>complex; the inputs can be unrealistic</td></tr>
     <tr><td>real data</td><td>matches the target domain</td><td>finite; licences; must respect the time splits</td></tr>
   </tbody></table></div>
