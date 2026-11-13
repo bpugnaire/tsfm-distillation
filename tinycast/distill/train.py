@@ -133,14 +133,28 @@ def train(
 
     levels = cfg.student.quantile_levels
     teacher_q = None
+    teacher_diag: dict = {}
     if cfg.loss.alpha > 0:
         from tinycast.data.cache import read_cache
 
         if not cfg.data.teacher:
             raise ValueError("alpha > 0 requires data.teacher")
-        teacher_q, man = read_cache(cfg.data.teacher, tr_spec.key(), tr.ids)
-        t_levels = tuple(man["levels"])
-        native = set(man["native_levels"])
+        from tinycast.distill.weighting import combine, parse
+
+        kind, members, tau = parse(cfg.data.teacher)
+        mans, qs = [], []
+        for name in members:
+            q_m, man = read_cache(name, tr_spec.key(), tr.ids)
+            qs.append(q_m)
+            mans.append(man)
+        t_levels = tuple(mans[0]["levels"])
+        if any(tuple(m["levels"]) != t_levels for m in mans):
+            raise ValueError("teachers were cached on different level grids")
+        teacher_q, diag = combine(kind, qs, tr.future, t_levels, tau)
+        native = set.intersection(*(set(m["native_levels"]) for m in mans))
+        if diag:
+            log(f"teacher combination {kind}: {diag}")
+            teacher_diag = diag
         t_mask = torch.tensor([lv in native for lv in t_levels], device=device)
         if cfg.loss.kd_levels == "all":
             t_mask = torch.ones_like(t_mask)
@@ -237,6 +251,8 @@ def train(
         if corpora is None
         else "custom",
         "init_from": str(init_from) if init_from else None,
+        "teacher": cfg.data.teacher,
+        "teacher_combination": teacher_diag,
         **(extra_metrics or {}),
         "steps": step + 1,
         "wall_seconds": round(time.time() - t_train, 1),

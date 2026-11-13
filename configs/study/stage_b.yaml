@@ -1,0 +1,32 @@
+# Stage B (RQ2-3): which TEACHER, and how much teacher vs ground truth (alpha)? 3 seeds.
+# Setting fixed to Stage A's best recipe (selected on validation): real multi-domain inputs, 30k windows (same windows
+# as Stage A, so the Timestral cache is reused), student s, 3000 steps. Only the teacher and alpha change.
+# Note: a combination's native levels = intersection of its members'. Toto 2.0 has no native 1%/99% levels, so
+# combinations including it give no teacher signal on the tails at alpha = 1 (alpha = 0.5 keeps ground truth there).
+# Weighted: softmax(-tau * WQL of each teacher on the training window's ground truth), tau = 20 (fixed for the pilot).
+name: stage_b
+base: configs/train/study_base_s.yaml
+reference_arm: kd_timestral
+seeds: [0, 1, 2]
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: gt,               mix: {multidomain: 30000}, alpha: 0.0}
+  - {name: kd_timestral,     mix: {multidomain: 30000}, alpha: 1.0, teacher: timestral-209m}
+  - {name: kd_timestral_a05, mix: {multidomain: 30000}, alpha: 0.5, teacher: timestral-209m}
+  - {name: kd_toto,          mix: {multidomain: 30000}, alpha: 1.0, teacher: toto-2.0-313m}
+  - {name: kd_toto_a05,      mix: {multidomain: 30000}, alpha: 0.5, teacher: toto-2.0-313m}
+  - {name: kd_t0,            mix: {multidomain: 30000}, alpha: 1.0, teacher: t0-gamma}
+  - {name: kd_t0_a05,        mix: {multidomain: 30000}, alpha: 0.5, teacher: t0-gamma}
+  - {name: kd_ensemble,      mix: {multidomain: 30000}, alpha: 1.0, teacher: "ensemble:timestral-209m+toto-2.0-313m+t0-gamma"}
+  - {name: kd_ensemble_a05,  mix: {multidomain: 30000}, alpha: 0.5, teacher: "ensemble:timestral-209m+toto-2.0-313m+t0-gamma"}
+  - {name: kd_weighted,      mix: {multidomain: 30000}, alpha: 1.0, teacher: "weighted:timestral-209m+toto-2.0-313m+t0-gamma@20"}
+  - {name: kd_weighted_a05,  mix: {multidomain: 30000}, alpha: 0.5, teacher: "weighted:timestral-209m+toto-2.0-313m+t0-gamma@20"}
+pairs:
+  - [kd_timestral, gt, "teacher labels vs ground truth (Timestral, 3 seeds)"]
+  - [kd_toto, kd_timestral, "teacher: Toto-313m vs Timestral-209M"]
+  - [kd_t0, kd_timestral, "teacher: t0-gamma vs Timestral-209M"]
+  - [kd_ensemble, kd_timestral, "ensemble of 3 vs Timestral alone"]
+  - [kd_weighted, kd_ensemble, "per-window weighting vs plain ensemble"]
+  - [kd_timestral_a05, kd_timestral, "alpha 0.5 vs 1 (Timestral)"]
+  - [kd_toto_a05, kd_toto, "alpha 0.5 vs 1 (Toto: no native tails)"]
+  - [kd_ensemble_a05, kd_ensemble, "alpha 0.5 vs 1 (ensemble)"]

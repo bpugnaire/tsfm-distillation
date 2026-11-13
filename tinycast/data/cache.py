@@ -163,6 +163,13 @@ def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = pr
     ):
         log(f"[{entry.name}] cache complete: {d}")
         return d
+    import torch
+
+    if (
+        entry.device == "auto"
+    ):  # Apple GPU for teachers that support it (Timestral uses float64: CPU only)
+        mps = torch.backends.mps.is_available() and entry.kind != "timestral"
+        entry.device = "cuda" if torch.cuda.is_available() else ("mps" if mps else "cpu")
     model = build_model(entry)
     meta = {
         "teacher": entry.name,

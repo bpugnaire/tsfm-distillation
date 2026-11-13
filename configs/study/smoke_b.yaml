@@ -1,0 +1,11 @@
+# SMOKE TEST of Stage B machinery (composite teachers, seeds). Not a result.
+name: smoke_b
+base: configs/train/study_base_s.yaml
+reference_arm: kd_ensemble
+seeds: [0, 1]
+eval_suites: [shapes]
+arms:
+  - {name: kd_ensemble, mix: {multidomain: 300}, alpha: 1.0, teacher: "ensemble:timestral-28m+toto-2.0-22m", override: {optim: {max_steps: 30, eval_every: 15}}}
+  - {name: kd_weighted, mix: {multidomain: 300}, alpha: 0.5, teacher: "weighted:timestral-28m+toto-2.0-22m@20", override: {optim: {max_steps: 30, eval_every: 15}}}
+pairs:
+  - [kd_weighted, kd_ensemble, "weighted vs ensemble"]

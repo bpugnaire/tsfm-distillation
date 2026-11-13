@@ -148,6 +148,7 @@
      ]
     }
    ],
+   "seed_spread": {},
    "zero_shot_models": {
     "timestral-209m": {
      "rel_wql": 0.4022977149312591,
@@ -379,6 +380,7 @@
      ]
     }
    ],
+   "seed_spread": {},
    "zero_shot_models": {
     "t0-gamma": {
      "rel_wql": 0.5106979883371865,
@@ -610,6 +612,7 @@
      ]
     }
    ],
+   "seed_spread": {},
    "zero_shot_models": {
     "timestral-209m": {
      "rel_wql": 0.6138338612752539,

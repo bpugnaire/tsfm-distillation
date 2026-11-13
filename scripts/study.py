@@ -27,6 +27,9 @@ from tinycast.models.student import StudentForecaster
 def arm_config(study: dict, arm: dict) -> TrainConfig:
     base = to_dict(load(ROOT / study["base"], TrainConfig))
     base["name"] = f"{study['name']}_{arm['name']}"
+    base["seed"] = arm.get(
+        "seed", base["seed"]
+    )  # init + batch order; data.seed (which windows) stays fixed
     base["data"]["mix"] = arm["mix"]
     base["loss"]["alpha"] = arm.get("alpha", base["loss"]["alpha"])
     base["data"]["teacher"] = (
@@ -90,8 +93,39 @@ def finetune_arm(study: dict, arm: dict) -> Path:
 
 
 def per_series(out: Path, model: str, key: str = "wql") -> np.ndarray:
-    r = json.loads((out / f"{model}.json").read_text())
-    return np.array([np.nan if v is None else v for v in r["per_series"][key]], dtype=float)
+    """Per-window scores of `model`; for a multi-seed arm (files model_s0, model_s1...), the mean over seeds."""
+    files = (
+        [out / f"{model}.json"]
+        if (out / f"{model}.json").exists()
+        else sorted(out.glob(f"{model}_s[0-9]*.json"))
+    )
+    if not files:
+        raise FileNotFoundError(f"{model} not evaluated in {out}")
+    vals = [
+        np.array(
+            [np.nan if v is None else v for v in json.loads(f.read_text())["per_series"][key]],
+            dtype=float,
+        )
+        for f in files
+    ]
+    return np.nanmean(np.stack(vals), axis=0)
+
+
+def expand_seeds(study: dict) -> list[dict]:
+    """Arms x study['seeds'] -> name_s<seed> (existing/finetune arms are not expanded)."""
+    seeds = study.get("seeds")
+    if not seeds:
+        return study["arms"]
+    out = []
+    for arm in study["arms"]:
+        if arm.get("type"):
+            out.append(arm)
+            continue
+        out += [
+            {**arm, "name": f"{arm['name']}_s{sd}", "seed": sd, "base_arm": arm["name"]}
+            for sd in seeds
+        ]
+    return out
 
 
 if __name__ == "__main__":
@@ -100,6 +134,7 @@ if __name__ == "__main__":
     ap.add_argument("--only-eval", action="store_true")
     a = ap.parse_args()
     study = yaml.safe_load(Path(a.study).read_text())
+    study["arms"] = expand_seeds(study)
     sdir = ROOT / "results" / "study" / study["name"]
     sdir.mkdir(parents=True, exist_ok=True)
     runs_file = sdir / "runs.json"
@@ -132,8 +167,11 @@ if __name__ == "__main__":
         corpus = build_corpus(tr_spec)
         build_corpus(va_spec)
         if cfg.loss.alpha > 0:
-            entry = load(ROOT / "configs" / "teachers" / f"{cfg.data.teacher}.yaml", ModelEntry)
-            cache_teacher_on_corpus(entry, tr_spec, corpus)
+            from tinycast.distill.weighting import parse
+
+            for member in parse(cfg.data.teacher)[1]:  # composite teachers: cache every member
+                entry = load(ROOT / "configs" / "teachers" / f"{member}.yaml", ModelEntry)
+                cache_teacher_on_corpus(entry, tr_spec, corpus)
         run = train(cfg, log_every=500)
         runs[arm["name"]] = str(run.relative_to(ROOT))
         runs_file.write_text(json.dumps(runs, indent=1))
@@ -182,24 +220,31 @@ if __name__ == "__main__":
                     }
         contrasts = []
         for a_arm, b_arm, question in study.get("pairs", []):
-            evaluated = {p.stem for p in out.glob("*.json")}
             b_name = b_arm.removeprefix("zoo:")
             b_dir = ROOT / "results" / suite_name if b_arm.startswith("zoo:") else out
-            if a_arm in evaluated and (b_dir / f"{b_name}.json").exists():
-                b_res = json.loads((b_dir / f"{b_name}.json").read_text())
-                if b_res["ids"] != suite.ids:  # paired comparisons need the exact same windows
-                    raise ValueError(
-                        f"{b_arm}: windows differ from this suite's; re-run the zoo benchmark"
-                    )
-                p, lo, hi = M.paired_ratio_ci(
-                    per_series(out, a_arm), per_series(b_dir, b_name), groups=groups
-                )
-                contrasts.append(
-                    {"a": a_arm, "b": b_arm, "question": question, "ratio": [p, lo, hi]}
-                )
+            files = [out / f"{a_arm}.json", *out.glob(f"{a_arm}_s[0-9]*.json")]
+            files += [b_dir / f"{b_name}.json", *b_dir.glob(f"{b_name}_s[0-9]*.json")]
+            files = [f for f in files if f.exists()]
+            try:
+                pa, pb = per_series(out, a_arm), per_series(b_dir, b_name)
+            except FileNotFoundError:
+                continue  # an arm not evaluated on this suite (e.g. a domain-specific fine-tune)
+            for f in files:  # paired comparisons need the exact same windows
+                if json.loads(f.read_text())["ids"] != suite.ids:
+                    raise ValueError(f"{f}: windows differ from suite {suite_name}; re-run it")
+            p, lo, hi = M.paired_ratio_ci(pa, pb, groups=groups)
+            contrasts.append({"a": a_arm, "b": b_arm, "question": question, "ratio": [p, lo, hi]})
         table["suites"][suite_name] = {
             "arms": rows,
             "pairs": contrasts,
+            "seed_spread": {
+                base: sorted(
+                    r["rel_wql"]
+                    for m, r in rows.items()
+                    if m.rsplit("_s", 1)[0] == base and m != base
+                )
+                for base in {x.get("base_arm") for x in study["arms"]} - {None}
+            },
             "zero_shot_models": teach,
             "n_windows": len(suite.ids),
             "flag": suite.flag,

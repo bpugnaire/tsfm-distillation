@@ -1,0 +1,15 @@
+{
+ "distilled_zero_shot": "runs/2026-11-13_stage_a_kd_multidomain",
+ "ft_fr_1w_distilled": "runs/2026-11-13_stage_d_pilot_ft_fr_1w_distilled",
+ "ft_fr_1w_scratch": "runs/2026-11-13_stage_d_pilot_ft_fr_1w_scratch",
+ "ft_fr_1m_distilled": "runs/2026-11-13_stage_d_pilot_ft_fr_1m_distilled",
+ "ft_fr_1m_scratch": "runs/2026-11-13_stage_d_pilot_ft_fr_1m_scratch",
+ "ft_fr_1y_distilled": "runs/2026-11-13_stage_d_pilot_ft_fr_1y_distilled",
+ "ft_fr_1y_scratch": "runs/2026-11-13_stage_d_pilot_ft_fr_1y_scratch",
+ "ft_ped_1w_distilled": "runs/2026-11-13_stage_d_pilot_ft_ped_1w_distilled",
+ "ft_ped_1w_scratch": "runs/2026-11-13_stage_d_pilot_ft_ped_1w_scratch",
+ "ft_ped_1m_distilled": "runs/2026-11-13_stage_d_pilot_ft_ped_1m_distilled",
+ "ft_ped_1m_scratch": "runs/2026-11-13_stage_d_pilot_ft_ped_1m_scratch",
+ "ft_ped_1y_distilled": "runs/2026-11-13_stage_d_pilot_ft_ped_1y_distilled",
+ "ft_ped_1y_scratch": "runs/2026-11-13_stage_d_pilot_ft_ped_1y_scratch"
+}
