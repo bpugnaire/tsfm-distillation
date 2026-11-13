@@ -147,3 +147,29 @@ counts (held out of distillation, public). 1000 steps, lr 3e-4 (fine-tune) / 1e-
 
 **Next:** final Stage D after C-lite/B: start from the C-lite winner (m), fix contexts (full past allowed, supervision limited to
 the history period) and scale steps with data; 3 seeds.
+
+## 2026-11-13 — Stage C-lite (scale): a 0.95M student beats Toto-2.0-4m on two suites
+
+**Did:** teacher Timestral-209M; 300k windows (150k synthetic + 150k real multi-domain); student m (0.95M) 15k steps; contrasts:
+KD vs GT, m vs s (0.22M), 300k vs 30k windows (same number of passes), vs Stage-A best. 1 seed (`results/study/stage_c_lite/table.md`).
+
+**Result (relative WQL, zero-shot; paired ratios, 95% cluster-bootstrap CI):**
+| | shapes | multi-domain (flagged) | fresh electricity |
+|---|---|---|---|
+| kd_mix_m_300k | 0.460 | 0.703 | 0.795 |
+| vs Toto-2.0-4m zero-shot | **0.89 [0.85, 0.93]** | 0.98 [0.95, 1.01] (tie) | 1.12 [1.08, 1.17] |
+| vs Timestral-5M | **0.94 [0.89, 0.98]** | 1.07 | 1.24 |
+| vs its teacher Timestral-209M | 1.14 | 1.12 | 1.29 |
+| teacher labels vs ground truth (same data) | **0.85** | **0.96** | **0.88** |
+| 300k vs 30k windows | **0.74** | **0.91** | **0.87** |
+| 0.95M vs 0.22M student | **0.92** | **0.97** | **0.93** |
+
+**Surprise / learned:**
+1. Scale fixed most of Stage A's gap: on electricity the student went from 1.035 (≈ naive) to 0.795, zero-shot, never having seen
+   electricity. Data (×10) was the biggest lever, then teacher labels, then size.
+2. A 0.95M student (4.3× smaller than Toto-2.0-4m, 5.5× smaller than Timestral-5M) beats both on shapes and ties Toto-4m on the
+   multi-domain test. It still trails them on electricity (12–24%) and its teacher everywhere (12–29%).
+3. Distillation's advantage over ground truth *persists at scale* (0.85–0.96, all significant): not a small-data artefact.
+
+**Next:** Stage B (teachers × α, s-size, running) and final Stage D (fine-tuning; its init is chosen on validation and will very
+likely be this run: val WQL 0.1377, the best so far).

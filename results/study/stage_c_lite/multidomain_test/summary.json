@@ -1,0 +1,241 @@
+{
+ "suite": "multidomain_test",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "kd_mix_m_300k",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7029393295419539,
+   "rel_wql_ci": [
+    0.661264264334507,
+    0.7487214965275965
+   ],
+   "rel_mase": 0.7690379282464541,
+   "rel_mase_ci": [
+    0.7354578657091527,
+    0.8060439212491444
+   ],
+   "mean_wql": 0.24264058333333333,
+   "mean_cov80": 0.7883691333333334,
+   "mean_cov98": 0.9788188833333333,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "kd_mix_s_300k",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.9,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7258505466419747,
+   "rel_wql_ci": [
+    0.6804414354179213,
+    0.7754327780906703
+   ],
+   "rel_mase": 0.7951576238335252,
+   "rel_mase_ci": [
+    0.7599210976059158,
+    0.8346449388050542
+   ],
+   "mean_wql": 0.2436284333333333,
+   "mean_cov80": 0.7976348,
+   "mean_cov98": 0.9825936666666667,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "gt_mix_m_300k",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7291356993442915,
+   "rel_wql_ci": [
+    0.6705830399444567,
+    0.7903163496158059
+   ],
+   "rel_mase": 0.801055798194672,
+   "rel_mase_ci": [
+    0.757152907205206,
+    0.8523983077303491
+   ],
+   "mean_wql": 0.2760085166666667,
+   "mean_cov80": 0.8014287666666666,
+   "mean_cov98": 0.9823592333333333,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "stage_a_best",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7337985811335747,
+   "rel_wql_ci": [
+    0.6925367330419797,
+    0.7771711813606644
+   ],
+   "rel_mase": 0.7945346010171312,
+   "rel_mase_ci": [
+    0.7639753353064176,
+    0.8287436982562012
+   ],
+   "mean_wql": 0.24533139999999998,
+   "mean_cov80": 0.83202075,
+   "mean_cov98": 0.9883727333333333,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "kd_mix_m_30k",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7753748696345246,
+   "rel_wql_ci": [
+    0.7307314973891669,
+    0.8249119786151449
+   ],
+   "rel_mase": 0.8385294889342756,
+   "rel_mase_ci": [
+    0.8038313007285478,
+    0.8762892167914449
+   ],
+   "mean_wql": 0.2678843333333333,
+   "mean_cov80": 0.8157865,
+   "mean_cov98": 0.9819157333333332,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.4504051,
+   "mean_cov80": 0.8127446166666668,
+   "mean_cov98": 0.9621705333333334,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  }
+ ],
+ "git_sha": "c3e5c842863afeff415d81ad5d5ed95f8a1bf5d9"
+}

@@ -1,0 +1,7 @@
+{
+ "kd_mix_m_300k": "runs/2026-11-13_stage_c_lite_kd_mix_m_300k",
+ "gt_mix_m_300k": "runs/2026-11-13_stage_c_lite_gt_mix_m_300k",
+ "kd_mix_s_300k": "runs/2026-11-13_stage_c_lite_kd_mix_s_300k",
+ "kd_mix_m_30k": "runs/2026-11-13_stage_c_lite_kd_mix_m_30k",
+ "stage_a_best": "runs/2026-11-13_stage_a_kd_multidomain"
+}
