@@ -10,13 +10,30 @@
   </ul>
 </div>
 
+<div class="tldr"><b>In one minute</b><ul>
+  <li>To learn what matters in a recipe, change <b>one ingredient at a time</b> and keep everything else fixed.</li>
+  <li>Compare two models on the <b>same test windows</b> (paired); it removes the luck of which windows are easy.</li>
+  <li>Choose on <b>validation</b>, report on <b>test</b>. Picking the best of many on the test set quietly inflates the result.</li>
+  <li>What moved the needle here: more data &gt; fine-tuning on your history &gt; teacher labels &gt; a bigger student &gt; which teacher.</li>
+</ul></div>
 <h2 id="design">What an ablation study is</h2>
 <div class="callout intuition"><b>Intuition</b>
   A recipe has many ingredients (data, teacher, loss, size…). To know which one matters, keep everything fixed and change <em>one</em> ingredient.
   The difference in the result is that ingredient's effect. Change two at once and you can no longer tell which one did it.</div>
+<div class="callout analogy"><b>Analogy</b>
+  Tasting a soup and wondering whether the salt or the thyme makes it good: cook two pots that differ only in the salt. Change salt and thyme together and you will never know which one it was.</div>
 <p>Each variant is an <b>arm</b>. One arm is the <b>reference</b>. Every arm is trained the same way and scored on the same <b>test suites</b>, which are never used to choose anything.
   Choices such as "which checkpoint" or "which recipe goes to the next stage" are made on a separate <b>validation set</b>; otherwise the test score is optimistic (chapter 1, leakage).</p>
 <p>Trying every combination (a full factorial) explodes quickly: 5 data sources × 5 teachers × 3 α × 3 sizes × 3 seeds = 675 runs. We work in <b>stages</b> instead: each stage answers one question, and its winner (chosen on validation) becomes the fixed setting of the next.</p>
+<figure class="diagram"><svg viewBox="0 0 700 175" role="img" aria-label="The stages of the study"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-fill-ink"/></marker></defs>
+  <rect x="5" y="30" width="125" height="72" rx="9" class="d-box "/><text x="67.5" y="63.0" text-anchor="middle" class="d-t">A · inputs</text><text x="67.5" y="81.0" text-anchor="middle" class="d-s">what to label?</text>
+  <rect x="145" y="30" width="125" height="72" rx="9" class="d-box s"/><text x="207.5" y="63.0" text-anchor="middle" class="d-t">C · scale</text><text x="207.5" y="81.0" text-anchor="middle" class="d-s">data, size</text>
+  <rect x="285" y="30" width="125" height="72" rx="9" class="d-box "/><text x="347.5" y="63.0" text-anchor="middle" class="d-t">B · teachers</text><text x="347.5" y="81.0" text-anchor="middle" class="d-s">which, α</text>
+  <rect x="425" y="30" width="125" height="72" rx="9" class="d-box c"/><text x="487.5" y="63.0" text-anchor="middle" class="d-t">D · fine-tune</text><text x="487.5" y="81.0" text-anchor="middle" class="d-s">on your data</text>
+  <rect x="565" y="30" width="130" height="72" rx="9" class="d-box "/><text x="630.0" y="63.0" text-anchor="middle" class="d-t">E · targets</text><text x="630.0" y="81.0" text-anchor="middle" class="d-s">labels vs truth</text>
+  <path d="M130,66 L143,66" class="d-arrow"/><path d="M270,66 L283,66" class="d-arrow"/><path d="M410,66 L423,66" class="d-arrow"/><path d="M550,66 L563,66" class="d-arrow"/>
+  <text x="350" y="135" text-anchor="middle" class="d-s">each stage answers one question; its winner, chosen on validation, becomes the fixed setting of the next</text>
+</svg><figcaption>The study as a chain of focused experiments instead of one giant grid.</figcaption></figure>
 <div class="table-wrap card"><table>
   <thead><tr><th>stage</th><th>question</th><th>status</th></tr></thead>
   <tbody id="w-stages"></tbody></table></div>
@@ -37,8 +54,10 @@
 <div class="callout intuition"><b>Intuition</b>
   Some test windows are easy, some are very hard. Two models compared on <em>different</em> windows differ partly because of luck in the windows.
   Compared on the <em>same</em> windows, the difficulty cancels: look at the ratio of their errors window by window.</div>
+<div class="callout analogy"><b>Analogy</b>
+  Two runners timed on different days are hard to compare (wind, heat). Two runners in the same race, side by side, are easy: whoever is ahead is faster, whatever the weather.</div>
 <div class="callout formal"><b>Formally</b>
-  <span class="math">ratio(a, b) = geometric mean over windows of WQL<sub>a</sub>(window) / WQL<sub>b</sub>(window)</span>
+  $$\text{ratio}(a, b) = \exp\!\left(\frac{1}{N}\sum_{i=1}^{N} \log \frac{\mathrm{WQL}_a(i)}{\mathrm{WQL}_b(i)}\right)$$<dl class="formula-note"><dt>i</dt><dd>a test window (both models scored on the same ones)</dd><dt>exp(mean(log))</dt><dd>the geometric mean, so ×2 and ×½ cancel</dd></dl>
   95% interval: cluster bootstrap over series (chapter 2). Below 1, a is better. The effect is called real only if the whole interval is on one side of 1.</div>
 <p>Pairing makes a huge difference in practice: two arms can have overlapping intervals on their own scores and still a clear, tight paired difference. Our test <code>test_paired_ratio_ci</code> shows a uniform 10% improvement that the unpaired intervals hide and the paired one detects.</p>
 <div class="card widget">
@@ -154,7 +173,18 @@
 <p>The headline question. Take the best student so far (Stage C-lite, chosen on validation), and fine-tune it on a target domain's own recent history
   (1 week, 1 month or 1 year), with plain supervised training on the true future. Compare with the same architecture trained from scratch on that history, and with the big models used as-is.
   Two domains it never saw in distillation: French electricity, and Melbourne pedestrian counts.</p>
-<div class="callout pitfall"><b>"1 week of your data" has two meanings</b>
+
+<figure class="diagram"><svg viewBox="0 0 700 200" role="img" aria-label="Warm versus cold-start fine-tuning"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-fill-ink"/></marker></defs>
+  <text x="10" y="30" class="d-t">warm</text>
+  <rect x="80" y="14" width="430" height="26" rx="5" class="d-box"/><rect x="420" y="14" width="90" height="26" rx="5" class="d-box s"/>
+  <rect x="510" y="14" width="170" height="26" rx="5" class="d-box t"/>
+  <text x="250" y="31" text-anchor="middle" class="d-s">older past: usable as context</text><text x="465" y="31" text-anchor="middle" class="d-s">fine-tune targets</text><text x="595" y="31" text-anchor="middle" class="d-s">test</text>
+  <text x="10" y="100" class="d-t">cold start</text>
+  <rect x="420" y="84" width="90" height="26" rx="5" class="d-box s"/><rect x="510" y="84" width="170" height="26" rx="5" class="d-box t"/>
+  <text x="465" y="101" text-anchor="middle" class="d-s">all you have</text><text x="595" y="101" text-anchor="middle" class="d-s">test (short contexts)</text>
+  <line x1="80" y1="97" x2="415" y2="97" class="d-line" stroke-dasharray="4 4"/><text x="250" y="91" text-anchor="middle" class="d-m">nothing before</text>
+  <text x="350" y="160" text-anchor="middle" class="d-s">"1 week of your data" can mean either; the results differ, so we measure both</text>
+</svg><figcaption>Warm: you have a long past but only label the last week for fine-tuning. Cold start: you only <em>have</em> a week, at training and at test time.</figcaption></figure><div class="callout pitfall"><b>"1 week of your data" has two meanings</b>
   <b>Warm</b>: you have a long past, but only label the last week for fine-tuning (contexts can use the full past). <b>Cold start</b>: you only <em>have</em> a week.
   Then contexts are short at training <em>and</em> at test time, and the big models must be scored on the same short contexts to be fair.
   Our pilot mixed the two (short training contexts, long test contexts) and got misleading failures. The final stage separates them.</div>
@@ -208,6 +238,8 @@
   <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:toto-2.0-4m"></b> vs Toto 2.0 4m (better, with 4.3× fewer parameters),
   <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:timestral-5m"></b> vs Timestral-5M, and <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:timestral-209m"></b> vs its 209M-parameter teacher.
   Pedestrians (validation picks the mix): <b data-pair="stage_e|pedestrian_test|mix_ped_1y|zoo:toto-2.0-4m"></b> vs Toto 2.0 4m, <b data-pair="stage_e|pedestrian_test|mix_ped_1y|zoo:timestral-5m"></b> vs Timestral-5M.</p>
+<div class="callout analogy"><b>Analogy</b>
+  Taking an exam nine times and reporting only your best grade tells people more about luck than about you. Choosing on validation is deciding which attempt counts <em>before</em> seeing the grades.</div>
 <div class="callout pitfall"><b>The 4% we did not claim</b>
   Reading all nine candidates on the test set, the best one (the 50/50 mix with a year of electricity) scores <b data-pair="stage_e|fresh_fr_power|mix_fr_1y|zoo:timestral-5m"></b> vs Timestral-5M: a tie.
   It is tempting to headline "matches Timestral-5M". But it was chosen <em>because</em> it looked best on test, so its score is optimistically biased (the maximum of nine noisy numbers).

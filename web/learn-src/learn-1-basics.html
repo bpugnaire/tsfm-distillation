@@ -9,6 +9,12 @@
   </ul>
 </div>
 
+<div class="tldr"><b>In one minute</b><ul>
+  <li>A forecast is a guess about the future made from a window of the past.</li>
+  <li>Real series mix a few ingredients: a slow <b>trend</b>, repeating <b>seasons</b>, sudden <b>shifts</b>, and noise.</li>
+  <li>Always compare with a dumb baseline ("same as last week"). It is surprisingly hard to beat.</li>
+  <li>Test like it is the past: only use data before the forecast date, and never test on data the model may have memorised.</li>
+</ul></div>
 <h2 id="anatomy">The anatomy of a forecast</h2>
 <div class="callout intuition"><b>Intuition</b>
   You stand at a point in time, look back at what happened, and say something about what comes next.
@@ -16,6 +22,21 @@
 <p>A <span class="term" data-g="time-series">time series</span> is a sequence x<sub>1</sub>, x<sub>2</sub>, … sampled at a fixed step (here: hourly electricity consumption).
   The <span class="term" data-g="origin">forecast origin</span> T is the last step you observed. The <span class="term" data-g="context">context</span> is the window of past
   values the model reads (ours: up to 512 hours ≈ 3 weeks). The <span class="term" data-g="horizon">horizon</span> H is how many steps you forecast (ours: 64 hours ≈ 2.7 days).</p>
+<figure class="diagram"><svg viewBox="0 0 700 190" role="img" aria-label="Context, forecast origin and horizon on a time axis"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-fill-ink"/></marker></defs>
+  <rect x="40" y="40" width="430" height="80" rx="8" class="d-box s"/>
+  <rect x="470" y="40" width="190" height="80" rx="8" class="d-box t"/>
+  <path d="M50,95 C80,60 110,60 140,95 S200,130 230,95 S290,60 320,95 S380,130 410,95 S440,70 465,85" class="d-line"/>
+  <path d="M470,85 C500,62 530,62 560,92 S620,125 650,95" class="d-line" stroke-dasharray="5 4"/>
+  <line x1="470" y1="25" x2="470" y2="140" class="d-line" stroke-width="2.5"/>
+  <text x="470" y="18" text-anchor="middle" class="d-t">origin T ("now")</text>
+  <text x="255" y="160" text-anchor="middle" class="d-t">context: the past the model reads</text>
+  <text x="255" y="178" text-anchor="middle" class="d-m">x₁ … x_T · ours: up to 512 steps (≈ 3 weeks of hours)</text>
+  <text x="565" y="160" text-anchor="middle" class="d-t">horizon: what we forecast</text>
+  <text x="565" y="178" text-anchor="middle" class="d-m">x_T+1 … x_T+H · ours: H = 64</text>
+</svg><figcaption>Every forecasting problem is three things: where you stand (the origin), how far back you look (the context), and how far ahead you look (the horizon).</figcaption></figure>
+<div class="callout analogy"><b>Analogy</b>
+  A weather forecaster at a window: the <em>origin</em> is the moment she looks up, the <em>context</em> is what she remembers of the last few days,
+  the <em>horizon</em> is how far ahead her bulletin goes. A better forecaster is not one who remembers more, but one who knows which memories matter.</div>
 <div class="callout formal"><b>Formally</b>
   A forecaster is a function f : (x<sub>T−L+1</sub>, …, x<sub>T</sub>) ↦ prediction of (x<sub>T+1</sub>, …, x<sub>T+H</sub>), with context length L and horizon H.
   The prediction can be one number per step (point forecast) or a distribution per step (probabilistic forecast, chapter 2).</div>
@@ -48,8 +69,10 @@
 <h3>Finding the season: the autocorrelation function</h3>
 <div class="callout intuition"><b>Intuition</b>
   Shift the series by k steps and lay it over itself. If the copies line up, the series repeats every k steps.</div>
+<div class="callout analogy"><b>Analogy</b>
+  Two transparencies of the same song's waveform: slide one over the other. When the beats line up again you have found the bar length. The ACF does that sliding for every possible shift and scores how well they line up.</div>
 <div class="callout formal"><b>Formally</b>
-  <span class="math">ACF(k) = Σ<sub>t</sub> (x<sub>t</sub> − x̄)(x<sub>t+k</sub> − x̄) / Σ<sub>t</sub> (x<sub>t</sub> − x̄)²</span>
+  $$\mathrm{ACF}(k) = \frac{\sum_t (x_t - \bar{x})(x_{t+k} - \bar{x})}{\sum_t (x_t - \bar{x})^2}$$<dl class="formula-note"><dt>k</dt><dd>the lag (how far we shift)</dd><dt>x̄</dt><dd>the average</dd><dt>result</dt><dd>1 = perfect overlap, 0 = no relation</dd></dl>
   A season of period m shows up as a peak at k = m (and smaller ones at 2m, 3m…). We remove a linear trend first, otherwise the trend makes every lag look correlated.</div>
 <div class="card widget"><svg id="w-acf"></svg>
   <p class="small muted">ACF of the context in the widget above (same sliders). The highlighted bar is the season our rule picks: the shortest lag whose peak is at least 90% as high as the best peak above 0.3.</p></div>
@@ -60,13 +83,16 @@
 
 <h2 id="baselines">Baselines: the models to beat</h2>
 <p>Before trusting a 200-million-parameter model, compare it with something trivial:</p>
+<div class="callout analogy"><b>Analogy</b>
+  "Tomorrow at 9 am will look like today at 9 am" is the forecasting equivalent of guessing that tomorrow's weather will be like today's.
+  It is right surprisingly often. A sophisticated model that cannot beat it is not useful, however impressive it sounds.</div>
 <ul>
   <li><b>Naive</b>: tomorrow = today's last value.</li>
   <li><span class="term" data-g="seasonal-naive">Seasonal naive</span>: copy the most recent value with the same phase. For hourly data with m = 24, the forecast for tomorrow 9:00 is today 9:00.</li>
   <li><b>ETS</b> (exponential smoothing): a classical statistical model with level, trend and season components, fitted per series.</li>
 </ul>
 <div class="callout formal"><b>Formally (seasonal naive)</b>
-  <span class="math">x̂<sub>T+s</sub> = x<sub>T+s−m·⌈s/m⌉</sub>,  s = 1, …, H</span>
+  $$\hat{x}_{T+s} = x_{\,T + s - m\lceil s/m \rceil}, \qquad s = 1, \dots, H$$<dl class="formula-note"><dt>T</dt><dd>now</dd><dt>s</dt><dd>steps ahead</dd><dt>m</dt><dd>the season length (24 for daily cycles in hourly data)</dd></dl>
   ⌈s/m⌉ is how many whole seasons you must step back to land on an observed value with the same phase.</div>
 <figure class="code" data-ref="tinycast.models.baselines.SeasonalNaive._one"></figure>
 <div class="callout pitfall"><b>Pitfall (a real bug in this project)</b>
@@ -80,6 +106,9 @@
 <figure class="code" data-ref="tinycast.data.windows.candidate_origins"></figure>
 <p>The rule in this project applies to the <em>forecast targets</em>: a window belongs to a split only if its whole horizon lies inside that split's dates. Contexts may reach back into earlier periods, which is simply the past.</p>
 <h3>Leakage, the foundation-model version</h3>
+<div class="callout analogy"><b>Analogy</b>
+  Testing a forecaster on data it was trained on is like grading a student on the exact exam questions they practised with.
+  Our "fresh" test set is an exam written <em>after</em> the student finished studying.</div>
 <p><span class="term" data-g="leakage">Leakage</span> is any path by which test information influences the model. Classic forms: normalising with statistics from the future,
   choosing a checkpoint on the test set. Foundation models add one: they are pretrained on huge public corpora, so the benchmark you test on may be in their training data
   (<span class="term" data-g="contamination">contamination</span>). Our answer: the headline test uses electricity data published <em>after</em> every model's release date, enforced by an automated test.</p>

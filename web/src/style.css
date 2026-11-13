@@ -103,3 +103,68 @@ details.check p { margin: 8px 0 2px; color: var(--ink-2); font-size: 14px; }
 .cards .n { font-size: 12px; color: var(--muted); }
 .gloss dt { font-weight: 600; margin-top: 12px; }
 .gloss dd { margin: 2px 0 0 0; color: var(--ink-2); font-size: 14.5px; max-width: 72ch; }
+
+/* ---------- Learn: readability pass (breathing room, formulas, code, diagrams) ---------- */
+.course article { max-width: 70ch; font-size: 16.5px; line-height: 1.72; }
+.course article p, .course article li { margin: 0 0 0.95em; }
+.course article h1 { font-size: 30px; margin-bottom: 10px; }
+.course article h2 { font-size: 22px; margin: 56px 0 14px; padding-top: 18px; border-top: 1px solid var(--grid); }
+.course article h3 { font-size: 17px; margin: 34px 0 10px; }
+.course article ul, .course article ol { padding-left: 22px; }
+.course article li { margin-bottom: 0.55em; }
+.course .lede { font-size: 18px; line-height: 1.6; }
+.course .callout { padding: 14px 18px; margin: 22px 0; font-size: 15.5px; line-height: 1.65; border-radius: 0 10px 10px 0; }
+.course .callout > b:first-child { margin-bottom: 6px; }
+.course .card.widget, .course figure { margin: 26px 0; }
+.callout.analogy { border-left-color: var(--comparator); background: color-mix(in srgb, var(--comparator) 7%, var(--surface)); }
+.callout.analogy > b:first-child { color: var(--comparator); }
+.callout.analogy > b:first-child::before { content: "💡 "; }
+.tldr { background: var(--accent-wash); border: 1px solid color-mix(in srgb, var(--student) 30%, transparent); border-radius: 12px; padding: 16px 20px; margin: 18px 0 30px; font-size: 16px; }
+.tldr > b:first-child { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--student); margin-bottom: 6px; }
+.tldr ul { margin: 0; }
+/* formulas */
+.katex-display { margin: 14px 0 !important; overflow-x: auto; overflow-y: hidden; padding: 6px 0; }
+.katex { font-size: 1.08em; }
+.formula-note { font-size: 14px; color: var(--ink-2); margin-top: -4px; }
+.formula-note dt { display: inline; font-weight: 600; }
+.formula-note dd { display: inline; margin: 0 14px 0 4px; }
+/* code cells */
+figure.code { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+figure.code figcaption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; border-bottom: 1px solid var(--border); background: var(--page); }
+figure.code figcaption::before { content: none; }
+figure.code .cap-title { font-size: 12.5px; color: var(--ink-2); }
+figure.code .cap-title b { color: var(--comparator); font-weight: 600; margin-right: 6px; }
+figure.code .doc { padding: 10px 14px 0; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+figure.code pre { margin: 0; border: 0; border-radius: 0; background: transparent; padding: 10px 0; max-height: none; font-size: 13px; line-height: 1.6; counter-reset: line; }
+figure.code pre .ln { display: block; padding: 0 14px 0 52px; position: relative; white-space: pre; }
+figure.code pre .ln::before { counter-increment: line; content: counter(line); position: absolute; left: 0; width: 38px; text-align: right; color: var(--muted); opacity: .6; user-select: none; }
+figure.code .collapsed pre { max-height: 300px; overflow: hidden; mask-image: linear-gradient(to bottom, #000 70%, transparent); }
+figure.code .more { display: block; width: 100%; border: 0; border-top: 1px solid var(--border); border-radius: 0; padding: 7px; font-size: 13px; color: var(--student); background: var(--page); }
+figure.code .copy { font-size: 12px; padding: 3px 9px; }
+figure.code .scroll { overflow-x: auto; }
+.hljs-keyword, .hljs-built_in { color: #a626a4; } .hljs-string { color: #50a14f; } .hljs-number, .hljs-literal { color: #b76b01; }
+.hljs-comment { color: var(--muted); font-style: italic; } .hljs-title, .hljs-title.function_ { color: #2a78d6; font-weight: 600; } .hljs-params { color: var(--ink-2); }
+.hljs-meta, .hljs-decorator { color: #c18401; } .hljs-type { color: #0184bc; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hljs-keyword, :root:not([data-theme="light"]) .hljs-built_in { color: #c678dd; } :root:not([data-theme="light"]) .hljs-string { color: #98c379; } :root:not([data-theme="light"]) .hljs-number { color: #d19a66; } :root:not([data-theme="light"]) .hljs-title { color: #61afef; } }
+:root[data-theme="dark"] .hljs-keyword { color: #c678dd; } :root[data-theme="dark"] .hljs-string { color: #98c379; } :root[data-theme="dark"] .hljs-title { color: #61afef; }
+/* diagrams */
+figure.diagram { margin: 28px 0; }
+figure.diagram svg { width: 100%; height: auto; display: block; }
+figure.diagram figcaption { font-size: 13.5px; color: var(--ink-2); margin-top: 8px; line-height: 1.5; }
+.d-box { fill: var(--surface); stroke: var(--axis); stroke-width: 1.5; }
+.d-box.s { stroke: var(--student); fill: color-mix(in srgb, var(--student) 9%, var(--surface)); }
+.d-box.t { stroke: var(--teacher); fill: color-mix(in srgb, var(--teacher) 9%, var(--surface)); }
+.d-box.c { stroke: var(--comparator); fill: color-mix(in srgb, var(--comparator) 9%, var(--surface)); }
+.d-t { fill: var(--ink); font: 600 13px var(--font); }
+.d-s { fill: var(--ink-2); font: 12px var(--font); }
+.d-m { fill: var(--muted); font: 11px var(--font); }
+.d-line { stroke: var(--ink-2); stroke-width: 1.5; fill: none; }
+.d-arrow { stroke: var(--ink-2); stroke-width: 1.6; fill: none; marker-end: url(#arr); }
+.d-fill-s { fill: var(--student); } .d-fill-t { fill: var(--teacher); } .d-fill-c { fill: var(--comparator); } .d-fill-ink { fill: var(--ink-2); }
+.d-band { fill: var(--student); opacity: .18; } .d-band2 { fill: var(--student); opacity: .32; }
+@media (max-width: 640px) { .course article { font-size: 16px; } .course article h2 { margin-top: 42px; } }
+/* reading comfort on the other long-form pages (Lab notes, Study) */
+main.narrow { max-width: 760px; }
+main.narrow p, main.narrow li { font-size: 16.5px; line-height: 1.72; margin-bottom: 0.95em; }
+main.narrow h2 { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--grid); }
+main .lede { font-size: 17.5px; line-height: 1.6; }

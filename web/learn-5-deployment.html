@@ -21,7 +21,21 @@
   </ul>
 </div>
 
-<h2 id="tradeoff">Size, latency, accuracy</h2>
+<div class="tldr"><b>In one minute</b><ul>
+  <li>Small models are cheap to run: our student forecasts in about 2 milliseconds in a browser tab.</li>
+  <li>To leave Python, the model is exported as an ONNX file, a portable recipe any runtime can execute. We put the pre-processing inside it.</li>
+  <li><b>int8 quantisation</b> rounds weights to 8-bit integers: 4× smaller, almost the same accuracy if a few sensitive layers stay in full precision.</li>
+  <li>Always check the exported model gives the same answers as the original (a parity test).</li>
+</ul></div>
+
+<figure class="diagram"><svg viewBox="0 0 700 150" role="img" aria-label="From PyTorch to the browser"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-fill-ink"/></marker></defs>
+  <rect x="10" y="30" width="140" height="70" rx="9" class="d-box "/><text x="80.0" y="62.0" text-anchor="middle" class="d-t">PyTorch student</text><text x="80.0" y="80.0" text-anchor="middle" class="d-s">training code</text>
+  <rect x="195" y="30" width="150" height="70" rx="9" class="d-box s"/><text x="270.0" y="62.0" text-anchor="middle" class="d-t">ONNX graph</text><text x="270.0" y="80.0" text-anchor="middle" class="d-s">scaler included</text>
+  <rect x="390" y="30" width="130" height="70" rx="9" class="d-box "/><text x="455.0" y="62.0" text-anchor="middle" class="d-t">int8 copy</text><text x="455.0" y="80.0" text-anchor="middle" class="d-s">4× smaller weights</text>
+  <rect x="565" y="30" width="125" height="70" rx="9" class="d-box c"/><text x="627.5" y="62.0" text-anchor="middle" class="d-t">browser</text><text x="627.5" y="80.0" text-anchor="middle" class="d-s">WASM, ~2 ms</text>
+  <path d="M150,65 L193,65" class="d-arrow"/><path d="M345,65 L388,65" class="d-arrow"/><path d="M520,65 L563,65" class="d-arrow"/>
+  <text x="172" y="125" text-anchor="middle" class="d-m">export</text><text x="367" y="125" text-anchor="middle" class="d-m">quantise</text><text x="542" y="125" text-anchor="middle" class="d-m">load</text>
+</svg><figcaption>The model leaves Python as a portable graph that contains everything, normalisation included, so the browser sends raw numbers and receives raw quantiles.</figcaption></figure><h2 id="tradeoff">Size, latency, accuracy</h2>
 <p>Parameters set the file size and roughly the compute per forecast. Latency also depends on the number of tokens (sequence length), the batch size and the runtime.
   For an interactive demo that forecasts on every pen move, the budget is a few milliseconds and a few megabytes.</p>
 <div class="card table-wrap" id="w-latency"></div>
@@ -31,6 +45,8 @@
 <div class="callout intuition"><b>Intuition</b>
   PyTorch is a Python program; a browser cannot run it. <span class="term" data-g="onnx">ONNX</span> is a file describing the computation as a graph of standard operations (MatMul, Add, Softmax…) plus the weights.
   Any ONNX runtime (Python, C++, the browser) executes the same graph.</div>
+<div class="callout analogy"><b>Analogy</b>
+  ONNX is to a model what PDF is to a document: you write it in one tool, and anyone can open it anywhere without that tool. Putting the scaler inside is like embedding the fonts in the PDF.</div>
 <p>The most important design choice: <b>put the preprocessing inside the graph</b>. Our scaler (median, MAD, asinh) and the un-scaling are part of the exported model.
   The browser sends raw numbers with NaN for missing values and gets raw-space quantiles back. There is no second implementation of the normalisation in JavaScript that could drift out of sync.</p>
 <figure class="code" data-ref="tinycast.export.onnx.export_onnx"></figure>
@@ -47,8 +63,11 @@
 <div class="callout intuition"><b>Intuition</b>
   Store each weight as an 8-bit integer instead of a 32-bit float, plus one scale factor per group of weights. Four times smaller, and integer arithmetic can be faster.
   The price: each weight is rounded to the nearest of 255 levels.</div>
+<div class="callout analogy"><b>Analogy</b>
+  Rounding prices to the nearest euro is fine for a supermarket receipt, and a disaster if one item costs 10,000 € and the rest cost cents: with one shared rounding step, all the small prices become 0.
+  Per-channel scales give each shelf its own price tag precision.</div>
 <div class="callout formal"><b>Formally (symmetric int8)</b>
-  <span class="math">s = max|w| / 127,   q = round(w / s) ∈ [−127, 127],   ŵ = s · q</span>
+  $$s = \frac{\max \lvert w\rvert}{127}, \qquad q = \operatorname{round}\!\left(\frac{w}{s}\right) \in [-127, 127], \qquad \hat{w} = s \cdot q$$<dl class="formula-note"><dt>w</dt><dd>a float32 weight</dd><dt>q</dt><dd>the stored 8-bit integer</dd><dt>ŵ</dt><dd>what the model computes with</dd></dl>
   The rounding error per weight is at most s / 2. One large weight makes s large, and then every <em>small</em> weight of the group is rounded coarsely.</div>
 <div class="card widget">
   <div class="widget-controls">

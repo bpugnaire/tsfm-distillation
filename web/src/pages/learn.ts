@@ -7,8 +7,10 @@ import { header } from "../lib/nav";
 import { cssVar, loadJSON, type Gallery, type Results } from "../lib/data";
 import { drawFan } from "../lib/fan";
 import { GLOSS, GLOSSARY } from "../lib/glossary";
+import { renderCode, renderMath } from "../lib/rich";
 
 header();
+renderMath();
 const $ = (id: string) => document.getElementById(id);
 type SVG = Selection<SVGSVGElement, unknown, HTMLElement, unknown>;
 
@@ -58,14 +60,13 @@ for (const el of document.querySelectorAll<HTMLElement>(".term[data-g]")) {
 }
 
 // ------------------------------------------------------------------ code snippets extracted from the repo
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const codeFigs = document.querySelectorAll<HTMLElement>("figure.code[data-ref]");
 if (codeFigs.length) {
   loadJSON<Record<string, { file: string; line: number; code: string }>>("code.json").then((code) => {
     for (const f of codeFigs) {
       const c = code[f.dataset.ref!];
       if (!c) { f.innerHTML = `<figcaption>missing snippet ${f.dataset.ref}</figcaption>`; continue; }
-      f.innerHTML = `<figcaption><code>${c.file}:${c.line}</code></figcaption><pre><code>${esc(c.code)}</code></pre>`;
+      renderCode(f, c);
     }
   });
 }

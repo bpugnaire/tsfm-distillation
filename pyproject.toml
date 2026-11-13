@@ -23,7 +23,8 @@ dependencies = [
 teachers = [
     "toto-2==2.0.0",                 # Toto 2.0 (`from toto2 import Toto2Model`); NOT toto-ts (that is Toto 1.0)
     "tfc-t0[torch]==0.6.1",          # t0 (weights gated on HF: needs HF_TOKEN)
-    "chronos-forecasting==2.3.2",    # comparator only
+    "chronos-forecasting==2.3.2",    # comparator only (fine-tuned via its official fit() in Stage F)
+    "peft>=0.18.1,<1",               # Chronos-2 LoRA fine-tuning; WITHOUT it fit(lora) silently falls back to full
     "timestral @ git+https://github.com/mistralai/timestral.git@a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff",  # comparator; weights: Modified MIT (owner OK 2026-11-13, personal project)
     "setuptools<81",                 # lightning (via gluonts via toto2) still imports pkg_resources
     "jaxtyping>=0.3",                # t0 annotates with TypeVars; jaxtyping 0.2.x raises at import
