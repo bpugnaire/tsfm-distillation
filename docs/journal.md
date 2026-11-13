@@ -231,3 +231,15 @@ year of your data (12–22%) > ensemble of teachers (~2%) ≈ which teacher (2�
 **Headline verdict so far:** with a year of its own history, the 0.95M student **matches Toto-2.0-4m on electricity and beats it by 9% on
 pedestrians**, i.e. it matches the out-of-the-box accuracy of the *smallest* official checkpoint at 4.3× fewer parameters. It does **not**
 yet reach Timestral-5M (9–10% behind) or the 200–300M models (13–29% behind).
+
+## 2026-11-13 — Diagnostic: why does 1 month of electricity fine-tuning hurt?
+
+`scripts/investigate_fr_1m.py` → `results/study/diagnostics/fr_1m.json` (1 seed; ratio vs the zero-shot student, <1 = helps).
+- H1 data problem (consolidated → real-time switch on 2026-09-01): **rejected**. No level discontinuity, no gaps, and 24-h profiles
+  are nearly identical across datasets/years (the "peak hour" flip was two near-equal peaks, midday 1.10 vs evening 1.11).
+- H2 overfitting: **partly**. Last month: 1.05 (25 steps), 1.09 (100), 1.08 (300), 1.17 (1000): harm grows with steps but is there at 25.
+- H3 seasonal regime: **rejected**. Same calendar month one year earlier (Sep–Oct 2025): 0.91 (100 steps) / 0.99 (1000), it *helps*;
+  the test-season month one year earlier (Oct–Nov 2025): 1.05 / 1.20, it hurts.
+- Conclusion: one month of supervision is a high-variance, idiosyncratic sample; whether it helps depends on the month, and more
+  steps amplify it. A year averages it out. Prediction for the next experiment: teacher labels on the same month should remove most
+  of the harm (they replace the month's single noisy realisations).

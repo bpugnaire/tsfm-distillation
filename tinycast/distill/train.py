@@ -99,6 +99,7 @@ def train(
     out_root: Path | None = None,
     log_every: int = 50,
     corpora: tuple | None = None,
+    teacher_corpus_key: str | None = None,
     init_from: Path | None = None,
     extra_metrics: dict | None = None,
 ) -> Path:
@@ -144,7 +145,7 @@ def train(
         kind, members, tau = parse(cfg.data.teacher)
         mans, qs = [], []
         for name in members:
-            q_m, man = read_cache(name, tr_spec.key(), tr.ids)
+            q_m, man = read_cache(name, teacher_corpus_key or tr_spec.key(), tr.ids)
             qs.append(q_m)
             mans.append(man)
         t_levels = tuple(mans[0]["levels"])

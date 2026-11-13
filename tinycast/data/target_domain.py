@@ -18,13 +18,16 @@ from tinycast.data.windows import window_id
 DOMAINS = ("fr_power", "pedestrian")
 
 
-def _domain_series(domain: str) -> list[tuple[str, np.ndarray, int]]:
-    """(series id, values, index where the history ends = first test index)."""
+def _domain_series(domain: str, end_time=None) -> list[tuple[str, np.ndarray, int]]:
+    """(series id, values, index where the history ends = first test index). `end_time` (fr_power only) moves the
+    end of the history earlier, e.g. to build "the same calendar month one year before" for diagnostics."""
     if domain == "fr_power":
         from tinycast.data.sources.rte_eco2mix import series_arrays
         from tinycast.data.splits import load_splits
 
-        fresh = load_splits().fresh_start
+        fresh = load_splits().fresh_start if end_time is None else end_time
+        if fresh > load_splits().fresh_start:
+            raise ValueError("fine-tuning history may not extend into the fresh test period")
         out = []
         for sid, (ts, v) in sorted(series_arrays().items()):
             out.append((sid, v, int(np.searchsorted(ts, fresh))))
@@ -56,6 +59,7 @@ def history_corpora(
     max_windows: int = 20000,
     seed: int = 0,
     mode: str = "cold",
+    end_time=None,
 ) -> tuple[Corpus, Corpus]:
     """mode "cold": you only have `history` steps (contexts AND targets inside it; the pilot's setting).
     mode "warm": you have a longer past; contexts may use it (up to context_length), but every *target* used for
@@ -66,7 +70,7 @@ def history_corpora(
         raise ValueError(f"history {history} too short for horizon {horizon}")
     rng = np.random.default_rng([seed, history, len(domain)])
     tr, va = ([], [], [], []), ([], [], [], [])
-    for sid, v, end in _domain_series(domain):
+    for sid, v, end in _domain_series(domain, end_time):
         start, origins = history_origins(end, history, min_context, horizon)
         if (
             mode == "warm"

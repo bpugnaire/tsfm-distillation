@@ -80,8 +80,9 @@ def finetune_arm(study: dict, arm: dict) -> Path:
     base["name"] = f"{study['name']}_{arm['name']}"
     base["seed"] = arm.get("seed", base["seed"])
     base["student"] = json.loads((arch_run / "student_config.json").read_text())
-    base["loss"]["alpha"] = 0.0
-    base["data"]["teacher"] = None
+    # GT-only by default; with "teacher", the history is labelled by that teacher once (cached) and alpha mixes the two
+    base["loss"]["alpha"] = arm.get("alpha", 0.0) if arm.get("teacher") else 0.0
+    base["data"]["teacher"] = arm.get("teacher")
     base["optim"].update(
         max_steps=arm["steps"],
         lr=arm.get("lr", 3e-4),
@@ -117,14 +118,31 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         f"[{arm['name']}] fine-tune {arm['domain']} history={arm['history']} train={len(corpora[0].ids)} init={arm['init']}",
         flush=True,
     )
+    teacher_key = None
+    if arm.get("teacher"):
+        from tinycast.distill.weighting import parse
+
+        class _HistorySpec:  # cache key for "this domain's history", distinct per domain / mode / length
+            horizon, context_length = cfg.student.horizon, cfg.student.context_length
+
+            def key(self) -> str:
+                return f"ft_{arm['domain']}_{arm.get('mode', 'cold')}{arm['history']}"
+
+        teacher_key = _HistorySpec().key()
+        for member in parse(arm["teacher"])[1]:
+            entry = load(ROOT / "configs" / "teachers" / f"{member}.yaml", ModelEntry)
+            cache_teacher_on_corpus(entry, _HistorySpec(), corpora[0])
     return train(
         cfg,
         log_every=100,
         corpora=corpora,
         init_from=init,
+        teacher_corpus_key=teacher_key,
         extra_metrics={
             "finetune": {
                 **{k: arm[k] for k in ("domain", "history", "steps", "init")},
+                "teacher": arm.get("teacher"),
+                "alpha": cfg.loss.alpha,
                 "mode": arm.get("mode", "cold"),
                 "epochs": arm.get("epochs"),
                 "init_run": str(init) if init else None,

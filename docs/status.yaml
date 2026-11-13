@@ -1,8 +1,8 @@
 # Hand-maintained project status for the website Status page (web/status.html).
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
-  Stages A, C-lite, B and D done (Study page). Headline so far: 0.95M student + 1 year of fine-tuning matches Toto-2.0-4m
-  (tie on electricity, -9% on pedestrians) but not Timestral-5M or the large models. Next: owner chooses the next lever.
+  Stage E running: fine-tune on your history with TEACHER labels (vs raw future, Stage D). Diagnostic of the 1-month anomaly done
+  (journal). Then: scaling stage and the clean GIFT-Eval retrain wait for approval.
 pending_decisions:
   - id: clean-retrain
     question: Retrain the final student without the 4 datasets that are GIFT-Eval test sets, then evaluate on GIFT-Eval short-term + fev (zero-overlap tasks only)?
@@ -37,5 +37,6 @@ decided:
   - {date: "2026-11-13", what: "Stage A approved and launched (inputs: multidomain / synth / rollouts / noise, ~35 min)", ref: configs/study/stage_a.yaml}
   - {date: "2026-11-13", what: "Stage D pilot + Stage C-lite approved and running; Stage B queued after them (owner: schedule the next runs)", ref: scripts/run_queue.sh}
   - {date: "2026-11-13", what: "Final Stage D design: warm (full past as context, supervision limited to the history; main, 3 seeds) + cold start (contexts cut at train AND test, zoo on the same cut contexts); init chosen on validation over C-lite + B", ref: scripts/study_configs/make_stage_d_final.py}
+  - {date: "2026-11-13", what: "Owner: investigate the 1-month anomaly, then teacher labels on your history (Stage E)", ref: scripts/investigate_fr_1m.py}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}
