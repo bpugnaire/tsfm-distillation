@@ -296,12 +296,21 @@ pairs:
 - - kd_fr_1w
   - zoo:toto-2.0-4m
   - 'fr_power 1w: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_fr_1w
+  - zoo:toto-2.0-4m
+  - 'fr_power 1w: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_fr_1w
   - zoo:timestral-5m
   - 'fr_power 1w: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_fr_1w
+  - zoo:timestral-5m
+  - 'fr_power 1w: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_fr_1w
   - zoo:timestral-209m
   - 'fr_power 1w: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_fr_1w
+  - zoo:timestral-209m
+  - 'fr_power 1w: 50/50-mix fine-tune vs timestral-209m zero-shot'
 - - kd_fr_1m
   - gt_fr_1m
   - 'fr_power 1m: teacher labels vs real future (fine-tuning target)'
@@ -314,12 +323,21 @@ pairs:
 - - kd_fr_1m
   - zoo:toto-2.0-4m
   - 'fr_power 1m: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_fr_1m
+  - zoo:toto-2.0-4m
+  - 'fr_power 1m: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_fr_1m
   - zoo:timestral-5m
   - 'fr_power 1m: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_fr_1m
+  - zoo:timestral-5m
+  - 'fr_power 1m: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_fr_1m
   - zoo:timestral-209m
   - 'fr_power 1m: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_fr_1m
+  - zoo:timestral-209m
+  - 'fr_power 1m: 50/50-mix fine-tune vs timestral-209m zero-shot'
 - - kd_fr_1y
   - gt_fr_1y
   - 'fr_power 1y: teacher labels vs real future (fine-tuning target)'
@@ -332,12 +350,24 @@ pairs:
 - - kd_fr_1y
   - zoo:toto-2.0-4m
   - 'fr_power 1y: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_fr_1y
+  - zoo:toto-2.0-4m
+  - 'fr_power 1y: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_fr_1y
   - zoo:timestral-5m
   - 'fr_power 1y: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_fr_1y
+  - zoo:timestral-5m
+  - 'fr_power 1y: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_fr_1y
   - zoo:timestral-209m
   - 'fr_power 1y: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_fr_1y
+  - zoo:timestral-209m
+  - 'fr_power 1y: 50/50-mix fine-tune vs timestral-209m zero-shot'
+- - kd_fr_1m
+  - gt_fr_1y
+  - 'fr_power: teacher labels on 1 month vs real future on 1 year'
 - - kd_ped_1w
   - gt_ped_1w
   - 'pedestrian 1w: teacher labels vs real future (fine-tuning target)'
@@ -350,12 +380,21 @@ pairs:
 - - kd_ped_1w
   - zoo:toto-2.0-4m
   - 'pedestrian 1w: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_ped_1w
+  - zoo:toto-2.0-4m
+  - 'pedestrian 1w: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_ped_1w
   - zoo:timestral-5m
   - 'pedestrian 1w: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_ped_1w
+  - zoo:timestral-5m
+  - 'pedestrian 1w: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_ped_1w
   - zoo:timestral-209m
   - 'pedestrian 1w: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_ped_1w
+  - zoo:timestral-209m
+  - 'pedestrian 1w: 50/50-mix fine-tune vs timestral-209m zero-shot'
 - - kd_ped_1m
   - gt_ped_1m
   - 'pedestrian 1m: teacher labels vs real future (fine-tuning target)'
@@ -368,12 +407,21 @@ pairs:
 - - kd_ped_1m
   - zoo:toto-2.0-4m
   - 'pedestrian 1m: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_ped_1m
+  - zoo:toto-2.0-4m
+  - 'pedestrian 1m: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_ped_1m
   - zoo:timestral-5m
   - 'pedestrian 1m: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_ped_1m
+  - zoo:timestral-5m
+  - 'pedestrian 1m: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_ped_1m
   - zoo:timestral-209m
   - 'pedestrian 1m: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_ped_1m
+  - zoo:timestral-209m
+  - 'pedestrian 1m: 50/50-mix fine-tune vs timestral-209m zero-shot'
 - - kd_ped_1y
   - gt_ped_1y
   - 'pedestrian 1y: teacher labels vs real future (fine-tuning target)'
@@ -386,9 +434,21 @@ pairs:
 - - kd_ped_1y
   - zoo:toto-2.0-4m
   - 'pedestrian 1y: teacher-label fine-tune vs toto-2.0-4m zero-shot'
+- - mix_ped_1y
+  - zoo:toto-2.0-4m
+  - 'pedestrian 1y: 50/50-mix fine-tune vs toto-2.0-4m zero-shot'
 - - kd_ped_1y
   - zoo:timestral-5m
   - 'pedestrian 1y: teacher-label fine-tune vs timestral-5m zero-shot'
+- - mix_ped_1y
+  - zoo:timestral-5m
+  - 'pedestrian 1y: 50/50-mix fine-tune vs timestral-5m zero-shot'
 - - kd_ped_1y
   - zoo:timestral-209m
   - 'pedestrian 1y: teacher-label fine-tune vs timestral-209m zero-shot'
+- - mix_ped_1y
+  - zoo:timestral-209m
+  - 'pedestrian 1y: 50/50-mix fine-tune vs timestral-209m zero-shot'
+- - kd_ped_1m
+  - gt_ped_1y
+  - 'pedestrian: teacher labels on 1 month vs real future on 1 year'

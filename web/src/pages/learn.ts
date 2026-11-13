@@ -519,6 +519,8 @@ if ($("w-sa") || document.querySelector("[data-pair],[data-arm],[data-zoo]") || 
         ["stage_d_pilot", "D (pilot)", "Does light fine-tuning on your data close the gap to the big models?"],
         ["stage_c_lite", "C (lite)", "Do a bigger student and more, mixed data close the zero-shot gap?"],
         ["stage_b", "B", "Which teacher (or combination) and how much teacher vs truth (α)? 3 seeds"],
+        ["stage_d_final", "D (final)", "Fine-tuning on your data: warm and cold start, 3 seeds"],
+        ["stage_e", "E", "Fine-tuning on your data with teacher labels instead of the real future"],
       ];
       $("w-stages")!.innerHTML = rows.map(([k, n, q]) => `<tr><td><b>${n}</b></td><td>${q}</td><td>${st[k] ? `<a href="study.html#${k}">results</a>` : '<span class="muted">queued / running</span>'}</td></tr>`).join("");
     }
@@ -694,5 +696,54 @@ if ($("w-sb") || $("w-sd")) {
       $("sd-domain")!.addEventListener("input", draw);
       draw();
     }
+  });
+}
+
+// ch6: Stage E (teacher labels on your history) ---------------------------------------------------------------------
+if ($("w-se")) {
+  interface R { rel_wql: number }
+  type St = Record<string, { suites: Record<string, { arms: Record<string, R>; zero_shot_models: Record<string, R> }> }>;
+  loadJSON<St>("study.json").then((st) => {
+    const mean = (arms: Record<string, R>, base: string) => {
+      const v = Object.keys(arms).filter((k) => k === base || k.startsWith(`${base}_s`)).map((k) => arms[k].rel_wql);
+      return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN;
+    };
+    const draw = () => {
+      const d = (ctrl("se-domain") as unknown as HTMLSelectElement).value;
+      const suite = d === "fr" ? "fresh_fr_power" : "pedestrian_test";
+      const t = st.stage_e?.suites[suite];
+      if (!t) { $("w-se")!.outerHTML = `<p class="muted" id="w-se">Stage E results not available yet.</p>`; return; }
+      const hs = ["1w", "1m", "1y"], labels = ["1 week", "1 month", "1 year"];
+      const series: [string, string, string][] = [["gt", cssVar("--baseline"), "target: real future"], ["kd", cssVar("--teacher"), "target: teacher labels"], ["mix", cssVar("--student"), "target: 50/50 mix"]];
+      const vals = series.map(([k]) => hs.map((h) => mean(t.arms, `${k}_${d}_${h}`)));
+      const zs = t.arms.zero_shot?.rel_wql;
+      const big: [string, string][] = [["toto-2.0-4m", "Toto 2.0 4m"], ["timestral-5m", "Timestral 5M"], ["timestral-209m", "Timestral 209M (the teacher)"]];
+      const all = [...vals.flat(), zs, ...big.map(([k]) => t.zero_shot_models[k]?.rel_wql)].filter((v): v is number => Number.isFinite(v));
+      const W = 720, H = 270, ml = 44, mr = 170;
+      const svg = svgOf("w-se", W, H)!;
+      svg.selectAll("*").remove();
+      const x = scaleLinear().domain([0, 2]).range([ml + 30, W - mr - 30]);
+      const y = scaleLinear().domain([Math.min(...all) * 0.92, Math.max(...all) * 1.04]).nice().range([H - 26, 10]);
+      grid(svg, y, y.ticks(5), ml, W - mr, (v) => v.toFixed(2));
+      labels.forEach((l, i) => svg.append("text").attr("x", x(i)).attr("y", H - 8).attr("text-anchor", "middle").text(l));
+      big.forEach(([k, l]) => {
+        const v = t.zero_shot_models[k]?.rel_wql;
+        if (v === undefined) return;
+        svg.append("line").attr("x1", ml).attr("x2", W - mr).attr("y1", y(v)).attr("y2", y(v)).attr("stroke", cssVar("--comparator")).attr("stroke-dasharray", "5 4").attr("opacity", 0.8);
+        svg.append("text").attr("x", W - mr + 6).attr("y", y(v) + 4).text(l);
+      });
+      if (zs !== undefined) {
+        svg.append("line").attr("x1", ml).attr("x2", W - mr).attr("y1", y(zs)).attr("y2", y(zs)).attr("stroke", cssVar("--ink-2")).attr("stroke-dasharray", "2 3");
+        svg.append("text").attr("x", W - mr + 6).attr("y", y(zs) + 4).style("fill", cssVar("--ink-2")).text("student, no fine-tune");
+      }
+      series.forEach(([, c, l], k) => {
+        const v = vals[k];
+        svg.append("path").attr("d", line<number>().defined((q) => Number.isFinite(q)).x((_, i) => x(i)).y((q) => y(q))(v)).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2.2);
+        v.forEach((q, i) => { if (Number.isFinite(q)) svg.append("circle").attr("cx", x(i)).attr("cy", y(q)).attr("r", 4.5).attr("fill", c); });
+        svg.append("text").attr("x", 8).attr("y", 18 + 16 * k).style("fill", c).text(`● ${l}`);
+      });
+    };
+    $("se-domain")!.addEventListener("input", draw);
+    draw();
   });
 }

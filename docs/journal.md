@@ -243,3 +243,25 @@ yet reach Timestral-5M (9–10% behind) or the 200–300M models (13–29% behin
 - Conclusion: one month of supervision is a high-variance, idiosyncratic sample; whether it helps depends on the month, and more
   steps amplify it. A year averages it out. Prediction for the next experiment: teacher labels on the same month should remove most
   of the harm (they replace the month's single noisy realisations).
+
+## 2026-11-13 — Stage E: fine-tune on your history with TEACHER labels
+
+**Did:** same as final Stage D warm (C-lite init, 1 week / 1 month / 1 year, 3 seeds), but the fine-tuning target is Timestral-209M's
+forecast of each history window (kd, alpha = 1) or a 50/50 mix with the real future (mix, alpha = 0.5). The teacher labels the history
+once (73k windows, ~10 min CPU). References: Stage-D fine-tunes on the real future (gt), same seeds (`results/study/stage_e/table.md`).
+
+**Result (paired, seed-averaged):**
+- Prediction confirmed: electricity, 1 month: kd vs gt **0.79 [0.76, 0.81]**; vs no fine-tune 0.90 (gt was 1.14: it hurt).
+- **Data efficiency: teacher labels on 1 month ≈ real future on 1 year** (electricity 1.03 [1.00, 1.06], pedestrians 0.995 [0.98, 1.01]).
+- kd vs gt: pedestrians 0.91 (1 w) / 0.95 (1 m) / 0.99 (1 y); electricity 0.99 / 0.79 / 0.97: largest gain where supervision is short or noisy.
+- Target chosen on the fine-tuning VALIDATION set (never test): electricity mix (1 w), kd (1 m), kd (1 y); pedestrians mix (all).
+- **Headline (validation-selected, electricity, 1 year, kd, 0.677): vs Toto-2.0-4m 0.96 [0.93, 0.98] (better), vs Timestral-5M
+  1.06 [1.02, 1.10], vs Timestral-209M (the teacher) 1.10 [1.07, 1.14].** Pedestrians (mix, 1 y, 0.582; public data, flagged):
+  vs Toto-4m 0.90, vs Timestral-5M 1.08, vs Timestral-209M 1.27.
+- Seed spread: ≤ 0.027 (electricity), ≤ 0.002 (pedestrians).
+
+**Surprise / learned:**
+1. The best-looking number (mix, 1 year: ties Timestral-5M, 1.02 [1.00, 1.05]) is the best of 9 combinations *read on test*; validation
+   picks kd (1.06). Choosing on test would have inflated the headline by ~4%. Recorded as a cautionary example; not claimed.
+2. Teacher labels act as a regulariser on your own data: the 1-month idiosyncrasy that made raw fine-tuning hurt disappears.
+3. The contrasts mix-vs-zoo and "kd 1 month vs gt 1 year" were added after a first read of the results (descriptive; no selection).

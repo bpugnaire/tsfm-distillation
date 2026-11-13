@@ -188,6 +188,43 @@
   On electricity, fine-tuning on the last <em>month</em> makes the student worse than not fine-tuning at all (<b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1m_distilled|distilled_zero_shot"></b>),
   while 1 week and 1 year do not. A result that does not fit a smooth trend is a reason to investigate before concluding anything, which is the next step of the study.</div>
 
+<h2 id="stage-e">Stage E: teacher labels on <em>your</em> history</h2>
+<p>Stage D fine-tuned on your history with the <em>real future</em> as target. But Stages A–C showed that a teacher's forecast is a better target than the real future.
+  So Stage E keeps everything identical (same starting student, history lengths, schedule and seeds) and changes only the fine-tuning target:
+  Timestral-209M's forecast of each window of your history (<b>kd</b>, α = 1), or a <b>50/50 mix</b> with the real future (α = 0.5).
+  In practice the big model runs <em>once, offline</em>, over your history (about 10 minutes on a laptop CPU for 73,000 windows); then the small model is all you deploy.</p>
+<div class="card widget">
+  <div class="widget-controls"><label>domain <select id="se-domain"><option value="fr">French electricity</option><option value="ped">pedestrians (public: flagged)</option></select></label></div>
+  <svg id="w-se"></svg>
+  <p class="small muted">Relative WQL (lower is better), mean of 3 seeds, per fine-tuning target and amount of history. Dashed: the big models used as-is. Source: <code>results/study/stage_e/table.json</code>.</p>
+</div>
+
+<h3>1. The prediction held: the "bad month" stops being bad</h3>
+<p>Stage D's anomaly: fine-tuning on the last month of electricity with the real future made the student worse than no fine-tuning (<b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1m_distilled|distilled_zero_shot"></b>).
+  Our diagnosis was that one month is a noisy, idiosyncratic sample. With teacher labels on the same month, the student is <b data-pair="stage_e|fresh_fr_power|kd_fr_1m|gt_fr_1m"></b> vs the real-future version,
+  and fine-tuning now <em>helps</em> (<b data-pair="stage_e|fresh_fr_power|kd_fr_1m|zero_shot"></b> vs no fine-tuning).
+  This is the target-noise argument of the widget above, applied to your own data: each window of your month has one noisy realised future,
+  and the teacher replaces it with its distribution, which keeps what is typical and drops what is accidental.</p>
+<div class="callout intuition"><b>Why this is a good scientific moment</b>
+  We had a hypothesis (target noise), it made a prediction about an experiment not yet run ("teacher labels should fix the 1-month case"),
+  and the experiment could have refuted it. It did not. That is far stronger evidence than explaining a result after the fact.</div>
+
+<h3>2. Teacher labels make your data go 12× further</h3>
+<p>Teacher labels on <b>1 month</b> of history vs the real future on <b>1 year</b>: <b data-pair="stage_e|fresh_fr_power|kd_fr_1m|gt_fr_1y"></b> (electricity), <b data-pair="stage_e|pedestrian_test|kd_ped_1m|gt_ped_1y"></b> (pedestrians):
+  no detectable difference. The gain is largest when supervision is short or noisy (pedestrians, 1 week: <b data-pair="stage_e|pedestrian_test|kd_ped_1w|gt_ped_1w"></b>)
+  and fades with a year of data (<b data-pair="stage_e|pedestrian_test|kd_ped_1y|gt_ped_1y"></b>), when the real futures average out on their own.</p>
+
+<h3>3. The headline, chosen honestly</h3>
+<p>Three targets × three history lengths make nine candidates. Which one do we report? <b>The one the fine-tuning validation set picks</b> (the last 20% of your history, never the test).
+  For electricity with a year of data, validation picks pure teacher labels: <b data-arm="stage_e|fresh_fr_power|kd_fr_1y"></b>, i.e.
+  <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:toto-2.0-4m"></b> vs Toto 2.0 4m (better, with 4.3× fewer parameters),
+  <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:timestral-5m"></b> vs Timestral-5M, and <b data-pair="stage_e|fresh_fr_power|kd_fr_1y|zoo:timestral-209m"></b> vs its 209M-parameter teacher.
+  Pedestrians (validation picks the mix): <b data-pair="stage_e|pedestrian_test|mix_ped_1y|zoo:toto-2.0-4m"></b> vs Toto 2.0 4m, <b data-pair="stage_e|pedestrian_test|mix_ped_1y|zoo:timestral-5m"></b> vs Timestral-5M.</p>
+<div class="callout pitfall"><b>The 4% we did not claim</b>
+  Reading all nine candidates on the test set, the best one (the 50/50 mix with a year of electricity) scores <b data-pair="stage_e|fresh_fr_power|mix_fr_1y|zoo:timestral-5m"></b> vs Timestral-5M: a tie.
+  It is tempting to headline "matches Timestral-5M". But it was chosen <em>because</em> it looked best on test, so its score is optimistically biased (the maximum of nine noisy numbers).
+  The validation-selected recipe is about 4% worse. That gap is the size of the lie you would tell by selecting on test.</div>
+
 <h2 id="sanity">Sanity checks that saved the study</h2>
 <p>Experiments fail silently far more often than they crash. What caught our bugs:</p>
 <ul>
@@ -211,7 +248,11 @@
   <p>To compare data amounts at the same number of passes over the data. With 15,000 steps on 30k windows it would see each window ten times more often: the comparison would mix "more data" with "less overfitting control".</p></details>
 <details class="check"><summary>5. Teacher labels beat ground truth by 15% at 30k windows. Should we expect the gain to vanish at 300k?</summary>
   <p>Not if the gain comes from target noise: each context still has a single observed future at any scale. Stage C-lite measured 4–15%, consistent with that.</p></details>
-<details class="check"><summary>6. Why is a 1-seed result called a "pilot"?</summary>
+<details class="check"><summary>6. In Stage E, why is the reported electricity recipe "teacher labels, 1 year" and not the 50/50 mix that scored best on test?</summary>
+  <p>Because the choice has to be made without looking at the test set. The fine-tuning validation set picks teacher labels; picking the test winner among nine candidates would bias the reported number upward (here by about 4%).</p></details>
+<details class="check"><summary>7. Teacher labels on 1 month ≈ real future on 1 year. In which situation would you expect this to break?</summary>
+  <p>If the teacher is poor on your domain (biased), its labels inject that bias, and a long, clean history of real futures would win. The widget on target noise shows the trade-off: teacher bias vs the noise of single observations.</p></details>
+<details class="check"><summary>8. Why is a 1-seed result called a "pilot"?</summary>
   <p>Training randomness (initialisation, batch order) moves scores too. An effect smaller than the seed-to-seed spread can be noise; headline results use 3 seeds (Stage B onwards).</p></details>
 
       <nav class="chapter-nav" id="chapter-nav"></nav>
