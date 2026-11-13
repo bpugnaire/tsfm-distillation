@@ -18,6 +18,7 @@ export default defineConfig({
         learn3: resolve(__dirname, "learn-3-tsfm.html"),
         learn4: resolve(__dirname, "learn-4-distillation.html"),
         learn5: resolve(__dirname, "learn-5-deployment.html"),
+        learn6: resolve(__dirname, "learn-6-ablations.html"),
         glossary: resolve(__dirname, "glossary.html"),
       },
     },

@@ -63,6 +63,11 @@ export const GLOSSARY: Term[] = [
   { key: "dynamic-quant", term: "Dynamic vs static quantisation", ch: 5, def: "Dynamic: weights int8 offline, activation scales computed at run time. Static: activation scales fixed from calibration data." },
   { key: "per-channel", term: "Per-tensor vs per-channel", ch: 5, def: "One scale for a whole weight matrix vs one per output channel. Per-channel limits the damage of a single large weight." },
   { key: "parity", term: "Parity test", ch: 5, def: "Check that the exported model gives the same outputs as the original, within a tolerance that matches the number format." },
+  { key: "ablation", term: "Ablation study", ch: 6, def: "Change one ingredient of a recipe at a time, keep everything else fixed, and measure the effect on fixed test suites." },
+  { key: "arm", term: "Arm / reference arm", ch: 6, def: "One variant of the recipe in an experiment; the reference is the variant every other arm is compared with." },
+  { key: "paired", term: "Paired comparison", ch: 6, def: "Compare two models on the same test windows (ratio window by window), so window difficulty cancels out. Much more sensitive than comparing two separate scores." },
+  { key: "covariate-shift", term: "Covariate shift", ch: 6, def: "The inputs seen at test time differ from the training inputs. A student learns its teacher only where it was shown inputs." },
+  { key: "smoke-test", term: "Smoke test / pilot", ch: 6, def: "A tiny run of the whole pipeline before the real one (catches bugs cheaply); a pilot is a first, single-seed experiment whose conclusions still need confirmation." },
   { key: "latency", term: "Latency p50 / p95", ch: 5, def: "Median and 95th-percentile time of one forecast call, measured after warm-up." },
 ];
 

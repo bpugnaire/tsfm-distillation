@@ -1,11 +1,12 @@
 # Hand-maintained project status for the website Status page (web/status.html).
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
-  Paper-style distillation study (docs/paper/outline.md). Stage A done (results on the Study page); next stages wait for approval.
+  Study queue running on the Mac (no overlap): Stage D pilot (fine-tuning on your data) -> Stage C-lite (scale) ->
+  Stage B (teachers x alpha, 3 seeds). Log: runs/queue.log. Results appear on the Study page as each stage ends.
 pending_decisions:
-  - id: approve-next-stages
-    question: "After Stage A: run the Stage D pilot (fine-tuning on your data, ~20 min) and Stage C-lite (scale: bigger student, mixed data, ~1.5 h) before Stage B?"
-    note: results/study/stage_a/table.md; docs/journal.md 2026-11-13
+  - id: after-queue
+    question: After D, C-lite and B, which recipe goes to the full Stage C (scale) and the final Stage D (3 seeds)?
+    note: decided on validation; results on the Study page
   - id: fair-comparison
     question: How do we compare an in-domain student with zero-shot teachers fairly?
     options: [report both explicitly, also train a synthetic-only student, evaluate on a held-out domain]
@@ -31,5 +32,6 @@ decided:
   - {date: "2026-11-13", what: "Baseline season from sampling frequency on real data (hourly -> 24); auto only for synthetic shapes", ref: configs/eval/fresh_fr_power.yaml}
   - {date: "2026-11-13", what: "Paper framing: broad ablations, paired effects, headline = student + light fine-tuning vs teachers zero-shot", ref: docs/paper/outline.md}
   - {date: "2026-11-13", what: "Stage A approved and launched (inputs: multidomain / synth / rollouts / noise, ~35 min)", ref: configs/study/stage_a.yaml}
+  - {date: "2026-11-13", what: "Stage D pilot + Stage C-lite approved and running; Stage B queued after them (owner: schedule the next runs)", ref: scripts/run_queue.sh}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Learn 6 · Running an ablation study</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- GENERATED from web/learn-src/learn-6-ablations.html by web/learn-src/build.py: edit the source, not this file -->
+  <div class="course">
+    <aside id="sidebar"></aside>
+    <article>
+<h1>6 · Running an ablation study</h1>
+<p class="lede">How to find out <em>what actually matters</em> in a training recipe, told through our first real experiment (Stage A of the distillation study).</p>
+<div class="goals"><b>After this chapter you can</b>
+  <ul>
+    <li>design an ablation: a reference recipe, one factor changed at a time, fixed test suites, selection on validation;</li>
+    <li>read a paired comparison and its interval, and say when a difference is real;</li>
+    <li>explain the Stage A results: when teacher labels beat the ground truth, why each data source wins at home, why noise fails;</li>
+    <li>recognise the sanity checks that catch silent bugs before they become conclusions.</li>
+  </ul>
+</div>
+
+<h2 id="design">What an ablation study is</h2>
+<div class="callout intuition"><b>Intuition</b>
+  A recipe has many ingredients (data, teacher, loss, size…). To know which one matters, keep everything fixed and change <em>one</em> ingredient.
+  The difference in the result is that ingredient's effect. Change two at once and you can no longer tell which one did it.</div>
+<p>Each variant is an <b>arm</b>. One arm is the <b>reference</b>. Every arm is trained the same way and scored on the same <b>test suites</b>, which are never used to choose anything.
+  Choices such as "which checkpoint" or "which recipe goes to the next stage" are made on a separate <b>validation set</b>; otherwise the test score is optimistic (chapter 1, leakage).</p>
+<p>Trying every combination (a full factorial) explodes quickly: 5 data sources × 5 teachers × 3 α × 3 sizes × 3 seeds = 675 runs. We work in <b>stages</b> instead: each stage answers one question, and its winner (chosen on validation) becomes the fixed setting of the next.</p>
+<div class="table-wrap card"><table>
+  <thead><tr><th>stage</th><th>question</th><th>status</th></tr></thead>
+  <tbody id="w-stages"></tbody></table></div>
+
+<h2 id="stage-a">Stage A: which inputs should the teacher label?</h2>
+<p>Fixed: teacher Timestral-209M, the small student (0.22M parameters), 30,000 training windows per arm, 3,000 training steps, 1 seed. Changed: the <b>inputs</b> and the <b>target</b>.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>arm</th><th>inputs (contexts)</th><th>target</th></tr></thead>
+  <tbody>
+    <tr><td>kd_multidomain (reference)</td><td>real series from 11 public datasets (traffic, weather, finance…)</td><td>teacher's forecast (α = 1)</td></tr>
+    <tr><td>gt_multidomain</td><td>the same real windows</td><td>the real future (α = 0)</td></tr>
+    <tr><td>kd_synth / gt_synth</td><td>KernelSynth + random shapes + mixtures</td><td>teacher / the generator's future</td></tr>
+    <tr><td>kd_rollout</td><td>real starts continued by a teacher (1–3 generated blocks)</td><td>teacher</td></tr>
+    <tr><td>kd_noise</td><td>white noise (control)</td><td>teacher</td></tr>
+  </tbody></table></div>
+
+<h2 id="reading">Reading the results: paired comparisons</h2>
+<div class="callout intuition"><b>Intuition</b>
+  Some test windows are easy, some are very hard. Two models compared on <em>different</em> windows differ partly because of luck in the windows.
+  Compared on the <em>same</em> windows, the difficulty cancels: look at the ratio of their errors window by window.</div>
+<div class="callout formal"><b>Formally</b>
+  <span class="math">ratio(a, b) = geometric mean over windows of WQL<sub>a</sub>(window) / WQL<sub>b</sub>(window)</span>
+  95% interval: cluster bootstrap over series (chapter 2). Below 1, a is better. The effect is called real only if the whole interval is on one side of 1.</div>
+<p>Pairing makes a huge difference in practice: two arms can have overlapping intervals on their own scores and still a clear, tight paired difference. Our test <code>test_paired_ratio_ci</code> shows a uniform 10% improvement that the unpaired intervals hide and the paired one detects.</p>
+<div class="card widget">
+  <div class="widget-controls"><label>test suite <select id="sa-suite"><option value="fresh_fr_power">fresh French electricity</option><option value="multidomain_test">held-out multi-domain</option><option value="shapes">synthetic shapes</option></select></label></div>
+  <svg id="w-sa"></svg>
+  <p class="small muted">Each row is one question, answered by a paired ratio (log scale). Left of the dashed line: the first arm is better.
+    <span style="color:var(--student)">Blue</span> / <span style="color:var(--teacher)">orange</span>: the interval excludes 1. Grey: no detectable difference. Source: <code>results/study/stage_a/table.json</code>.</p>
+</div>
+
+<h2 id="findings">What we learned, and why</h2>
+<h3>1. On real inputs, the teacher's forecast is a better target than the real future</h3>
+<p>Teacher labels vs ground truth on the same real windows: <b data-pair="stage_a|fresh_fr_power|kd_multidomain|gt_multidomain"></b> on fresh electricity,
+  <b data-pair="stage_a|shapes|kd_multidomain|gt_multidomain"></b> on shapes, <b data-pair="stage_a|multidomain_test|kd_multidomain|gt_multidomain"></b> on the multi-domain test.</p>
+<div class="callout intuition"><b>Why</b>
+  Every context is unique: for each one, the training data contains <em>one</em> observed future, a single noisy draw from what could have happened.
+  Learning a quantile from one draw is very noisy. The teacher instead hands over its whole predictive distribution: no sampling noise, but possibly biased.
+  It is the classic bias–variance trade-off, applied to the <em>target</em>.</div>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>teacher bias <input type="range" id="tg-bias" min="0" max="1" step="0.05" value="0.3" /> <b id="tg-biasv">0.30</b></label>
+    <label>teacher spread error <input type="range" id="tg-spread" min="-0.5" max="0.5" step="0.05" value="0.1" /> <b id="tg-spreadv">0.10</b></label>
+  </div>
+  <svg id="w-target"></svg><div class="stat-row" id="w-target-stats"></div>
+  <p class="small muted">Task: learn the 0.9-quantile of a N(0, 1) outcome. <span style="color:var(--baseline)">Grey</span>: from n real observations (error shrinks like 1/√n).
+    <span style="color:var(--teacher)">Orange</span>: from the teacher's distribution N(bias, (1 + spread error)²); no noise, so its error is the same for every n. Computed live (400 repetitions per n).</p>
+</div>
+<p>In forecasting the relevant n is small (each situation is seen once), so a reasonably good teacher wins. This is our <em>interpretation</em> of the result, consistent with it; Stage B tests it further with three teachers and α = 0.5.</p>
+
+<h3>2. On synthetic inputs, teacher labels add nothing</h3>
+<p>Same comparison on synthetic contexts: <b data-pair="stage_a|fresh_fr_power|kd_synth|gt_synth"></b> on electricity, <b data-pair="stage_a|multidomain_test|kd_synth|gt_synth"></b> on the multi-domain test,
+  and the ground truth even wins on shapes (<b data-pair="stage_a|shapes|kd_synth|gt_synth"></b>).
+  In the widget's terms: synthetic series have little noise, so the real target is already precise, while teachers make more mistakes on unusual synthetic shapes (larger bias). Move the bias slider right: the teacher stops winning.</p>
+
+<h3>3. Each input source wins on its own kind of data</h3>
+<p>Synthetic vs real inputs (teacher labels): <b data-pair="stage_a|shapes|kd_synth|kd_multidomain"></b> on shapes (synthetic wins), <b data-pair="stage_a|multidomain_test|kd_synth|kd_multidomain"></b> on the real multi-domain test (real wins),
+  <b data-pair="stage_a|fresh_fr_power|kd_synth|kd_multidomain"></b> on electricity (tie). The student learns the teacher's behaviour <em>where it is shown inputs</em> (chapter 4); a test that looks like the training inputs is easier.
+  This is <b>covariate shift</b>. The practical answer is to <b>mix</b> sources, which is what Stage C does.</p>
+
+<h3>4. Teacher rollouts did not help (at this scale)</h3>
+<p>Rollouts vs real inputs: <b data-pair="stage_a|multidomain_test|kd_rollout|kd_multidomain"></b> on the multi-domain test, <b data-pair="stage_a|fresh_fr_power|kd_rollout|kd_multidomain"></b> on electricity.
+  A rollout is the teacher's own idea of what comes next: training on it shows the student the teacher's "comfort zone" rather than new situations, and a few blocks of drift make contexts less realistic (chapter 4).
+  Worth one more try at larger scale, not a priority.</p>
+
+<h3>5. White noise is the worst input everywhere</h3>
+<p>Noise vs synthetic inputs: <b data-pair="stage_a|shapes|kd_noise|kd_synth"></b> on shapes, <b data-pair="stage_a|fresh_fr_power|kd_noise|kd_synth"></b> on electricity, as predicted by the teacher-on-noise measurement of chapter 4: the teacher's answer to noise is always "flat line", so there is nothing to learn.</p>
+
+<h3>6. The gap that remains</h3>
+<p>The best Stage A student scores <b data-arm="stage_a|fresh_fr_power|kd_multidomain"></b> on fresh electricity (1 = seasonal naive), while its teacher scores <b data-zoo="stage_a|fresh_fr_power|timestral-209m"></b>.
+  On the multi-domain test it is much closer: <b data-arm="stage_a|multidomain_test|kd_multidomain"></b> vs Toto 2.0 4M at <b data-zoo="stage_a|multidomain_test|toto-2.0-4m"></b>.
+  A 0.22M-parameter student trained for 2 minutes on 30,000 windows does not generalise to a domain it never saw. Two levers remain: <b>scale</b> (Stage C) and <b>fine-tuning on the target domain</b> (Stage D).</p>
+
+<h2 id="sanity">Sanity checks that saved the study</h2>
+<p>Experiments fail silently far more often than they crash. What caught our bugs:</p>
+<ul>
+  <li><b>Look at anything suspicious.</b> Two different arms had exactly the same best validation score. That turned out to be a coincidence, but checking the logs revealed that another arm's distillation loss was <code>inf</code>:
+    teacher labels were stored in float16, which overflows above 65,504, and 3–5% of real-data labels had become infinite. Training did not crash, because the pinball loss's gradient stays finite. Fixed, with a regression test, and the affected arms were re-run.</li>
+  <li><b>Integrity checks must test what can actually go wrong.</b> The cache check looked for NaN, not for infinity. It now rejects any non-finite value.</li>
+  <li><b>Run a tiny version first.</b> A 1-minute smoke run of the whole pipeline caught three bugs before the real run: arms of unequal size, a stale cache silently reused, and a float64 array the Mac GPU cannot hold.</li>
+  <li><b>Log every component of the loss</b>, not just the total. The <code>inf</code> was visible only in the "kd" column.</li>
+</ul>
+
+<h2 id="check">Check yourself</h2>
+<details class="check"><summary>1. Why choose the recipe for the next stage on the validation set and not on the test suites?</summary>
+  <p>Choosing on the test set turns it into training data for decisions: the reported test score of the chosen recipe becomes optimistically biased. The test must be read only to report.</p></details>
+<details class="check"><summary>2. Two arms score 0.76 [0.69, 0.82] and 0.73 [0.69, 0.78]; their paired ratio is 0.97 [0.93, 1.01]. Conclusion?</summary>
+  <p>No detectable difference: the paired interval includes 1. (These are the Stage A numbers for teacher vs ground truth on the multi-domain test.)</p></details>
+<details class="check"><summary>3. Using the bias–variance widget: when would ground truth beat a teacher even with one observation per context?</summary>
+  <p>When the outcome is nearly noise-free (the real future is already the right target) or when the teacher is badly biased on that kind of data, as on unusual synthetic shapes.</p></details>
+<details class="check"><summary>4. Why is a 1-seed result called a "pilot"?</summary>
+  <p>Training randomness (initialisation, batch order) moves scores too. An effect smaller than the seed-to-seed spread can be noise; headline results use 3 seeds (Stage B onwards).</p></details>
+
+      <nav class="chapter-nav" id="chapter-nav"></nav>
+    </article>
+  </div>
+  <script type="module" src="/src/pages/learn.ts"></script>
+</body>
+</html>

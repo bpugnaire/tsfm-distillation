@@ -20,6 +20,7 @@ const CHAPTERS: [string, string][] = [
   ["learn-3-tsfm.html", "3 · How foundation models work"],
   ["learn-4-distillation.html", "4 · Knowledge distillation"],
   ["learn-5-deployment.html", "5 · Compression & the browser"],
+  ["learn-6-ablations.html", "6 · Running an ablation study"],
   ["glossary.html", "Glossary"],
 ];
 {
@@ -45,7 +46,7 @@ for (const el of document.querySelectorAll<HTMLElement>(".term[data-g]")) {
 {
   const g = $("glossary-list"), q = $("glossary-search") as HTMLInputElement | null;
   if (g && q) {
-    const names = ["", "Fundamentals", "Scoring", "Foundation models", "Distillation", "Deployment"];
+    const names = ["", "Fundamentals", "Scoring", "Foundation models", "Distillation", "Deployment", "Experiments"];
     const render = () => {
       const s = q.value.toLowerCase();
       const hits = GLOSSARY.filter((t) => !s || (t.term + " " + t.def).toLowerCase().includes(s)).sort((a, b) => a.term.localeCompare(b.term));
@@ -485,4 +486,100 @@ if ($("w-rollout")) {
     for (const id of ["r-teacher", "r-src", "r-metric"]) $(id)!.addEventListener("input", draw);
     draw();
   });
+}
+
+// ch6: ablation study (Stage A) -------------------------------------------------------------------------------
+if ($("w-sa") || document.querySelector("[data-pair],[data-arm],[data-zoo]") || $("w-stages")) {
+  interface SRow { rel_wql: number; rel_wql_ci: [number, number] }
+  interface SContrast { a: string; b: string; question: string; ratio: [number, number, number] }
+  interface SSuite { arms: Record<string, SRow>; pairs?: SContrast[]; zero_shot_models: Record<string, SRow> }
+  type Study = Record<string, { suites: Record<string, SSuite> }>;
+  loadJSON<Study>("study.json").then((st) => {
+    const fmt = (r: [number, number, number]) => `${r[0].toFixed(2)} [${r[1].toFixed(2)}, ${r[2].toFixed(2)}]`;
+    for (const el of document.querySelectorAll<HTMLElement>("[data-pair]")) {
+      const [stage, suite, a, b] = el.dataset.pair!.split("|");
+      const c = st[stage]?.suites[suite]?.pairs?.find((p) => p.a === a && p.b === b);
+      el.textContent = c ? fmt(c.ratio) : "(not computed yet)";
+    }
+    for (const el of document.querySelectorAll<HTMLElement>("[data-arm]")) {
+      const [stage, suite, arm] = el.dataset.arm!.split("|");
+      const r = st[stage]?.suites[suite]?.arms[arm];
+      el.textContent = r ? r.rel_wql.toFixed(2) : "(n/a)";
+    }
+    for (const el of document.querySelectorAll<HTMLElement>("[data-zoo]")) {
+      const [stage, suite, m] = el.dataset.zoo!.split("|");
+      const r = st[stage]?.suites[suite]?.zero_shot_models[m];
+      el.textContent = r ? r.rel_wql.toFixed(2) : "(n/a)";
+    }
+    if ($("w-stages")) {
+      const rows: [string, string, string][] = [
+        ["stage_a", "A", "Which inputs should the teacher label?"],
+        ["stage_d_pilot", "D (pilot)", "Does light fine-tuning on your data close the gap to the big models?"],
+        ["stage_c_lite", "C (lite)", "Do a bigger student and more, mixed data close the zero-shot gap?"],
+        ["stage_b", "B", "Which teacher (or combination) and how much teacher vs truth (α)? 3 seeds"],
+      ];
+      $("w-stages")!.innerHTML = rows.map(([k, n, q]) => `<tr><td><b>${n}</b></td><td>${q}</td><td>${st[k] ? `<a href="study.html#${k}">results</a>` : '<span class="muted">queued / running</span>'}</td></tr>`).join("");
+    }
+    if ($("w-sa")) {
+      const draw = () => {
+        const suite = (ctrl("sa-suite") as unknown as HTMLSelectElement).value;
+        const pairs = st.stage_a?.suites[suite]?.pairs ?? [];
+        const W = 720, rowH = 34, H = pairs.length * rowH + 30, ml = 330;
+        const svg = svgOf("w-sa", W, H)!;
+        svg.selectAll("*").remove();
+        const x = scaleLinear().domain([Math.log(0.25), Math.log(6)]).range([ml, W - 50]);
+        const lx = (v: number) => x(Math.log(Math.min(6, Math.max(0.25, v))));
+        svg.append("line").attr("x1", lx(1)).attr("x2", lx(1)).attr("y1", 4).attr("y2", H - 22).attr("stroke", cssVar("--ink")).attr("stroke-dasharray", "3 3");
+        for (const t of [0.25, 0.5, 1, 2, 4]) svg.append("text").attr("x", lx(t)).attr("y", H - 6).attr("text-anchor", "middle").text(t);
+        pairs.forEach((p, i) => {
+          const y = 18 + i * rowH, [r, lo, hi] = p.ratio;
+          const col = hi < 1 ? cssVar("--student") : lo > 1 ? cssVar("--teacher") : cssVar("--baseline");
+          svg.append("text").attr("x", ml - 10).attr("y", y - 3).attr("text-anchor", "end").style("fill", cssVar("--ink")).text(p.question);
+          svg.append("text").attr("x", ml - 10).attr("y", y + 11).attr("text-anchor", "end").text(`${p.a} vs ${p.b}`);
+          svg.append("line").attr("x1", lx(lo)).attr("x2", lx(hi)).attr("y1", y).attr("y2", y).attr("stroke", col).attr("stroke-width", 3);
+          svg.append("circle").attr("cx", lx(r)).attr("cy", y).attr("r", 5).attr("fill", col);
+          svg.append("text").attr("x", lx(hi) + 6).attr("y", y + 4).text(r.toFixed(2));
+        });
+      };
+      $("sa-suite")!.addEventListener("input", draw);
+      draw();
+    }
+  });
+}
+
+// ch6: bias-variance of the training target -------------------------------------------------------------------
+if ($("w-target")) {
+  const Z90 = 1.2816;
+  const ns = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+  const g = gaussian(mulberry32(5));
+  const gtErr = ns.map((n) => {
+    let s = 0;
+    for (let r = 0; r < 400; r++) {
+      const x = Array.from({ length: n }, () => g()).sort((a, b) => a - b);
+      const pos = 0.9 * (n - 1), i = Math.floor(pos), f = pos - i;
+      const q = n === 1 ? x[0] : x[i] * (1 - f) + x[Math.min(i + 1, n - 1)] * f;
+      s += Math.abs(q - Z90);
+    }
+    return s / 400;
+  });
+  const draw = () => {
+    const b = +ctrl("tg-bias").value, se = +ctrl("tg-spread").value;
+    $("tg-biasv")!.textContent = b.toFixed(2); $("tg-spreadv")!.textContent = se.toFixed(2);
+    const tErr = Math.abs(b + Z90 * se);
+    const W = 720, H = 220, ml = 44;
+    const svg = svgOf("w-target", W, H)!;
+    svg.selectAll("*").remove();
+    const x = scaleLinear().domain([0, Math.log2(1024)]).range([ml, W - 12]);
+    const y = scaleLinear().domain([0, Math.max(1.5, tErr * 1.1)]).range([H - 26, 10]);
+    grid(svg, y, y.ticks(4), ml, W - 12, (v) => v.toFixed(1));
+    ns.forEach((n) => svg.append("text").attr("x", x(Math.log2(n))).attr("y", H - 8).attr("text-anchor", "middle").text(n));
+    svg.append("text").attr("x", W - 12).attr("y", H - 30).attr("text-anchor", "end").text("observations per situation (n) →");
+    svg.append("path").attr("d", line<number>().x((_, i) => x(Math.log2(ns[i]))).y((d) => y(d))(gtErr)).attr("fill", "none").attr("stroke", cssVar("--baseline")).attr("stroke-width", 2.2);
+    svg.append("line").attr("x1", ml).attr("x2", W - 12).attr("y1", y(tErr)).attr("y2", y(tErr)).attr("stroke", cssVar("--teacher")).attr("stroke-width", 2.2);
+    svg.append("text").attr("x", ml + 6).attr("y", 20).text("error of the learned 0.9-quantile");
+    const cross = ns.find((_, i) => gtErr[i] < tErr);
+    stats("w-target-stats", [["error from 1 real observation", gtErr[0].toFixed(2)], ["error from the teacher", tErr.toFixed(2)], ["ground truth wins from n =", cross ? String(cross) : "> 1024"]]);
+  };
+  for (const id of ["tg-bias", "tg-spread"]) $(id)!.addEventListener("input", draw);
+  draw();
 }
