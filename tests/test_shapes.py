@@ -53,3 +53,15 @@ def test_synthetic_deterministic_and_finite_future():
     assert c1.shape == (64, 512) and f1.shape == (64, 64)
     assert np.isfinite(f1).all()
     assert elapsed < 10, f"synthetic generation too slow: {elapsed:.1f}s / 64"
+
+
+def test_parallel_synthetic_identical_to_serial():
+    from tinycast.data.synthetic import synthetic_batch, synthetic_series
+
+    seeds = np.arange(5000, 10000)
+    c, f = synthetic_batch(seeds)  # parallel path (>= 5000)
+    for k in (0, 1234, 4999):
+        np.testing.assert_array_equal(
+            np.nan_to_num(np.concatenate([c[k], f[k]])),
+            np.nan_to_num(synthetic_series(int(seeds[k]))),
+        )

@@ -1,0 +1,24 @@
+# Stage C-lite (RQ5, scale): does a bigger student + more (mixed) data close the zero-shot gap?
+# Mixed inputs because Stage A showed each source wins on its own distribution. Teacher Timestral-209M. 1 seed.
+# Steps scale with data (15000 x 256 = 3.84M samples ~ 13 passes over 300k; the 30k arm gets the same passes: 1500 steps).
+name: stage_c_lite
+base: configs/train/study_base_m.yaml
+teacher: timestral-209m
+reference_arm: kd_mix_m_300k
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: kd_mix_m_300k, mix: {synth: 150000, multidomain: 150000}, alpha: 1.0}
+  - {name: gt_mix_m_300k, mix: {synth: 150000, multidomain: 150000}, alpha: 0.0}
+  - {name: kd_mix_s_300k, mix: {synth: 150000, multidomain: 150000}, alpha: 1.0,
+     override: {student: {d_model: 64, n_layers: 3, n_heads: 4}}}
+  - {name: kd_mix_m_30k, mix: {synth: 15000, multidomain: 15000}, alpha: 1.0,
+     override: {optim: {max_steps: 1500, warmup_steps: 100, eval_every: 100}}}
+  - {name: stage_a_best, type: existing, run: "stage_a:kd_multidomain"}
+pairs:
+  - [kd_mix_m_300k, gt_mix_m_300k, "teacher labels vs ground truth at scale (m, 300k)"]
+  - [kd_mix_m_300k, kd_mix_s_300k, "student size: 0.95M vs 0.22M (300k)"]
+  - [kd_mix_m_300k, kd_mix_m_30k, "data: 300k vs 30k windows (m)"]
+  - [kd_mix_m_300k, stage_a_best, "C-lite recipe vs best Stage-A student"]
+  - [kd_mix_m_300k, "zoo:toto-2.0-4m", "student m vs Toto-2.0-4m zero-shot"]
+  - [kd_mix_m_300k, "zoo:timestral-5m", "student m vs Timestral-5M zero-shot"]
+  - [kd_mix_m_300k, "zoo:timestral-209m", "student m vs its teacher Timestral-209M"]

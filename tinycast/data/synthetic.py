@@ -82,7 +82,24 @@ def synthetic_batch(
     seeds: np.ndarray, context_length: int = 512, horizon: int = 64
 ) -> tuple[np.ndarray, np.ndarray]:
     n = context_length + horizon
-    arr = np.stack([synthetic_series(int(s), n, context_length) for s in seeds])
+    if (
+        len(seeds) >= 5000
+    ):  # each series depends only on its seed: parallel generation gives identical results
+        import os
+        from concurrent.futures import ProcessPoolExecutor
+        from functools import partial
+
+        with ProcessPoolExecutor(max_workers=os.cpu_count()) as ex:
+            rows = list(
+                ex.map(
+                    partial(synthetic_series, n=n, context_length=context_length),
+                    [int(s) for s in seeds],
+                    chunksize=256,
+                )
+            )
+        arr = np.stack(rows)
+    else:
+        arr = np.stack([synthetic_series(int(s), n, context_length) for s in seeds])
     ctx, fut = arr[:, :context_length], arr[:, context_length:]
     fut = np.where(np.isnan(fut), np.nan, fut)  # shapes never put NaN in the future; keep explicit
     return ctx, fut

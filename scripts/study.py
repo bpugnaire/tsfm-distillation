@@ -112,6 +112,15 @@ if __name__ == "__main__":
             continue
         if a.only_eval:
             continue
+        if (
+            arm.get("type") == "existing"
+        ):  # reuse a run from an earlier stage as an arm (e.g. zero-shot reference)
+            stage, src = arm["run"].split(":")
+            runs[arm["name"]] = json.loads(
+                (ROOT / "results" / "study" / stage / "runs.json").read_text()
+            )[src]
+            runs_file.write_text(json.dumps(runs, indent=1))
+            continue
         if arm.get("type") == "finetune":
             run = finetune_arm(study, arm)
             runs[arm["name"]] = str(run.relative_to(ROOT))
@@ -141,7 +150,10 @@ if __name__ == "__main__":
         if bcfg.season:
             sn.season = list(suite.season) if bcfg.season == "freq" else bcfg.season
         run_model(build_model(sn), sn, suite, bcfg, out)
+        arm_suites = {x["name"]: x.get("eval_suites") for x in study["arms"]}
         for arm_name, run in runs.items():
+            if arm_suites.get(arm_name) and suite_name not in arm_suites[arm_name]:
+                continue  # e.g. an electricity fine-tune is not evaluated on pedestrians
             entry = ModelEntry(kind="student", name=arm_name, checkpoint=str(ROOT / run))
             run_model(
                 StudentForecaster.from_run(str(ROOT / run), name=arm_name), entry, suite, bcfg, out
@@ -170,9 +182,17 @@ if __name__ == "__main__":
                     }
         contrasts = []
         for a_arm, b_arm, question in study.get("pairs", []):
-            if a_arm in runs and b_arm in runs:
+            evaluated = {p.stem for p in out.glob("*.json")}
+            b_name = b_arm.removeprefix("zoo:")
+            b_dir = ROOT / "results" / suite_name if b_arm.startswith("zoo:") else out
+            if a_arm in evaluated and (b_dir / f"{b_name}.json").exists():
+                b_res = json.loads((b_dir / f"{b_name}.json").read_text())
+                if b_res["ids"] != suite.ids:  # paired comparisons need the exact same windows
+                    raise ValueError(
+                        f"{b_arm}: windows differ from this suite's; re-run the zoo benchmark"
+                    )
                 p, lo, hi = M.paired_ratio_ci(
-                    per_series(out, a_arm), per_series(out, b_arm), groups=groups
+                    per_series(out, a_arm), per_series(b_dir, b_name), groups=groups
                 )
                 contrasts.append(
                     {"a": a_arm, "b": b_arm, "question": question, "ratio": [p, lo, hi]}

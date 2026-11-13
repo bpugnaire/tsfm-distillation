@@ -1,0 +1,8 @@
+# Base recipe for study arms (overridden per arm by configs/study/*.yaml). Student size m (0.95M).
+name: study_base_m
+seed: 0
+device: mps
+student: {d_model: 128, n_layers: 4, n_heads: 4}
+loss: {alpha: 1.0, kd: pinball_teacher, kd_levels: native}
+data: {val_mix: {multidomain: 2000}}
+optim: {lr: 0.001, batch_size: 256, max_steps: 15000, warmup_steps: 500, eval_every: 1000, patience: 4}
