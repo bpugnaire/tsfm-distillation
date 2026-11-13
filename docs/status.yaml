@@ -4,6 +4,9 @@ current_focus: >-
   Study queue running on the Mac (no overlap): Stage D pilot (fine-tuning on your data) -> Stage C-lite (scale) ->
   Stage B (teachers x alpha, 3 seeds). Log: runs/queue.log. Results appear on the Study page as each stage ends.
 pending_decisions:
+  - id: stage-d-design
+    question: "Final Stage D: what does '1 week of your data' mean? (a) supervision AND contexts limited to that week (pilot), or (b) full past contexts, supervision limited to the last N targets?"
+    note: The pilot used (a); its short-history failures look like a context-length mismatch with the 512-step test contexts (journal 2026-11-13).
   - id: after-queue
     question: After D, C-lite and B, which recipe goes to the full Stage C (scale) and the final Stage D (3 seeds)?
     note: decided on validation; results on the Study page

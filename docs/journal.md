@@ -120,3 +120,30 @@ The two affected arms were re-run; invalid runs kept as `runs/INVALID_fp16overfl
 4. A 0.22M student at 30k windows does not transfer zero-shot to electricity (≈ naive). Scale (data/size) and fine-tuning are open.
 
 **Next:** propose Stage D pilot (fine-tuning, headline) and Stage C (scale) before B; owner approval needed.
+
+## 2026-11-13 — Stage D pilot (light fine-tuning on "your data") + a 2 h stall
+
+**Did:** fine-tuned the Stage-A student selected on validation (kd_multidomain, 0.22M) on 1 week / 1 month / 1 year of a target
+domain's own history (ground truth), vs the same architecture from scratch; domains: French electricity (fresh test) and pedestrian
+counts (held out of distillation, public). 1000 steps, lr 3e-4 (fine-tune) / 1e-3 (scratch), 1 seed (`results/study/stage_d_pilot/table.md`).
+
+**Result (relative WQL; paired ratios a/b on the same windows):**
+- Fine-tuning works **with enough history**: 1 year → electricity 0.748 (zero-shot 1.035; ratio 0.72 [0.68, 0.76]),
+  pedestrians 0.740 (zero-shot 0.948; 0.78 [0.76, 0.81]).
+- Distilled init vs scratch: **1 week 0.60 [0.54, 0.65] (electricity), 0.63 [0.60, 0.66] (pedestrians)**: pretraining matters most
+  when data is scarce. 1 month: tie. 1 year: scratch slightly better on electricity (1.05 [1.03, 1.07]), distilled on pedestrians (0.98).
+- **Short-history fine-tuning hurts** vs not fine-tuning: 1 week 1.27 / 1.28, 1 month (electricity) 1.07, with collapsed
+  calibration (80% intervals cover 32–36%).
+- vs big models zero-shot (headline): **not reached yet**. Electricity, 1 year: 1.06× Toto-2.0-4m, 1.17× Timestral-5M, 1.22× Timestral-209M.
+  Pedestrians, 1 year: 1.14× Toto-4m, 1.61× Timestral-209M. A 0.22M model trained *from scratch* on 1 year of electricity (0.713)
+  ≈ Toto-4m zero-shot (0.709).
+
+**Surprise / learned:**
+1. The short-history failures look like a **design flaw of the pilot**, not of fine-tuning: (a) contexts were cut to the history
+   window (≈ 60 observed steps for 1 week) while the test uses 512-step contexts (train/test mismatch); (b) 1000 steps on ~750
+   windows ≈ 170 epochs, and the early-stopping set came from the same week (too similar to stop overfitting). To fix before the final D.
+2. With a year of data, a tiny local model is already strong: the bar for "distillation helps" is the scratch model, not only the teachers.
+3. Stall: the Mac slept ~2h20 during C-lite caching (shards 20→30, 10:41→13:03). Queue now runs under `caffeinate -i -s`.
+
+**Next:** final Stage D after C-lite/B: start from the C-lite winner (m), fix contexts (full past allowed, supervision limited to
+the history period) and scale steps with data; 3 seeds.
