@@ -51,3 +51,11 @@ def test_large_values_survive_encoding():
     assert np.isfinite(out).all()
     spread = q.max(axis=(1, 2), keepdims=True) - q.min(axis=(1, 2), keepdims=True)
     assert (np.abs(out - q) <= 1e-3 * spread + 1e-6 * np.abs(q)).all()
+
+
+def test_teacher_caching_never_uses_mps(monkeypatch):
+    """Regression: Toto-2.0-313m returned non-finite quantiles on Apple MPS for a constant context (Stage B)."""
+    import inspect
+
+    src = inspect.getsource(C.cache_teacher_on_corpus)
+    assert '"mps"' not in src

@@ -1,0 +1,12 @@
+{
+ "distilled_zero_shot": "runs/2026-11-13_stage_c_lite_kd_mix_m_300k",
+ "ft_warm_fr_1w_distilled_s0": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_distilled_s0",
+ "ft_warm_fr_1w_distilled_s1": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_distilled_s1",
+ "ft_warm_fr_1w_distilled_s2": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_distilled_s2",
+ "ft_warm_fr_1w_scratch_s0": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_scratch_s0",
+ "ft_warm_fr_1w_scratch_s1": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_scratch_s1",
+ "ft_warm_fr_1w_scratch_s2": "runs/2026-11-13_stage_d_final_ft_warm_fr_1w_scratch_s2",
+ "ft_cold_fr_1w_distilled": "runs/2026-11-13_stage_d_final_ft_cold_fr_1w_distilled",
+ "ft_cold_fr_1w_scratch": "runs/2026-11-13_stage_d_final_ft_cold_fr_1w_scratch",
+ "ft_warm_fr_1m_distilled_s0": "runs/2026-11-13_stage_d_final_ft_warm_fr_1m_distilled_s0"
+}

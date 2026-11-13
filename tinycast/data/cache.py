@@ -165,11 +165,10 @@ def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = pr
         return d
     import torch
 
-    if (
-        entry.device == "auto"
-    ):  # Apple GPU for teachers that support it (Timestral uses float64: CPU only)
-        mps = torch.backends.mps.is_available() and entry.kind != "timestral"
-        entry.device = "cuda" if torch.cuda.is_available() else ("mps" if mps else "cpu")
+    if entry.device == "auto":
+        # CPU (or CUDA), never Apple MPS: Toto-2.0-313m returns non-finite quantiles on MPS for a constant context
+        # (CPU is fine; Stage B, 2026-11-13), and the benchmarks ran every teacher on CPU: labels = the measured teacher.
+        entry.device = "cuda" if torch.cuda.is_available() else "cpu"
     model = build_model(entry)
     meta = {
         "teacher": entry.name,

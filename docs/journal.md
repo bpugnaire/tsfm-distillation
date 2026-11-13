@@ -186,3 +186,12 @@ m4_hourly (9.2%, from our pedestrian counts), m4_monthly (0.08%); fev fred_md_20
 (a spike on a flat line looks identical in any series once z-normalised) → require ≥ 8 distinct values (+ regression test).
 (2) M4-hourly contains pedestrian-count series: a dataset we treated as a clean "held-out domain" is partly inside a famous benchmark.
 (3) 4 of our 11 training datasets are GIFT-Eval *test* sets: name-level checks would have caught those, but not (2).
+
+## 2026-11-13 — Stage B interrupted: Toto on Apple MPS + constant context
+
+Stage B stopped after 9/33 runs (gt ×3, kd_timestral ×3, kd_timestral_a05 ×3 done) while caching Toto-2.0-313m: the output check
+refused non-finite quantiles. Cause: window 564 of the multi-domain corpus is a perfectly constant series; **Toto-313m on Apple
+MPS returns non-finite values for it, on CPU it is fine.** I had moved teacher caching to MPS for speed: reverted (teachers always
+run on CPU, as in the benchmarks), partial MPS caches deleted, regression test added. The final Stage D started meanwhile and selects
+its init among C-lite + the 9 finished B runs (s-size, val ≥ 0.144 vs C-lite 0.1377): to re-check once B is complete.
+Lesson: a speed-up that changes *where* a teacher runs changes the teacher; the "never silently fix outputs" check caught it.
