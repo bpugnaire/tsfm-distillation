@@ -199,13 +199,21 @@ def status() -> dict:
             m = re.match(r"^- \[( |x|~)\] (.*)", ln.strip())
             if m:
                 text = re.sub(r"[*`]", "", m.group(2)).strip()
-                items.append({"state": {"x": "done", " ": "todo", "~": "superseded"}[m.group(1)], "text": text, "section": section})
+                items.append(
+                    {
+                        "state": {"x": "done", " ": "todo", "~": "superseded"}[m.group(1)],
+                        "text": text,
+                        "section": section,
+                    }
+                )
         phases.append({"title": title, "items": items})
     journal = []
     for block in re.split(r"(?m)^## ", (ROOT / "docs" / "journal.md").read_text())[1:]:
         head = block.splitlines()[0].strip()
         nxt = re.search(r"\*\*Next[^*]*\*\*\s*(.*)", block, re.S)
-        journal.append({"title": head, "next": (nxt.group(1).strip().split("\n\n")[0] if nxt else "")})
+        journal.append(
+            {"title": head, "next": (nxt.group(1).strip().split("\n\n")[0] if nxt else "")}
+        )
     models = []
     for p in sorted((WEB / "public" / "models").glob("*.onnx")):
         models.append({"file": p.name, "size_mb": round(p.stat().st_size / 1e6, 2)})
@@ -248,7 +256,11 @@ def code_snippets() -> dict:
             raise ImportError(ref)
         src = inspect.getsource(obj)
         file = inspect.getsourcefile(obj)
-        out[ref] = {"file": str(Path(file).relative_to(ROOT)), "line": inspect.getsourcelines(obj)[1], "code": inspect.cleandoc(src) if src.startswith(" ") else src}
+        out[ref] = {
+            "file": str(Path(file).relative_to(ROOT)),
+            "line": inspect.getsourcelines(obj)[1],
+            "code": inspect.cleandoc(src) if src.startswith(" ") else src,
+        }
     return out
 
 

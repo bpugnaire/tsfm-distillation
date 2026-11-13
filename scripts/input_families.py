@@ -24,19 +24,27 @@ from tinycast.eval.benchmark import ROOT, git_sha
 from tinycast.models import build_model
 
 N, T, H = 200, 512, 64
-TEACHERS = [("toto", "toto-2.0-22m", "Datadog/Toto-2.0-22m"), ("t0", "t0-gamma", "theforecastingcompany/t0-gamma")]
+TEACHERS = [
+    ("toto", "toto-2.0-22m", "Datadog/Toto-2.0-22m"),
+    ("t0", "t0-gamma", "theforecastingcompany/t0-gamma"),
+]
 
 
 def families(rng: np.random.Generator) -> dict[str, np.ndarray]:
     out = {
         "white_noise": rng.standard_normal((N, T)),
         "random_walk": np.cumsum(rng.standard_normal((N, T)), axis=1),
-        "kernelsynth": np.stack([kernel_synth(np.random.default_rng([s, 99]), T) for s in range(N)]),
+        "kernelsynth": np.stack(
+            [kernel_synth(np.random.default_rng([s, 99]), T) for s in range(N)]
+        ),
     }
     from tinycast.data.shapes import SHAPE_NAMES, make_shape
 
     out["random_shapes"] = np.stack(
-        [make_shape(SHAPE_NAMES[s % len(SHAPE_NAMES)], 900_000 + s, T, H, randomize=True).context for s in range(N)]
+        [
+            make_shape(SHAPE_NAMES[s % len(SHAPE_NAMES)], 900_000 + s, T, H, randomize=True).context
+            for s in range(N)
+        ]
     )
     try:
         from tinycast.data.corpus import CorpusSpec, build_corpus
@@ -85,7 +93,9 @@ if __name__ == "__main__":
                 res["examples"][fname] = [
                     {
                         "context": [round(float(v), 4) for v in x[i, -192:]],
-                        "q": [[round(float(v), 4) for v in q[i, lv]] for lv in (0, 2, 4, 6, 8, 10, 12)],
+                        "q": [
+                            [round(float(v), 4) for v in q[i, lv]] for lv in (0, 2, 4, 6, 8, 10, 12)
+                        ],
                     }
                     for i in show
                 ]

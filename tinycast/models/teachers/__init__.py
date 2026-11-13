@@ -155,8 +155,12 @@ class TimestralAdapter:
         self.device = _device(device)
         self.model = TimestralForecaster.from_pretrained(checkpoint, device=self.device)
         trained = self.model.quantile_levels
-        self.idx = [min(range(len(trained)), key=lambda i: abs(trained[i] - lv)) for lv in QUANTILE_LEVELS]
-        if any(abs(trained[i] - lv) > 1e-9 for i, lv in zip(self.idx, QUANTILE_LEVELS, strict=True)):
+        self.idx = [
+            min(range(len(trained)), key=lambda i: abs(trained[i] - lv)) for lv in QUANTILE_LEVELS
+        ]
+        if any(
+            abs(trained[i] - lv) > 1e-9 for i, lv in zip(self.idx, QUANTILE_LEVELS, strict=True)
+        ):
             raise ValueError(f"{name}: levels {QUANTILE_LEVELS} not all native in {trained}")
         self.native_levels = QUANTILE_LEVELS
         self.batch_size = batch_size
