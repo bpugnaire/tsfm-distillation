@@ -16,9 +16,12 @@ This adds **fine-tuning the teachers** to the scope (CLAUDE.md §11 listed it as
    - **accuracy** after fine-tuning (paired, 3 seeds where affordable);
    - **cost**: fine-tuning wall time / memory on the same machine, inference latency (CPU, browser), parameters;
    - **robustness**: seed spread, forgetting on other suites, gain from ensembling k fine-tuned models at equal inference cost.
-4. Teacher fine-tuning recipes: **Chronos-2 via its official `fit()` (full and LoRA)**; Toto 2.0 (22m, 313m) and Timestral (28M, 209M)
+4. **Update (owner, 2026-11-13): teachers that ship no fine-tuning (Toto 2.0, t0, Timestral) are compared zero-shot**: that is what a
+   user can actually do with them, and being fine-tunable is precisely the student's advantage. Only Chronos-2, which has an official
+   fine-tuning API, is compared fine-tuned. The custom-loop plan below is dropped.
+   ~~Teacher fine-tuning recipes: **Chronos-2 via its official `fit()` (full and LoRA)**; Toto 2.0 (22m, 313m) and Timestral (28M, 209M)
    via our own loop around their modules (pinball loss on native quantiles, AdamW, early stopping on the same fine-tuning validation
-   set). Stated in the paper as "our recipe" (no vendor fine-tuning code exists for them; checked 2026-11-13).
+   set). Stated in the paper as "our recipe" (no vendor fine-tuning code exists for them; checked 2026-11-13).~~
 
 ## Evidence already available (`results/study/diagnostics/robustness.json`, no new training)
 - Ensemble of the 3 seeds of the electricity 1-year fine-tune: 0.659 (single seed 0.686; paired 0.947 [0.938, 0.955]).

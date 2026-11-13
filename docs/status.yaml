@@ -8,6 +8,12 @@ pending_decisions:
   - id: clean-retrain
     question: Retrain the final student without the 4 datasets that are GIFT-Eval test sets, then evaluate on GIFT-Eval short-term + fev (zero-overlap tasks only)?
     note: docs/decisions/0006-benchmarks-and-contamination.md (~1.5 h retrain + evaluation harness)
+  - id: release-teachers
+    question: "Released student: distil the final model from Apache-2.0 teachers only (Toto 2.0 + t0), keeping Timestral as a zero-shot comparator?"
+    note: >-
+      Timestral's Modified MIT licence does not mention distillation; its >$20M revenue restriction "applies to the Model and any
+      derivatives, modifications, or combined works based on it" ("derivative" undefined). A Timestral-distilled student may inherit it.
+      Stage B: Toto as good a teacher as Timestral (0.95-1.02).
   - id: next-lever
     question: "Close the last gap to Timestral-5M: (1) scale student + data (3M, ~1M windows, ensemble teacher, ~3-4 h), or (2) go to the clean GIFT-Eval retrain + benchmark with the current recipe?"
     note: journal 2026-11-13 (Stage E); ADR 0006
@@ -39,5 +45,7 @@ decided:
   - {date: "2026-11-13", what: "Stage D pilot + Stage C-lite approved and running; Stage B queued after them (owner: schedule the next runs)", ref: scripts/run_queue.sh}
   - {date: "2026-11-13", what: "Final Stage D design: warm (full past as context, supervision limited to the history; main, 3 seeds) + cold start (contexts cut at train AND test, zoo on the same cut contexts); init chosen on validation over C-lite + B", ref: scripts/study_configs/make_stage_d_final.py}
   - {date: "2026-11-13", what: "Owner: investigate the 1-month anomaly, then teacher labels on your history (Stage E)", ref: scripts/investigate_fr_1m.py}
+  - {date: "2026-11-13", what: "Claim framing: fine-tune on real data; teachers without official fine-tuning (Toto, t0, Timestral) compared zero-shot; Chronos-2 compared fine-tuned via its official fit()", ref: docs/decisions/0007-claim-student-ft-vs-teacher-ft.md}
+  - {date: "2026-11-13", what: "Code pushed to https://github.com/bpugnaire/tsfm-distillation (public)", ref: README.md}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}
