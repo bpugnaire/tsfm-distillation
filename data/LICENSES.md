@@ -7,4 +7,4 @@
 | Toto 2.0 (4m, 22m, 313m) | https://huggingface.co/Datadog | Apache-2.0 | teacher / comparator | 2026-11-12 |
 | t0-gamma | https://huggingface.co/theforecastingcompany/t0-gamma | Apache-2.0 (not gated) | teacher | 2026-11-12 |
 | Chronos-2, Chronos-2-small | https://huggingface.co/amazon/chronos-2, autogluon/chronos-2-small | Apache-2.0 | comparator only | 2026-11-12 |
-| Timestral 5M/28M/123M/209M | https://huggingface.co/mistralai | Modified MIT (revenue clause > $20M/month) | **disabled pending owner confirmation** | 2026-11-12 |
+| Timestral 5M/28M/123M/209M | https://huggingface.co/mistralai | Modified MIT (revenue clause > $20M/month); code Apache-2.0 | comparator (owner confirmed eligibility 2026-11-13, personal project) | 2026-11-13 |

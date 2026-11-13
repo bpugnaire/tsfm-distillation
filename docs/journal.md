@@ -41,3 +41,34 @@ synthetic corpus; teacher cache; student + KD losses + training loop; ONNX/int8 
 
 **Next (owner decisions, nothing launched):** experiment design for Phase 3–4: fair comparison protocol (in-domain vs zero-shot),
 corpus size, teacher choice per level/window, seeds/power. Teacher caching ≈ 25–28 min per teacher per 300k windows on MPS (needs approval).
+
+## 2026-11-13 — Correction: seasonal-naive baseline bug; Timestral; data for distillation
+
+**Did:** enabled Timestral as a comparator (owner: personal project, licence clause does not apply; vendor post-processing off, same
+policy as t0). Measured what teachers output on different input families (owner question: "can we distil on pure random noise?").
+Rebuilt Draw mode (forecast origin = pen tip, hover = backtest), added Status and Learn pages.
+
+**CORRECTION (affects every relative score of 2026-11-12):** `SeasonalNaive` stepped back one season too many for horizon steps
+beyond the period (step 25 with m=24 copied y[T-48] instead of y[T-24]). It was a valid but *weaker* baseline, so every model looked
+better relative to it. Found when the Learn page extracted the function's source. Fixed + hand-computed test
+(`tests/test_metrics.py::test_seasonal_naive_uses_most_recent_season`), baseline re-run, summaries recomputed. Rankings unchanged.
+
+**Result (corrected, relative WQL, cluster-bootstrap 95% CI):**
+- Fresh FR power (`results/fresh_fr_power/summary.json`): Timestral-209M 0.616 [0.574, 0.660], Timestral-28M 0.617, Toto-313m 0.621,
+  Chronos-2 0.626, Toto-22m 0.641, Timestral-5M 0.643, Chronos-2-small 0.645, preview student 0.658, t0-gamma 0.670, Toto-4m 0.711, ETS 1.396.
+- Shapes (`results/shapes/summary.json`): Timestral-209M 0.402 [0.366, 0.443], Toto-313m 0.439, Timestral-28M 0.447, Toto-22m 0.475,
+  t0-gamma 0.485, Timestral-5M 0.492, Chronos-2-small 0.494, Chronos-2 0.504, Toto-4m 0.519, preview student 0.564, ETS 1.246.
+- Input families (`results/input_families.json`, 200 contexts each; Toto-22m / t0-gamma): median movement (std of the median forecast
+  / 80% band width) white noise 0.001 / 0.004, random walk 0.03 / 0.06, KernelSynth 0.27 / 0.35, random shapes 0.63 / 0.64,
+  real electricity 0.66 / 0.78. Diversity across contexts: 0.006 / 0.024 (white noise) vs 1.04 / 1.07 (real).
+
+**Surprise / learned:**
+1. *Showing code to a learner is a code review*: extracting `SeasonalNaive._one` for the Learn page exposed the bug. Also: a
+   `str.replace` patch that matches nothing fails silently; patch scripts must assert.
+2. *On white noise the teachers are correct and useless for distillation*: flat median, constant calibrated band (3.28 MAD
+   ≈ 2.56σ/0.8σ), the same answer for every context. Structured random noise (KernelSynth) carries ~70% of the real-data signal.
+3. *On fresh data the top four models are tied* (0.616–0.626, overlapping CIs): Timestral-28M = Timestral-209M.
+4. Timestral-5M fails on sawtooth (2.17× seasonal naive) and level shift (1.22×) while the 209M is the best model overall.
+
+**Next:** owner decisions in `docs/status.yaml`; the input-family result suggests an experiment: same student, teacher labels on
+{real, KernelSynth, shapes, white noise} contexts, evaluated on fresh + shapes.

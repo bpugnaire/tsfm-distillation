@@ -14,7 +14,9 @@ rigorous study + demo. Constraints: free GPUs only, no fabricated numbers, fresh
 - **t0 is not gated** (t0-alpha/beta/gamma: `gated=False`, Apache-2.0, checked 2026-11-12). No HF_TOKEN needed.
 - **Timestral disabled.** Its Modified MIT licence withdraws *all* rights (evaluation included) when the
   user's company or employer has > $20M monthly revenue. The owner must confirm eligibility before we
-  even run it as a comparator. The adapter raises `PermissionError` until then.
+  even run it as a comparator. ~~The adapter raises `PermissionError` until then.~~
+  **Update 2026-11-13:** owner confirmed this is a personal project, so the revenue clause does not apply. Timestral is
+  enabled as a **comparator** (5M/28M/209M). Distilling *from* Timestral still needs an explicit owner decision (CLAUDE.md §2.4).
 - Chronos-2: comparator only (Apache-2.0).
 
 ## Consequences

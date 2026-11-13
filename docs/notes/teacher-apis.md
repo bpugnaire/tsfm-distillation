@@ -32,6 +32,11 @@ All installed together in one Python 3.12 env (`uv sync --extra teachers`).
 - **Raw quantiles cross** on 0.4% (small) / 1.6% (base) of gallery cells (worst: 3.3% of the quantile span). We sort them
   (monotone rearrangement; never increases pinball loss) and record the rate in each result's `fallbacks`.
 
-## Timestral (comparator only) — disabled
-- Install from GitHub (`pip install git+https://github.com/mistralai/timestral.git`), 21 quantiles 0.01…0.99.
-- Licence: Modified MIT with a $20M/month revenue clause that removes all rights. Waiting for the owner (ADR 0001).
+## Timestral (comparator) — `timestral` from GitHub, pinned commit a534bdb
+- Install: `git+https://github.com/mistralai/timestral.git@<sha>` (not on PyPI). Code Apache-2.0; weights Modified MIT (revenue clause;
+  owner confirmed eligibility 2026-11-13).
+- `from timestral import TimestralForecaster`; `TimestralForecaster.from_pretrained("mistralai/Timestral-{5M,28M,123M,209M}", device=...)`.
+- `forecast(context (B,T) with NaN, prediction_length)` → `Forecast.quantiles` `(B, V, H, Q)`; 21 native levels → our 13 all native.
+- **Defaults differ from t0:** `symmetric_averaging=True` (also forecasts −context and averages; 2× cost) and `clip_nonnegative=True`.
+  We pass both `False` (raw-model policy, like t0). Ablation candidate.
+- Block-autoregressive decoding with median feedback beyond 32 patches (1024 steps); horizon 64 is one shot.

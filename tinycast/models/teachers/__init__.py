@@ -138,11 +138,38 @@ class Chronos2Adapter:
 
 
 class TimestralAdapter:
-    """Comparator only. Disabled until the owner confirms the licence (revenue clause)."""
+    """Mistral Timestral (`timestral` from GitHub, pinned commit), comparator.
 
-    def __init__(self, *args, **kwargs):
-        raise PermissionError(
-            "Timestral is disabled: its Modified MIT licence withdraws all rights if your "
-            "company's (or employer's) monthly revenue exceeds $20M. The owner must confirm "
-            "eligibility (see docs/decisions/0001-project-scope.md) before enabling it."
-        )
+    Weights: Modified MIT with a revenue clause; owner confirmed eligibility 2026-11-13 (personal project).
+    Native: 21 quantiles 0.01, 0.05, 0.1 ... 0.95, 0.99 -> our 13 levels are all native.
+    `forecast()` defaults to symmetric_averaging=True and clip_nonnegative=True. We turn both OFF:
+    same "raw model" policy as t0 (whose identical options default to off). Ablation candidate.
+    """
+
+    quantile_levels = QUANTILE_LEVELS
+
+    def __init__(self, name: str, checkpoint: str, device: str = "cpu", batch_size: int = 32):
+        from timestral import TimestralForecaster
+
+        self.name = name
+        self.device = _device(device)
+        self.model = TimestralForecaster.from_pretrained(checkpoint, device=self.device)
+        trained = self.model.quantile_levels
+        self.idx = [min(range(len(trained)), key=lambda i: abs(trained[i] - lv)) for lv in QUANTILE_LEVELS]
+        if any(abs(trained[i] - lv) > 1e-9 for i, lv in zip(self.idx, QUANTILE_LEVELS, strict=True)):
+            raise ValueError(f"{name}: levels {QUANTILE_LEVELS} not all native in {trained}")
+        self.native_levels = QUANTILE_LEVELS
+        self.batch_size = batch_size
+        self.n_params = sum(p.numel() for p in self.model.model.parameters())
+
+    @torch.no_grad()
+    def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
+        out = []
+        for sl in _batches(len(context), self.batch_size):
+            fc = self.model.forecast(
+                np.asarray(context[sl], dtype=np.float32), horizon,
+                symmetric_averaging=False, clip_nonnegative=False,
+            )  # fmt: skip
+            out.append(fc.quantiles[:, 0][..., self.idx].float().cpu().numpy())  # (b, H, 13)
+        q = np.concatenate(out).transpose(0, 2, 1)
+        return check_output(q, len(context), horizon, self.name)

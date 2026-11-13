@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Learn 5 · Compression and the browser</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- GENERATED from web/learn-src/learn-5-deployment.html by web/learn-src/build.py: edit the source, not this file -->
+  <div class="course">
+    <aside id="sidebar"></aside>
+    <article>
+<h1>5 · Compression and the browser</h1>
+<div class="goals"><b>After this chapter you can</b>
+  <ul>
+    <li>reason about the size / latency / accuracy trade-off of forecasting models;</li>
+    <li>export a PyTorch model to ONNX <em>with its preprocessing inside</em>, and test that the export is faithful;</li>
+    <li>explain int8 quantisation (scales, per-tensor vs per-channel, dynamic vs static) and why outliers hurt;</li>
+    <li>run a model in a browser tab with onnxruntime-web, and measure it honestly.</li>
+  </ul>
+</div>
+
+<h2 id="tradeoff">Size, latency, accuracy</h2>
+<p>Parameters set the file size and roughly the compute per forecast. Latency also depends on the number of tokens (sequence length), the batch size and the runtime.
+  For an interactive demo that forecasts on every pen move, the budget is a few milliseconds and a few megabytes.</p>
+<div class="card table-wrap" id="w-latency"></div>
+<p>Note the shape of the table: going from 4M to 300M parameters multiplies latency by about 25 and improves the relative score by roughly 15% on the shapes. Distillation tries to keep most of that gain at the small end.</p>
+
+<h2 id="onnx">Exporting the model: ONNX</h2>
+<div class="callout intuition"><b>Intuition</b>
+  PyTorch is a Python program; a browser cannot run it. <span class="term" data-g="onnx">ONNX</span> is a file describing the computation as a graph of standard operations (MatMul, Add, Softmax…) plus the weights.
+  Any ONNX runtime (Python, C++, the browser) executes the same graph.</div>
+<p>The most important design choice: <b>put the preprocessing inside the graph</b>. Our scaler (median, MAD, asinh) and the un-scaling are part of the exported model.
+  The browser sends raw numbers with NaN for missing values and gets raw-space quantiles back. There is no second implementation of the normalisation in JavaScript that could drift out of sync.</p>
+<figure class="code" data-ref="tinycast.export.onnx.export_onnx"></figure>
+<div class="callout pitfall"><b>Pitfall: not every operation exports</b>
+  PyTorch's exporter had no ONNX translation for <code>torch.asinh</code>. We rewrote it with basic operations. The naive formula log(z + √(z² + 1)) loses all precision for large negative z
+  (catastrophic cancellation: two nearly equal numbers subtracted), so we use the symmetric form sign(z) · log(|z| + √(z² + 1)) and a unit test against <code>torch.asinh</code>.</div>
+<figure class="code" data-ref="tinycast.models.student._asinh"></figure>
+<h3>Parity: is the export faithful?</h3>
+<p>A <span class="term" data-g="parity">parity test</span> runs the PyTorch model and the ONNX file on the same inputs and compares. The tolerance must match the number format: float32 keeps about 7 significant digits,
+  so on electricity data around 50,000 MW an absolute tolerance of 0.0001 is impossible (one rounding step is about 0.004). We use an error relative to the series' scale and to the value's distance from the centre.
+  The test inputs are deliberately nasty: scales from 0.001 to 50,000, gaps, very short series.</p>
+
+<h2 id="quant">int8 quantisation</h2>
+<div class="callout intuition"><b>Intuition</b>
+  Store each weight as an 8-bit integer instead of a 32-bit float, plus one scale factor per group of weights. Four times smaller, and integer arithmetic can be faster.
+  The price: each weight is rounded to the nearest of 255 levels.</div>
+<div class="callout formal"><b>Formally (symmetric int8)</b>
+  <span class="math">s = max|w| / 127,   q = round(w / s) ∈ [−127, 127],   ŵ = s · q</span>
+  The rounding error per weight is at most s / 2. One large weight makes s large, and then every <em>small</em> weight of the group is rounded coarsely.</div>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>outlier size <input type="range" id="q-outlier" min="1" max="40" step="1" value="12" /> <b id="q-outlierv">12×</b></label>
+    <label>bits <input type="range" id="q-bits" min="2" max="8" step="1" value="4" /> <b id="q-bitsv">4</b></label>
+    <label><input type="checkbox" id="q-perch" /> one scale per channel</label>
+  </div>
+  <svg id="w-quant"></svg><div class="stat-row" id="w-quant-stats"></div>
+  <p class="small muted">Four rows (channels) of a weight matrix. Blue: true weights. Grey lines: the values that can be represented. Orange: how far each weight is moved by rounding.
+    Increase the outlier in channel 0 with one shared scale: every channel loses precision. Tick "one scale per channel": only channel 0 suffers.</p></div>
+<ul>
+  <li><span class="term" data-g="per-channel">Per-channel</span> scales isolate outliers (the widget).</li>
+  <li><span class="term" data-g="dynamic-quant">Dynamic</span> quantisation stores weights in int8 and computes activation scales on the fly: no calibration data needed. <b>Static</b> quantisation fixes activation scales from a calibration set: faster, more work.</li>
+  <li>Not every layer is equally sensitive. In our student, keeping the <b>patch embedding</b> (the first layer, which sees the raw-scale input) in float32 roughly halved the int8 error.</li>
+</ul>
+<figure class="code" data-ref="tinycast.export.quantize.quantize_int8"></figure>
+<div class="callout project"><b>In this project</b>
+  int8 changes outputs by about 3% (99th percentile, stress-test inputs), yet the relative WQL on both test sets is unchanged to three decimals.
+  Parity error and accuracy loss are different things: always measure the metric you care about.</div>
+
+<h2 id="browser">Running it in the browser</h2>
+<ul>
+  <li><b>onnxruntime-web</b> executes the ONNX graph with <span class="term" data-g="wasm">WebAssembly</span> (CPU) or WebGPU. Our 1M-parameter student takes about 2 ms per forecast in onnxruntime-web's WASM runtime on one thread (measured under Node.js; in-browser timing is shown live in Draw mode).</li>
+  <li><b>Threads</b> in WASM need the page to be "cross-origin isolated" (special HTTP headers). Static hosts like GitHub Pages do not send them, so the demo runs single-threaded and says so.</li>
+  <li><b>Measure honestly</b>: time only <code>session.run</code>, after a warm-up, and report a median over many runs. The first call includes compilation and is much slower.</li>
+  <li><b>Ship small files</b>: the fp32 model is about 4 MB, the int8 one about 1.3 MB. The runtime itself is the largest download (the WASM binary, about 15 MB before compression).</li>
+</ul>
+
+<h2 id="check">Check yourself</h2>
+<details class="check"><summary>1. Why include the scaler in the ONNX graph instead of re-implementing it in JavaScript?</summary>
+  <p>One implementation means it cannot drift: the parity test covers preprocessing and network together, and the browser cannot normalise differently from training.</p></details>
+<details class="check"><summary>2. A weight matrix has one weight 30× larger than the others. Per-tensor int8: what happens to the small weights?</summary>
+  <p>The scale is set by the large weight, so the small weights fall on only a few of the 255 levels (many round to 0). Per-channel scales or keeping that layer in float32 avoid it.</p></details>
+<details class="check"><summary>3. The ONNX output differs from PyTorch by 0.004 on a value of 52,000. Bug?</summary>
+  <p>Probably not: that is about one float32 rounding step at that magnitude (relative 8 × 10⁻⁸). Judge parity relative to the values' scale.</p></details>
+<details class="check"><summary>4. The first forecast in the browser takes 300 ms, the next ones 2 ms. Which number goes in the paper?</summary>
+  <p>Report both, labelled: the steady-state median after warm-up (2 ms) as latency, and the first-call time as "cold start".</p></details>
+
+      <nav class="chapter-nav" id="chapter-nav"></nav>
+    </article>
+  </div>
+  <script type="module" src="/src/pages/learn.ts"></script>
+</body>
+</html>

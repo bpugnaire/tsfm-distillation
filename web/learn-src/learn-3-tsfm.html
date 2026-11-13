@@ -1,0 +1,117 @@
+<!-- title: tinycast · Learn 3 · How foundation models work -->
+<h1>3 · How time-series foundation models work</h1>
+<div class="goals"><b>After this chapter you can</b>
+  <ul>
+    <li>describe the five stages every TSFM goes through: scale, tokenise, mix, decode the output, roll out;</li>
+    <li>explain the design choices that differ between Chronos, TimesFM, Moirai, Toto, t0, Timestral and our student;</li>
+    <li>read the student's code and map each block to its role;</li>
+    <li>say what pretraining data these models learn from, and why synthetic data is part of it.</li>
+  </ul>
+</div>
+
+<h2 id="idea">The idea</h2>
+<div class="callout intuition"><b>Intuition</b>
+  Classical models are fitted per series. A <span class="term" data-g="tsfm">foundation model</span> is trained once on millions of series from every domain
+  (energy, traffic, sales, servers, weather), and learns <em>generic</em> forecasting skills: continue a cycle, extrapolate a trend, widen the band after a shock.
+  It then forecasts a series it has never seen from its context alone: <span class="term" data-g="zero-shot">zero-shot</span>.</div>
+<p>The models used in this project:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>model</th><th>by</th><th>input tokens</th><th>output</th><th>role here</th></tr></thead>
+  <tbody>
+    <tr><td>Toto 2.0 (4m…2.5B)</td><td>Datadog</td><td>patches, causal decoder, time + variate attention</td><td>9 quantiles (0.1–0.9)</td><td>teacher / official small checkpoints</td></tr>
+    <tr><td>t0 (alpha, beta, gamma)</td><td>The Forecasting Company</td><td>patches of 32</td><td>21 quantiles (0.01–0.99)</td><td>teacher</td></tr>
+    <tr><td>Timestral (5M…209M)</td><td>Mistral</td><td>patches of 32, time + variate attention</td><td>21 quantiles</td><td>comparator</td></tr>
+    <tr><td>Chronos-2</td><td>Amazon</td><td>patches, group attention across series</td><td>quantiles</td><td>comparator</td></tr>
+    <tr><td>tinycast student</td><td>this project</td><td>patches of 16, encoder</td><td>13 quantiles, monotone</td><td>student</td></tr>
+  </tbody></table></div>
+<p class="small muted">Architecture facts come from each package's source code and model card (read before writing adapters; see <code>docs/notes/teacher-apis.md</code>).
+  Earlier designs you will meet in papers: Chronos-1 (value bins as tokens, a T5 language model), TimesFM (decoder-only, patches), Moirai (any-variate encoder, mixture-distribution output).</p>
+
+<h2 id="scaling">Stage 1 · Scaling: make every series look alike</h2>
+<div class="callout intuition"><b>Intuition</b>
+  The network should not care whether a series is in megawatts or page views. Normalise each context by its own location and scale, forecast in that unit-free space, and convert back at the end.
+  This is <span class="term" data-g="instance-norm">instance normalisation</span> (RevIN in the literature).</div>
+<div class="callout formal"><b>Formally (our student)</b>
+  <span class="math">z<sub>t</sub> = asinh( (x<sub>t</sub> − median(x)) / mean|x − median(x)| ),   x̂ = sinh(ẑ) · scale + loc</span>
+  Statistics come from the <em>context only</em>: using the future would be leakage. <span class="term" data-g="asinh">asinh</span> is ≈ z near 0 and ≈ log(2|z|) far out, so spikes are compressed instead of dominating.</div>
+<div class="card widget"><svg id="w-scaler"></svg><div class="stat-row" id="w-scaler-stats"></div>
+  <p class="small muted">The "spikes" shape from the gallery: a daily wave plus a few large outliers. Mean/std scaling lets the spikes set the scale, which squashes the wave the model has to learn. Median/MAD ignores them, and asinh tames them.</p></div>
+<figure class="code" data-ref="tinycast.models.student.RobustScaler"></figure>
+<div class="callout pitfall"><b>Pitfall</b>
+  A constant series has scale 0, so dividing by it explodes. Every implementation adds a floor (ours: 0.001 × (|loc| + 1)). Toto, t0 and Timestral all have their own variant; check yours.</div>
+
+<h2 id="tokens">Stage 2 · Tokenisation: patches or bins</h2>
+<p>Transformers read a sequence of vectors (tokens). There are two ways to turn numbers into tokens:</p>
+<ul>
+  <li><b>Patches</b> (PatchTST, TimesFM, Toto, t0, Timestral, ours): cut the context into blocks of p steps and embed each block with a small MLP. 512 steps with p = 16 give 32 tokens.</li>
+  <li><b>Bins</b> (Chronos-1): scale, then round each value to one of B bins, and treat the bin index as a word from a vocabulary. It reuses language-model machinery, at the cost of rounding error and one token per time step.</li>
+</ul>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>patch size <input type="range" id="t-patch" min="0" max="4" step="1" value="2" /> <b id="t-patchv">16</b></label>
+    <label>number of bins <input type="range" id="t-bins" min="0" max="5" step="1" value="2" /> <b id="t-binsv">32</b></label>
+  </div>
+  <svg id="w-tokens"></svg><div class="stat-row" id="w-tokens-stats"></div>
+  <p class="small muted">Shaded stripes: patches (one token each). Grey: the real series. Orange: the same series after binning, the only information a bin-token model receives.</p></div>
+<p>Attention compares every token with every other one, so its cost grows with the square of the number of tokens. Patching 512 steps into 32 tokens makes attention 256× cheaper. That is why patches won.
+  We also feed a "was observed" mask next to the values, so a missing value (NaN) is not mistaken for a zero.</p>
+<figure class="code" data-ref="tinycast.models.student.PatchTransformerNet.forward"></figure>
+
+<h2 id="transformer">Stage 3 · Mixing information: the transformer</h2>
+<p>Each layer lets every token look at the others (<span class="term" data-g="attention">self-attention</span>) and then transforms it with an MLP. After a few layers, the token for "the last patch"
+  knows about the daily cycle seen 5 days ago and the level shift 2 days ago.</p>
+<ul>
+  <li><span class="term" data-g="decoder-only">Decoder-only</span> models (Toto, TimesFM) use causal attention: patch i only sees patches ≤ i, and every position is trained to predict the next patch. That gives many training signals per series.</li>
+  <li><b>Encoder</b> models (our student) let every token see every other, and read the forecast from a dedicated "forecast token". Simpler; fine for a fixed horizon.</li>
+  <li><b>Multivariate</b> models alternate attention over time and over variates (Toto, Timestral) or over a group of related series (Chronos-2). Our student is <span class="term" data-g="univariate">univariate</span>.</li>
+</ul>
+
+<h2 id="head">Stage 4 · The output head</h2>
+<p>The last hidden state is mapped to the forecast. Three families:</p>
+<ul>
+  <li><span class="term" data-g="quantile-head">Quantile head</span>: K outputs per step, each trained with the pinball loss at its level (Toto 2.0, t0, Timestral, Chronos-2, ours).</li>
+  <li><b>Parametric</b>: the parameters of a distribution (e.g. a mixture of Student-t), trained by likelihood (Moirai, Toto 1.0).</li>
+  <li><b>Categorical over bins</b>: a softmax over the value vocabulary (Chronos-1), trained with cross-entropy.</li>
+</ul>
+<h3>Quantiles must not cross</h3>
+<p>Nothing forces 13 independent outputs to stay ordered. If q<sub>0.7</sub> &lt; q<sub>0.3</sub>, the forecast is not a valid distribution. We measured raw Chronos-2 outputs crossing in 0.4–1.6% of cells; Toto sorts its outputs after the fact.
+  Our student builds the order in: predict the median, then add positive gaps (softplus) outwards.</p>
+<div class="card widget">
+  <div class="widget-controls">raw network outputs:
+    <label>a₁ <input type="range" id="h-1" min="-3" max="3" step="0.1" value="-1.5" /></label>
+    <label>a₂ <input type="range" id="h-2" min="-3" max="3" step="0.1" value="-0.5" /></label>
+    <label>a₃ <input type="range" id="h-3" min="-3" max="3" step="0.1" value="0.5" /></label>
+    <label>a₄ <input type="range" id="h-4" min="-3" max="3" step="0.1" value="1.5" /></label>
+  </div>
+  <svg id="w-head"></svg>
+  <p class="small muted">Top: use the four outputs directly as q<sub>0.1</sub>, q<sub>0.3</sub>, q<sub>0.7</sub>, q<sub>0.9</sub> (median at 0). Drag a₂ above a₃ and they cross. Bottom: the same outputs as gaps, q<sub>0.3</sub> = −softplus(a₂), q<sub>0.1</sub> = q<sub>0.3</sub> − softplus(a₁), …: always ordered, whatever the network outputs.</p></div>
+<figure class="code" data-ref="tinycast.models.student.MonotoneQuantileHead"></figure>
+<h3>What about levels a model does not produce?</h3>
+<p>Toto 2.0 only outputs 0.1…0.9, but we also want 0.01 and 0.99. Inside the range, interpolate. Outside, extrapolate the tails with an exponential shape fitted to the two outermost quantiles (the rule t0 uses).
+  It is a guess, and it is flagged as such in every result file.</p>
+<figure class="code" data-ref="tinycast.models.base.extend_tails_exponential"></figure>
+
+<h2 id="decoding">Stage 5 · Decoding long horizons</h2>
+<p>A model trained to output 32 patches can forecast at most 32 × 32 = 1024 steps in one pass. Beyond that, models roll out <span class="term" data-g="autoregressive">autoregressively</span>:
+  append the forecast median to the context as if observed, forecast the next block, repeat. Errors can compound, and the uncertainty of the appended block is lost (only its median is fed back).
+  Toto 2.0 and Timestral both do this "median feedback" in their decoding loops. Our 64-step horizon fits in one pass for every model.</p>
+
+<h2 id="pretraining">Pretraining data</h2>
+<ul>
+  <li><b>Real corpora</b>: large public collections (energy, traffic, retail, finance, weather…), and for Toto, Datadog's observability metrics.</li>
+  <li><b>Synthetic data</b>: <span class="term" data-g="kernelsynth">KernelSynth</span> draws series from Gaussian processes whose kernels are randomly composed (periodic + trend, periodic × smooth…). It provides unlimited, diverse, licence-free training data (chapter 4 has a live sampler).</li>
+  <li><b>Augmentations</b>: <span class="term" data-g="tsmixup">TSMixup</span> mixes several series into new ones; random scaling and cropping.</li>
+</ul>
+<div class="callout project"><b>In this project: does size buy accuracy?</b>
+  On the fresh electricity data, Timestral-28M scores the same as Timestral-209M, and four very different models are statistically tied (see the table in chapter 2).
+  On the toy shapes, every model has a failure mode: t0-gamma is 2.3× worse than seasonal naive on a level shift, and on impulse-decay the smallest Toto (4M) beats every larger Toto and both Chronos-2 models. Bigger is better on average, not everywhere.</div>
+
+<h2 id="check">Check yourself</h2>
+<details class="check"><summary>1. Why compute the scaler's statistics on the context only?</summary>
+  <p>At forecast time the future is unknown. Using it in training would let the model learn from information it cannot have, and evaluation would be optimistic (leakage).</p></details>
+<details class="check"><summary>2. A model reads 4096 steps with patches of 32. How many tokens, and how does attention cost compare with patches of 16?</summary>
+  <p>128 tokens. With patches of 16: 256 tokens, so 4× the attention cost (256² / 128² = 4).</p></details>
+<details class="check"><summary>3. Two independent heads output q<sub>0.1</sub> and q<sub>0.9</sub>. Name two ways to guarantee q<sub>0.1</sub> ≤ q<sub>0.9</sub>.</summary>
+  <p>Construct it (median + positive gaps, as in our head), or post-process it (sort the outputs, as Toto does; sorting never increases the total pinball loss).</p></details>
+<details class="check"><summary>4. Why would a model pretrained only on real data still benefit from synthetic GP data?</summary>
+  <p>Real corpora are biased toward a few domains and patterns. Synthetic data fills gaps (rare periods, odd combinations of trend and season) and is unlimited, licence-free and leakage-free.</p></details>

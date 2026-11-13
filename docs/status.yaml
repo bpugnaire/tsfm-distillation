@@ -1,0 +1,37 @@
+# Hand-maintained project status for the website Status page (web/status.html).
+# Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
+current_focus: >-
+  Experiment design for distillation (Phases 3-4), together with the owner. The pipeline is ready and tested;
+  no distillation experiment has been run yet.
+pending_decisions:
+  - id: fair-comparison
+    question: How do we compare an in-domain student with zero-shot teachers fairly?
+    options: [report both explicitly, also train a synthetic-only student, evaluate on a held-out domain]
+  - id: input-distribution
+    question: Which contexts do we label with the teachers (real windows, synthetic, teacher-generated, a mix)?
+    options: [real RTE windows, KernelSynth + shapes, mix with a ratio to sweep]
+    note: results/input_families.json shows white noise carries almost no teacher signal.
+  - id: corpus-size
+    question: How many cached windows per teacher (30k / 100k / 300k)?
+    note: ~24-28 min per 300k windows per teacher on the Mac GPU (results/throughput.json). Needs approval before running.
+  - id: teacher-choice
+    question: Which teacher(s)? Per level (native tails) or per window (weighting by error)?
+  - id: seeds-power
+    question: How many seeds, and which effect size can the fresh split detect?
+  - id: fresh-split
+    question: Review ADR 0003 (fresh test starts 2026-10-15, ~4 weeks of data).
+  - id: baseline-seasons
+    question: Fix the baselines' season on electricity instead of auto-detecting it?
+    options: [ETS m=24 + seasonal naive m=24, seasonal naive m=168 (weekly), keep auto]
+    note: >-
+      Auto-detection picks 168 h on some fresh windows; statsforecast ETS cannot fit seasons > 24 and silently
+      went non-seasonal (now recorded in results/fresh_fr_power/ets.json "fallbacks"). That makes ETS a weak
+      baseline on real data. Changing the denominator changes every relative score.
+  - id: distill-from-timestral
+    question: Use Timestral as a teacher too, or keep it as a comparator only?
+decided:
+  - {date: "2026-11-12", what: "Python 3.12 (toto-2 requires it)", ref: docs/decisions/0001-project-scope.md}
+  - {date: "2026-11-12", what: "Headline metric = 9-level WQL relative to seasonal naive, cluster bootstrap over series", ref: docs/decisions/0002-metrics.md}
+  - {date: "2026-11-12", what: "Vendor post-processing tricks off for every model (raw model policy)", ref: docs/notes/teacher-apis.md}
+  - {date: "2026-11-13", what: "Timestral enabled as a comparator (owner: personal project, licence clause does not apply)", ref: docs/decisions/0001-project-scope.md}
+  - {date: "2026-11-13", what: "Ask the owner before any long run on the Mac; learn step by step", ref: docs/journal.md}

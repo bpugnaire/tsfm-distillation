@@ -181,6 +181,77 @@ def results() -> dict:
     return out
 
 
+def status() -> dict:
+    """PLAN.md checkboxes per phase + docs/status.yaml + journal headlines + artifacts."""
+    import re
+
+    plan = (ROOT / "PLAN.md").read_text()
+    phases = []
+    for block in re.split(r"(?m)^## ", plan)[1:]:
+        title = block.splitlines()[0].strip()
+        if not title.lower().startswith("phase"):
+            continue
+        items = []
+        section = ""
+        for ln in block.splitlines()[1:]:
+            if ln.startswith("### "):
+                section = ln[4:].strip()
+            m = re.match(r"^- \[( |x|~)\] (.*)", ln.strip())
+            if m:
+                text = re.sub(r"[*`]", "", m.group(2)).strip()
+                items.append({"state": {"x": "done", " ": "todo", "~": "superseded"}[m.group(1)], "text": text, "section": section})
+        phases.append({"title": title, "items": items})
+    journal = []
+    for block in re.split(r"(?m)^## ", (ROOT / "docs" / "journal.md").read_text())[1:]:
+        head = block.splitlines()[0].strip()
+        nxt = re.search(r"\*\*Next[^*]*\*\*\s*(.*)", block, re.S)
+        journal.append({"title": head, "next": (nxt.group(1).strip().split("\n\n")[0] if nxt else "")})
+    models = []
+    for p in sorted((WEB / "public" / "models").glob("*.onnx")):
+        models.append({"file": p.name, "size_mb": round(p.stat().st_size / 1e6, 2)})
+    st = yaml.safe_load((ROOT / "docs" / "status.yaml").read_text())
+    return {"phases": phases, "journal": journal, "models": models, **st}
+
+
+CODE_REFS = [
+    "tinycast.eval.metrics.pinball_loss", "tinycast.eval.metrics.wql", "tinycast.eval.metrics.mase_scale",
+    "tinycast.eval.metrics.coverage", "tinycast.eval.metrics.bootstrap_ci",
+    "tinycast.models.baselines.estimate_season", "tinycast.models.baselines.SeasonalNaive._one",
+    "tinycast.models.student.RobustScaler", "tinycast.models.student.MonotoneQuantileHead",
+    "tinycast.models.student.PatchTransformerNet.forward", "tinycast.models.student._asinh",
+    "tinycast.models.base.extend_tails_exponential",
+    "tinycast.distill.losses.level_mass", "tinycast.distill.losses.pinball_gt",
+    "tinycast.distill.losses.kd_pinball_teacher", "tinycast.distill.losses.kd_quantile_huber",
+    "tinycast.distill.losses.mixed_objective", "tinycast.distill.train.scaled_targets", "tinycast.distill.train.lr_at",
+    "tinycast.data.synthetic.kernel_synth", "tinycast.data.windows.candidate_origins",
+    "tinycast.export.onnx.export_onnx", "tinycast.export.quantize.quantize_int8",
+]  # fmt: skip
+
+
+def code_snippets() -> dict:
+    """Source of the functions the Learn pages show, extracted from the repo (never stale)."""
+    import importlib
+    import inspect
+
+    out = {}
+    for ref in CODE_REFS:
+        parts = ref.split(".")
+        for k in range(len(parts) - 1, 0, -1):
+            try:
+                obj = importlib.import_module(".".join(parts[:k]))
+                for attr in parts[k:]:
+                    obj = getattr(obj, attr)
+                break
+            except (ImportError, AttributeError):
+                continue
+        else:
+            raise ImportError(ref)
+        src = inspect.getsource(obj)
+        file = inspect.getsourcefile(obj)
+        out[ref] = {"file": str(Path(file).relative_to(ROOT)), "line": inspect.getsourcelines(obj)[1], "code": inspect.cleandoc(src) if src.startswith(" ") else src}
+    return out
+
+
 if __name__ == "__main__":
     palette_ts()
     data = WEB / "public" / "data"
@@ -188,5 +259,10 @@ if __name__ == "__main__":
     g = gallery()
     (data / "gallery.json").write_text(json.dumps(g, separators=(",", ":")))
     (data / "results.json").write_text(json.dumps(results(), separators=(",", ":")))
-    for f in ("gallery.json", "results.json"):
+    (data / "code.json").write_text(json.dumps(code_snippets(), separators=(",", ":")))
+    (data / "status.json").write_text(json.dumps(status(), separators=(",", ":")))
+    ifp = ROOT / "results" / "input_families.json"
+    if ifp.exists():
+        (data / "input_families.json").write_text(ifp.read_text())
+    for f in ("gallery.json", "results.json", "status.json"):
         print(f, f"{(data / f).stat().st_size / 1e3:.0f} kB")

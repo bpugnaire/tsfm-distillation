@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Learn 1 · Forecasting fundamentals</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- GENERATED from web/learn-src/learn-1-basics.html by web/learn-src/build.py: edit the source, not this file -->
+  <div class="course">
+    <aside id="sidebar"></aside>
+    <article>
+<h1>1 · Forecasting fundamentals</h1>
+<div class="goals"><b>After this chapter you can</b>
+  <ul>
+    <li>name the parts of a forecasting problem (context, origin, horizon) and read any forecast plot;</li>
+    <li>recognise trend, seasonality, level shifts and noise, and find a season with the autocorrelation function;</li>
+    <li>explain why "repeat last week" is a serious baseline, and why a model must beat it;</li>
+    <li>set up an evaluation that does not cheat (backtesting, time splits, leakage, zero-shot vs in-domain).</li>
+  </ul>
+</div>
+
+<h2 id="anatomy">The anatomy of a forecast</h2>
+<div class="callout intuition"><b>Intuition</b>
+  You stand at a point in time, look back at what happened, and say something about what comes next.
+  Everything in forecasting is about <em>where you stand</em>, <em>how far you look back</em> and <em>how far you look ahead</em>.</div>
+<p>A <span class="term" data-g="time-series">time series</span> is a sequence x<sub>1</sub>, x<sub>2</sub>, … sampled at a fixed step (here: hourly electricity consumption).
+  The <span class="term" data-g="origin">forecast origin</span> T is the last step you observed. The <span class="term" data-g="context">context</span> is the window of past
+  values the model reads (ours: up to 512 hours ≈ 3 weeks). The <span class="term" data-g="horizon">horizon</span> H is how many steps you forecast (ours: 64 hours ≈ 2.7 days).</p>
+<div class="callout formal"><b>Formally</b>
+  A forecaster is a function f : (x<sub>T−L+1</sub>, …, x<sub>T</sub>) ↦ prediction of (x<sub>T+1</sub>, …, x<sub>T+H</sub>), with context length L and horizon H.
+  The prediction can be one number per step (point forecast) or a distribution per step (probabilistic forecast, chapter 2).</div>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>trend <input type="range" id="a-trend" min="-0.06" max="0.06" step="0.005" value="0.02" /></label>
+    <label>seasonal amplitude <input type="range" id="a-amp" min="0" max="15" step="0.5" value="8" /></label>
+    <label>period <select id="a-period"><option value="12">12</option><option value="24" selected>24</option><option value="48">48</option></select></label>
+    <label>noise <input type="range" id="a-noise" min="0" max="6" step="0.25" value="1.5" /></label>
+    <label><input type="checkbox" id="a-shift" /> level shift at t = 300</label>
+    <label>forecast origin <input type="range" id="a-origin" min="260" max="430" step="1" value="380" /></label>
+  </div>
+  <svg id="w-anatomy"></svg>
+  <div class="stat-row" id="w-anatomy-stats"></div>
+  <p class="small muted">Grey: the past. Shaded: the last 256 steps, the context a model would read. Dashed: what actually happens next.
+    <span style="color:var(--student)">Blue</span>: seasonal naive (repeat the last season). <span style="color:var(--teacher)">Orange</span>: repeat the last value.</p>
+</div>
+<p><b>Try it:</b> set the noise to 0 and move the origin: seasonal naive is perfect as long as there is no trend. Add a trend: it lags behind. Tick "level shift" and put the origin a few steps after t = 300:
+  seasonal naive copies a "last season" that is partly before the jump, so part of its forecast sits at the old level. Move the origin 30 steps further: the last season is entirely after the jump and it recovers.</p>
+
+<h2 id="patterns">Patterns: trend, seasonality, shifts, noise</h2>
+<p>Most real series combine a few ingredients:</p>
+<ul>
+  <li><span class="term" data-g="trend">Trend</span>: slow change of the level (growth, decline, saturation).</li>
+  <li><span class="term" data-g="seasonality">Seasonality</span>: a pattern repeating with a fixed period m. Electricity has two: daily (m = 24) and weekly (m = 168).</li>
+  <li><span class="term" data-g="level-shift">Level shifts</span> and trend breaks: sudden structural changes (a factory opens, a sensor is recalibrated).</li>
+  <li>Noise: what no model can predict. Probabilistic forecasts exist to describe it honestly.</li>
+</ul>
+<p>A series whose statistical properties stay constant over time is <span class="term" data-g="stationarity">stationary</span>. Trends, random walks and level shifts break stationarity, which is why every model normalises the context (chapter 3).</p>
+<h3>Finding the season: the autocorrelation function</h3>
+<div class="callout intuition"><b>Intuition</b>
+  Shift the series by k steps and lay it over itself. If the copies line up, the series repeats every k steps.</div>
+<div class="callout formal"><b>Formally</b>
+  <span class="math">ACF(k) = Σ<sub>t</sub> (x<sub>t</sub> − x̄)(x<sub>t+k</sub> − x̄) / Σ<sub>t</sub> (x<sub>t</sub> − x̄)²</span>
+  A season of period m shows up as a peak at k = m (and smaller ones at 2m, 3m…). We remove a linear trend first, otherwise the trend makes every lag look correlated.</div>
+<div class="card widget"><svg id="w-acf"></svg>
+  <p class="small muted">ACF of the context in the widget above (same sliders). The highlighted bar is the season our rule picks: the shortest lag whose peak is at least 90% as high as the best peak above 0.3.</p></div>
+<figure class="code" data-ref="tinycast.models.baselines.estimate_season"></figure>
+<div class="callout pitfall"><b>Pitfall</b>
+  On real hourly electricity, the ACF sometimes prefers the <em>weekly</em> period (168). A model that can only handle seasons up to 24 (statsforecast's ETS) then silently fell back to "no season" in our runs.
+  We now record every such fallback in the results file. An automatic choice made for you deserves to be logged.</div>
+
+<h2 id="baselines">Baselines: the models to beat</h2>
+<p>Before trusting a 200-million-parameter model, compare it with something trivial:</p>
+<ul>
+  <li><b>Naive</b>: tomorrow = today's last value.</li>
+  <li><span class="term" data-g="seasonal-naive">Seasonal naive</span>: copy the most recent value with the same phase. For hourly data with m = 24, the forecast for tomorrow 9:00 is today 9:00.</li>
+  <li><b>ETS</b> (exponential smoothing): a classical statistical model with level, trend and season components, fitted per series.</li>
+</ul>
+<div class="callout formal"><b>Formally (seasonal naive)</b>
+  <span class="math">x̂<sub>T+s</sub> = x<sub>T+s−m·⌈s/m⌉</sub>,  s = 1, …, H</span>
+  ⌈s/m⌉ is how many whole seasons you must step back to land on an observed value with the same phase.</div>
+<figure class="code" data-ref="tinycast.models.baselines.SeasonalNaive._one"></figure>
+<div class="callout pitfall"><b>Pitfall (a real bug in this project)</b>
+  Our first version stepped back one season too many for every step beyond the first season (step 25 copied 48 h ago instead of 24 h ago).
+  It was still a plausible forecast, so nothing crashed, but it made the baseline weaker, and every model's score <em>relative</em> to it looked better than it was.
+  We found it by showing the code in this course. The fix came with a test computed by hand: x = [0, 1, 2, 10, 11, 12, 20, 21, 22], m = 3 must forecast 20, 21, 22, 20, 21, 22, …</div>
+
+<h2 id="evaluation">Evaluating without cheating</h2>
+<p>The only honest test is to pretend to be in the past. A <span class="term" data-g="backtest">backtest</span> picks many origins T, forecasts from each using only data up to T,
+  and compares with what happened after T. Splits are by <em>time</em>, never at random: training data must end before validation starts, and validation before test.</p>
+<figure class="code" data-ref="tinycast.data.windows.candidate_origins"></figure>
+<p>The rule in this project applies to the <em>forecast targets</em>: a window belongs to a split only if its whole horizon lies inside that split's dates. Contexts may reach back into earlier periods, which is simply the past.</p>
+<h3>Leakage, the foundation-model version</h3>
+<p><span class="term" data-g="leakage">Leakage</span> is any path by which test information influences the model. Classic forms: normalising with statistics from the future,
+  choosing a checkpoint on the test set. Foundation models add one: they are pretrained on huge public corpora, so the benchmark you test on may be in their training data
+  (<span class="term" data-g="contamination">contamination</span>). Our answer: the headline test uses electricity data published <em>after</em> every model's release date, enforced by an automated test.</p>
+<h3>Zero-shot vs in-domain</h3>
+<p>A foundation model forecasting our electricity data has never been trained on it: <span class="term" data-g="zero-shot">zero-shot</span>. Our preview student was trained on earlier years of the same 13 regions:
+  <span class="term" data-g="in-domain">in-domain</span>. In-domain is usually easier, so "the small student beats the big model" means little until both are compared under the same conditions.</p>
+
+<h2 id="check">Check yourself</h2>
+<details class="check"><summary>1. Why do we split time series by date and not at random?</summary>
+  <p>Random splits put future observations in the training set. The model then learns from information it would never have at forecast time, and the score is optimistic.</p></details>
+<details class="check"><summary>2. Hourly data with a strong daily cycle and no trend: which simple baseline should be hard to beat, and why?</summary>
+  <p>Seasonal naive with m = 24: it reproduces the daily shape exactly and only misses noise and slow changes.</p></details>
+<details class="check"><summary>3. A paper reports that a foundation model beats all baselines on a public benchmark released in 2019. What should you ask before believing it?</summary>
+  <p>Whether that benchmark (or its source data) was part of the model's pretraining corpus, and how the baselines were configured (season, horizon). A fresh test set published after the model avoids the first problem.</p></details>
+<details class="check"><summary>4. Why does the ACF need the trend removed first?</summary>
+  <p>A trend makes values far apart in time differ systematically, and values close in time similar, at every lag. The ACF then decays slowly and hides the seasonal peaks.</p></details>
+
+      <nav class="chapter-nav" id="chapter-nav"></nav>
+    </article>
+  </div>
+  <script type="module" src="/src/pages/learn.ts"></script>
+</body>
+</html>

@@ -132,3 +132,15 @@ def test_cluster_bootstrap_is_wider_for_correlated_items():
     _, lo_i, hi_i = M.bootstrap_ci(x)
     _, lo_c, hi_c = M.bootstrap_ci(x, groups=groups)
     assert (hi_c - lo_c) > 3 * (hi_i - lo_i)
+
+
+def test_seasonal_naive_uses_most_recent_season():
+    from tinycast.models.baselines import SeasonalNaive
+
+    x = np.array([[0.0, 1, 2, 10, 11, 12, 20, 21, 22]])  # m=3: last season = [20, 21, 22]
+    q = SeasonalNaive(season=3).forecast(x, 7)
+    median = q[0, QUANTILE_LEVELS.index(0.5)]
+    resid_med = np.median([10.0] * 6)  # every seasonal difference is 10
+    np.testing.assert_allclose(median - resid_med * np.sqrt([1, 1, 1, 2, 2, 2, 3]), [20, 21, 22, 20, 21, 22, 20])
+    q1 = SeasonalNaive(season=1).forecast(x, 3)  # m=1: random-walk naive = last value
+    assert q1[0, QUANTILE_LEVELS.index(0.5), 0] == pytest.approx(22 + np.median(np.diff(x[0])))

@@ -40,6 +40,7 @@ export:
 	$(UV) python scripts/export.py --run $(R)
 
 web-data:
+	python3 web/learn-src/build.py
 	$(UV) python scripts/build_web_data.py
 
 web-dev:

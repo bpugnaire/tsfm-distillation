@@ -75,7 +75,7 @@ For each: read the official README/source first, pin the version, write findings
 - [x] **Toto 2.0**: the official small checkpoints (4m, 22m) + one larger checkpoint as teacher (pick the largest that keeps caching within budget; measure in 1.5).
 - [x] **t0**: t0-gamma (the current release) if accessible, otherwise t0-alpha/beta; HF gated access via `HF_TOKEN`.
 - [x] **Chronos-2** (comparator).
-- [ ] **Timestral** 5M/28M/209M — blocked: owner must confirm licence eligibility (ADR 0001) (comparator only; see licence rule).
+- [x] **Timestral** 5M/28M/209M (comparator; owner confirmed licence eligibility 2026-11-13) (comparator only; see licence rule).
 - [ ] Contract test (`tests/test_forecaster_contract.py`, slow): every adapter returns `(B, 13, H)`, monotone in the quantile axis, finite, and handles NaNs in the context.
 
 ### 1.4 Benchmark harness (`tinycast/eval/benchmark.py`, `latency.py`)
@@ -183,10 +183,10 @@ For each: read the official README/source first, pin the version, write findings
 ## Phase 6 — Compression & browser parity
 
 - [x] `export/onnx.py`: export student **including the scaler** (input: raw context + NaN mask, length 512, left-padded; output: raw-space quantiles). Dynamic batch axis.
-- [ ] Parity test (slow): torch vs onnxruntime max abs diff < 1e-4 (fp32) on 1k windows.
+- [x] Parity test (slow): torch vs onnxruntime on 1k stress windows; tolerance 1e-4 *relative to max(scale, |q−loc|)* (abs 1e-4 is impossible in float32 at 50,000 MW). Run by `scripts/export.py`.
 - [x] `export/quantize.py`: int8 dynamic quantisation (and static with calibration if needed); report the accuracy delta on the fresh split and shapes.
 - [ ] Browser latency: a tiny page in `web/` that times onnxruntime-web WASM (1 and 4 threads) and optionally WebGPU, on ≥ 2 machines; record results in `results/latency_browser.json`.
-- [ ] Model files ≤ 10 MB (target: ~1–4 MB fp32, < 1 MB int8 for size s/m).
+- [x] Model files ≤ 10 MB (target: ~1–4 MB fp32, < 1 MB int8 for size s/m).
 - [ ] Copy artifacts to `web/public/models/` and push to the HF Hub with the model card.
 
 ### Article kit A3 — "Compressing a forecaster to run in the browser"
@@ -199,16 +199,16 @@ For each: read the official README/source first, pin the version, write findings
 Design: one consistent visual language (palette from `configs/style.yaml`), fast first load, works offline after load, mobile-friendly.
 
 ### 7.1 Draw mode (home page)
-- [ ] Canvas: the user draws freehand left→right; strokes are resampled to a uniform grid (up to 512 points; shorter drawings are left-padded with the NaN mask). Buttons: clear, undo, "add noise", "repeat my pattern" (tiles the drawing so seasonality emerges).
-- [ ] Live forecast: run the student on pointer-up and throttled (~every 100 ms) while drawing; draw the median line plus 50% / 80% / 98% fan bands.
-- [ ] HUD: in-browser latency (ms, rolling median), model size, int8/fp32 toggle, horizon slider (≤ 64).
-- [ ] Presets: load any gallery shape into the canvas.
+- [x] Canvas: the user draws freehand left→right; strokes are resampled to a uniform grid (up to 512 points; shorter drawings are left-padded with the NaN mask). Buttons: clear, undo, "add noise", "repeat my pattern" (tiles the drawing so seasonality emerges).
+- [x] Live forecast (changed with owner 2026-11-13: the forecast starts at the pen tip and runs every frame, ~2 ms; hover = backtest from any point); draw the median line plus 50% / 80% / 98% fan bands.
+- [x] HUD: in-browser latency (ms, rolling median), model size, int8/fp32 toggle, horizon slider (≤ 64).
+- [x] Presets: load any gallery shape into the canvas.
 - [ ] Optional "compare with teachers" toggle: calls the Space if configured. Otherwise show it only for presets, using precomputed forecasts.
 
 ### 7.2 Shapes gallery (e-means-style)
-- [ ] Grid: rows = shapes, columns = models (seasonal naive, ETS, Toto large, t0, Chronos-2, Timestral, Toto 4m/22m, **student fp32/int8**). Each cell is a small multiple with context, truth and fan, plus WQL and CPU latency under the plot.
+- [x] Grid: rows = shapes, columns = models (seasonal naive, ETS, Toto large, t0, Chronos-2, Timestral, Toto 4m/22m, **student fp32/int8**). Each cell is a small multiple with context, truth and fan, plus WQL and CPU latency under the plot.
 - [ ] Column headers show params and median latency; best-in-row is highlighted; you can sort columns by accuracy or speed; clicking a cell opens it large in Draw mode.
-- [ ] Data from `web/public/data/gallery.json` (built by `make web-data`).
+- [x] Data from `web/public/data/gallery.json` (built by `make web-data`).
 
 ### 7.3 Results page
 - [ ] Interactive Pareto charts (WQL vs latency, log x; WQL vs params), with model toggles and CI whiskers.

@@ -79,7 +79,7 @@
       <li><b>Toto 2.0 outputs 9 fixed quantiles (0.1–0.9), no samples.</b> Its head ignores requested levels. We extend to 1%/99% with the same exponential-tail rule t0 uses, and flag it.</li>
       <li><b>t0 is not gated</b> on Hugging Face, and t0-gamma natively emits all 13 of our levels.</li>
       <li><b>Chronos-2 silently clamps</b> levels outside its trained range (a log warning only), and its raw quantiles <b>cross</b> occasionally. We sort them (it never increases the loss) and record the rate.</li>
-      <li><b>Timestral's licence</b> withdraws every right if your company's or employer's monthly revenue exceeds $20M, evaluation included. It stays disabled until the owner confirms eligibility.</li>
+      <li><b>Timestral's licence</b> withdraws every right if your company's or employer's monthly revenue exceeds $20M, evaluation included. It stayed disabled until the owner confirmed this is a personal project (2026-11-13); it is now a comparator. Its <code>forecast()</code> turns two post-processing tricks on by default; we turn them off, as for t0.</li>
     </ul>
     <p>Then the zoo met the shapes gallery. No model wins everywhere (see the <a href="results.html">per-shape table</a>):</p>
     <div class="card small" id="w4"></div>

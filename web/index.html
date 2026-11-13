@@ -9,8 +9,10 @@
 <body>
   <main>
     <h1>Draw a time series, get a probabilistic forecast</h1>
-    <p class="lede">Draw left to right in the grey area. A ~1M-parameter student network forecasts the next 64 steps
-      <strong>in your browser</strong> (onnxruntime-web, WASM), with quantile bands: 40% (dark), 80%, 98% (light).</p>
+    <p class="lede">Draw left to right in the shaded area. <strong>The pen tip is "now"</strong>: a ~1M-parameter network
+      forecasts the next steps from wherever your pen is, live, <strong>in your browser</strong> (onnxruntime-web, WASM).
+      Bands: 40% (dark), 80%, 98% (light). <strong>Then hover</strong> over your drawing: the forecast restarts from that point,
+      using only the past, and what you drew afterwards (dashed) becomes the truth it is compared against. That is a backtest.</p>
     <p class="warn" id="banner">This is the <strong>preview student</strong>: trained on ground truth only for ~3 minutes, one seed.
       It exists to build and test the export + browser pipeline. The distilled student comes later.</p>
     <div class="card">
@@ -33,9 +35,9 @@
         <div id="hud" class="muted" style="font-variant-numeric:tabular-nums">loading model…</div>
       </div>
     </div>
-    <h2>What happens when you lift the pen</h2>
+    <h2>What happens on every pen move</h2>
     <ol class="small" style="color:var(--ink-2); max-width:75ch">
-      <li>Your stroke becomes 512 numbers (one per x pixel column of the context area). Columns you did not draw are <code>NaN</code>: the model treats them as missing.</li>
+      <li>Everything left of the forecast origin (your pen tip, or the hovered point) becomes up to 512 numbers, one per time step. Shorter drawings are left-padded with <code>NaN</code>, which the model treats as missing.</li>
       <li>The ONNX graph normalises them itself: location = median, scale = mean absolute deviation, then <code>asinh</code>. So the units of your drawing do not matter.</li>
       <li>A 4-layer transformer reads 32 patches of 16 steps and predicts a median plus 12 positive gaps, so the 13 quantiles can never cross.</li>
       <li>The graph un-normalises, and you get quantiles in your drawing's units. Latency above is measured around <code>session.run</code> only.</li>

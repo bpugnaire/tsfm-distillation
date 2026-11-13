@@ -1,0 +1,134 @@
+<!-- title: tinycast · Learn 4 · Knowledge distillation -->
+<h1>4 · Knowledge distillation for forecasters</h1>
+<div class="goals"><b>After this chapter you can</b>
+  <ul>
+    <li>explain why a teacher's forecast can be a better training target than the true future;</li>
+    <li>say why classic distillation (soft labels + KL divergence) does not apply directly to quantile forecasters, and what replaces it;</li>
+    <li>implement the three losses of this project and choose α;</li>
+    <li>decide which inputs to distil on, and why pure random noise does not work but structured random series do.</li>
+  </ul>
+</div>
+
+<h2 id="idea">The idea: learn from a teacher, not only from the answers</h2>
+<div class="callout intuition"><b>Intuition</b>
+  The true future is <em>one</em> draw from what could have happened. If tomorrow was unusually cold, the observed load is high, but a forecast made today should not have predicted that exactly.
+  A good teacher tells the student the whole range of plausible futures. That target is less noisy than the single observed outcome, and it is available for any input, even without ground truth.</div>
+<p>In <span class="term" data-g="kd">knowledge distillation</span> (Hinton et al., 2015), a small <span class="term" data-g="teacher">student</span> is trained to reproduce the outputs of a large teacher.
+  For image classifiers the teacher's probability vector says "this 7 looks a bit like a 1": information the hard label "7" does not carry
+  (<span class="term" data-g="soft-targets">dark knowledge</span>). The student matches it with a KL divergence between temperature-softened softmaxes.</p>
+<h3>Why that recipe does not transfer</h3>
+<p>Our models have no softmax and no logits: they output 13 quantile values per step. There is nothing to soften with a temperature, and no categorical distribution to compare with a KL divergence.
+  What the teacher <em>does</em> give us is its predictive distribution, seen through its quantiles. The question becomes: what loss makes the student's quantiles match the teacher's distribution?</p>
+
+<h2 id="losses">Three losses</h2>
+<h3>L<sub>gt</sub>: learn from the truth only (the floor)</h3>
+<p>The pinball loss of chapter 2 against the observed future, summed over levels with probability-mass weights (so the 1% and 99% levels do not count as much as the median).
+  A student trained only with it is the <b>floor</b> every distilled student must beat, at the same size and on the same data.</p>
+<figure class="code" data-ref="tinycast.distill.losses.level_mass"></figure>
+<figure class="code" data-ref="tinycast.distill.losses.pinball_gt"></figure>
+
+<h3>L<sub>kd, huber</sub>: copy each quantile</h3>
+<p>The obvious approach: regress the student's q<sub>τ</sub> onto the teacher's q<sub>τ</sub>, level by level, with a robust (Huber) loss. Simple, but every level is fitted independently and every teacher mistake is copied with full weight.</p>
+<figure class="code" data-ref="tinycast.distill.losses.kd_quantile_huber"></figure>
+
+<h3>L<sub>kd, pinball</sub>: treat the teacher's quantiles as samples</h3>
+<div class="callout intuition"><b>Intuition</b>
+  A teacher's 13 quantiles, each weighted by the probability mass it represents, form a small discrete distribution: "with probability 3%, the value is near q<sub>0.01</sub>; with 10%, near the median…".
+  Use those values as weighted pseudo-observations and train with the ordinary pinball loss. Chapter 2 showed that the pinball loss is minimised by the quantile of whatever data you give it.
+  Give it the teacher's distribution, and the minimum is the teacher's quantile.</div>
+<div class="card widget">
+  <div class="widget-controls">
+    <label>τ <input type="range" id="w-kdpin-tau" min="0.02" max="0.98" step="0.01" value="0.9" /> <b id="w-kdpin-tauv">0.90</b></label>
+    <label>observations <select id="w-kdpin-src"><option value="teacher" selected>a teacher's 13 quantiles (weighted by probability mass)</option><option value="samples">300 real samples</option></select></label>
+  </div>
+  <svg id="w-kdpin"></svg><div class="stat-row" id="w-kdpin-stats"></div>
+  <p class="small muted">Orange ticks: the teacher's 13 quantiles; their height is the weight of each. The loss minimum (blue dot) lands on the teacher's τ-quantile for every τ.</p></div>
+<div class="callout formal"><b>Formally</b>
+  <span class="math">L<sub>kd</sub> = Σ<sub>k</sub> w<sub>k</sub> Σ<sub>j</sub> v<sub>j</sub> · 2ρ<sub>τ<sub>k</sub></sub>( q<sup>teacher</sup><sub>j</sub>, q<sup>student</sup><sub>k</sub> )</span>
+  where v<sub>j</sub> is the probability mass of teacher level j and w<sub>k</sub> that of student level k. This is the expected pinball loss under the teacher's discretised distribution.
+  With samples instead of quantiles it would be the "sample-pinball" loss; Toto 2.0 outputs no samples, and this version is the same loss with quantiles in their place.</div>
+<figure class="code" data-ref="tinycast.distill.losses.kd_pinball_teacher"></figure>
+<div class="callout pitfall"><b>Pitfall: do not distil a guess</b>
+  Toto 2.0 does not produce the 1% and 99% quantiles; we extrapolate them. Distilling from those extrapolated values would teach the student our guess, not the teacher's knowledge.
+  The loss takes a mask of the teacher's <em>native</em> levels, and only those act as pseudo-observations.</div>
+
+<h3>Everything happens in the student's scaled space</h3>
+<p>The ground truth and the teacher's quantiles are transformed with the student's own scaler (computed on the context) before the loss.
+  This is allowed because quantiles commute with increasing transforms: the 0.9-quantile of asinh(Y) is asinh of the 0.9-quantile of Y. So the minimum does not move, and a 50 GW series and a 3 GW one contribute comparable gradients.</p>
+<figure class="code" data-ref="tinycast.distill.train.scaled_targets"></figure>
+
+<h2 id="alpha">Mixing truth and teacher: α</h2>
+<div class="callout formal"><b>Formally</b><span class="math">L = (1 − α) · L<sub>gt</sub> + α · L<sub>kd</sub></span></div>
+<figure class="code" data-ref="tinycast.distill.losses.mixed_objective"></figure>
+<ul>
+  <li>α = 0: the teacher is ignored (the floor).</li>
+  <li>α = 1: pure imitation. No ground truth needed, so the student can learn on inputs that have no future at all (next section), but it can never be better than its teacher.</li>
+  <li>In between: the truth corrects the teacher's mistakes, and the teacher smooths the truth's noise. Where the best α lies is an experiment, not something to assume.</li>
+</ul>
+
+<h2 id="data">Which data do we distil on? (and: can it be pure noise?)</h2>
+<div class="callout intuition"><b>Intuition</b>
+  Distillation teaches the student the teacher's <em>function</em>: context → forecast. A function is only learned where you show it inputs. The question is not "is the data real?" but
+  "on these inputs, does the teacher do anything worth copying?".</div>
+<p>With α = 1 we do not need any ground truth, only contexts. So why not generate millions of random contexts, label them with the teachers, and train on that? We measured what the teachers answer on five kinds of input:</p>
+<div class="card widget"><div id="w-families"></div><div class="table-wrap" id="w-families-table" style="margin-top:10px"></div></div>
+<p><b>What this shows.</b> On white noise the teachers are <em>right</em>: the best forecast of independent noise is a flat line at the level with a constant band, and their 80% band is about 3.3 mean absolute deviations wide, what a perfectly calibrated forecast of Gaussian noise gives.
+  But they give essentially the <em>same</em> answer to every context (diversity near 0). A student trained on that learns one thing, "predict the average with a fixed band", and never sees the teacher continue a cycle, follow a trend or react to a level shift.
+  Random walks are only slightly better. <b>Structured</b> randomness is a different story: KernelSynth contexts already make the teachers move and differ almost as much as on real data.</p>
+<h3>Try it: random but structured</h3>
+<p>KernelSynth draws random series from a Gaussian process. The kernel says which shapes are likely; the randomness picks one. With no kernel ticked you get white noise. Combine a periodic kernel with a trend, or multiply it by a smooth one to get a season whose amplitude drifts.</p>
+<div class="card widget">
+  <div class="widget-controls">
+    <label><input type="checkbox" id="k-periodic" checked /> periodic</label>
+    <label>period <input type="range" id="k-period" min="8" max="60" step="1" value="24" /> <b id="k-periodv">24</b></label>
+    <label><input type="checkbox" id="k-rbf" /> smooth (RBF)</label>
+    <label>length scale <input type="range" id="k-ell" min="0.02" max="0.5" step="0.01" value="0.15" /> <b id="k-ellv">0.15</b></label>
+    <label><input type="checkbox" id="k-linear" checked /> linear trend</label>
+    <label><input type="checkbox" id="k-white" checked /> white noise</label>
+    <label>combine with <select id="k-op"><option value="+">+</option><option value="*">×</option></select></label>
+    <button id="k-resample">new samples</button>
+  </div>
+  <svg id="w-ks"></svg>
+  <p class="small muted"><code id="k-formula"></code> · three independent draws from the same Gaussian process, computed in your browser (Cholesky factorisation of a 200 × 200 covariance matrix).</p></div>
+<figure class="code" data-ref="tinycast.data.synthetic.kernel_synth"></figure>
+<h3>The options, from cheapest to most realistic</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>input source</th><th>pros</th><th>cons</th></tr></thead>
+  <tbody>
+    <tr><td>white noise</td><td>free, infinite</td><td>the teacher shows no behaviour worth copying (measured above)</td></tr>
+    <tr><td>structured synthetic (KernelSynth, randomised shapes, mixtures)</td><td>infinite, licence- and leakage-free, covers rare patterns; makes Draw-mode inputs familiar</td><td>its distribution differs from real data; missing real quirks (holidays, outages)</td></tr>
+    <tr><td>teacher-generated series (sample a future, append it, repeat)</td><td>realistic-looking, infinite</td><td>needs samples (Toto 2.0 has none; you would sample from quantiles); drift and "model collapse" over long rollouts</td></tr>
+    <tr><td>optimised inputs ("data-free" distillation, as in vision with DeepInversion)</td><td>targets what the student does not yet know</td><td>complex; the inputs can be unrealistic</td></tr>
+    <tr><td>real data</td><td>matches the target domain</td><td>finite; licences; must respect the time splits</td></tr>
+  </tbody></table></div>
+<div class="callout pitfall"><b>Pitfall</b>
+  With α = 1 and synthetic inputs, the student can at best become a copy of the teacher, and only on the kind of inputs it saw. Its quality on real data then depends on how well the synthetic distribution covers real patterns.
+  This is a <em>distribution shift</em>, measurable: evaluate on the fresh real data and on the shapes.</div>
+<div class="callout project"><b>In this project (proposed, not run)</b>
+  One experiment answers the question directly: the same student and the same teacher, labels on {real windows, KernelSynth, shapes, white noise}, evaluated on fresh electricity and shapes.
+  Cost: one cache per input family (minutes on a laptop GPU) plus one short training run each.</div>
+
+<h2 id="teachers">Which teacher?</h2>
+<p>No teacher wins everywhere (see the per-shape table on <a href="results.html">Results</a>): t0-gamma fails on level shifts, Timestral-5M on sawtooth, and the large Toto loses to its own 4M sibling on impulse-decay.
+  A student copying one teacher inherits its blind spots. Options for <span class="term" data-g="multi-teacher">multi-teacher distillation</span>:</p>
+<ul>
+  <li>average the teachers' quantiles (simple; blurs disagreements);</li>
+  <li>weight each teacher per window by its error on that window's ground truth (softmax of −τ·WQL), which needs ground truth;</li>
+  <li>choose per level: a teacher with native tails for the 1% / 99% levels, the most accurate one for the centre.</li>
+</ul>
+<h3>Measure fidelity and accuracy separately</h3>
+<p><span class="term" data-g="fidelity">Fidelity</span> (how close the student is to the teacher) and accuracy (how close it is to the truth) are different questions. A perfectly faithful student of a wrong teacher is still wrong. We report both.</p>
+
+<h2 id="practice">In practice: the teacher cache</h2>
+<p>Running a 300M-parameter teacher at every training step would be far too slow. Instead, teachers run once over the training contexts and their quantiles are stored on disk
+  (<span class="term" data-g="teacher-cache">teacher cache</span>: float16, one row per window id, resumable). Training then only reads numbers. On this project's laptop (Apple M1 Pro GPU), caching 300k windows takes about 25 minutes per teacher.</p>
+
+<h2 id="check">Check yourself</h2>
+<details class="check"><summary>1. Why can a distilled student beat a student trained on the same data with ground truth only?</summary>
+  <p>The teacher's distribution is a lower-variance target than the single observed future, and it encodes knowledge from the teacher's much larger pretraining corpus. The student gets more information per example.</p></details>
+<details class="check"><summary>2. With α = 1, can the student become better than the teacher on the test set?</summary>
+  <p>Not by design: its target is the teacher. It may occasionally score better (regularisation, smoothing teacher noise), but there is no signal pushing it beyond the teacher. α &lt; 1 brings the truth back in.</p></details>
+<details class="check"><summary>3. Why does distilling on white noise produce a student that cannot forecast a daily cycle?</summary>
+  <p>The student only learns the teacher's function where it sees inputs. On white noise the teacher always outputs a flat, constant-width forecast, so no example ever shows a cycle being continued.</p></details>
+<details class="check"><summary>4. Why mask the teacher's extrapolated tail levels in the KD loss?</summary>
+  <p>They are our extrapolation, not the teacher's output. Distilling them would teach the student our assumption about tail shape, presented as teacher knowledge.</p></details>

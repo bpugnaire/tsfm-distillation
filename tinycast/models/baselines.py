@@ -10,7 +10,6 @@ from __future__ import annotations
 import warnings
 
 import numpy as np
-from scipy.stats import norm
 
 from tinycast.config import QUANTILE_LEVELS
 from tinycast.models.base import check_output
@@ -62,14 +61,9 @@ class SeasonalNaive:
         x = interpolate_nans(ctx)
         m = estimate_season(x) if self.season == "auto" else int(self.season)
         steps = np.arange(1, h + 1)
-        k = np.ceil(steps / m).astype(int)
-        point = (
-            x[len(x) - m * k + (steps - 1) % m - (m - 1) + (m - 1)] if m > 1 else np.full(h, x[-1])
-        )
-        if m > 1:
-            point = np.array(
-                [x[len(x) - m * kk + (s - 1) % m] for s, kk in zip(steps, k, strict=True)]
-            )
+        k = np.ceil(steps / m).astype(int)  # seasons we must step back to reach an observed value
+        # most recent observation with the same phase: x_{T-1+s-m*ceil(s/m)} (m=1 -> last value)
+        point = x[len(x) - 1 + steps - m * k]
         resid = x[m:] - x[:-m]
         rq = np.quantile(resid, QUANTILE_LEVELS)  # (K,)
         return point[None, :] + rq[:, None] * np.sqrt(k)[None, :]
@@ -90,6 +84,7 @@ class ETS:
         self.name = name
         self.season = season
         self.max_season = max_season
+        self.fallbacks: list[str] = []  # written to the results JSON: never silent
 
     def _one(self, ctx: np.ndarray, h: int) -> np.ndarray:
         from statsforecast.models import AutoETS
@@ -97,14 +92,16 @@ class ETS:
         x = interpolate_nans(ctx)
         m = estimate_season(x) if self.season == "auto" else int(self.season)
         if m > self.max_season:
-            m = 1  # statsforecast's ETS does not fit long seasons; record it in docs
+            self.fallbacks.append(f"season {m} > {self.max_season}: non-seasonal ETS")
+            m = 1
         # integer interval levels (statsforecast keys are 'lo-80', 'hi-98', ...)
         lvls = sorted({int(round(abs(2 * t - 1) * 100)) for t in QUANTILE_LEVELS if t != 0.5})
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             try:
                 fc = AutoETS(season_length=m).forecast(y=x, h=h, level=lvls)
-            except Exception:
+            except Exception as e:  # e.g. not enough data for the seasonal model
+                self.fallbacks.append(f"seasonal fit failed ({type(e).__name__}): non-seasonal ETS")
                 fc = AutoETS(season_length=1).forecast(y=x, h=h, level=lvls)
         out = []
         for t in QUANTILE_LEVELS:
@@ -114,11 +111,7 @@ class ETS:
                 lv = int(round(abs(2 * t - 1) * 100))
                 key = f"lo-{lv}" if t < 0.5 else f"hi-{lv}"
                 out.append(fc[key])
-        q = np.stack(out)
-        if not np.isfinite(q).all():  # e.g. a degenerate fit: Gaussian around the mean
-            sd = np.nanstd(np.diff(x)) * np.sqrt(np.arange(1, h + 1))
-            q = fc["mean"][None] + norm.ppf(QUANTILE_LEVELS)[:, None] * sd[None]
-        return q
+        return np.stack(out)  # non-finite values are rejected by check_output (no silent fix)
 
     def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
         q = np.stack([self._one(c, horizon) for c in context])

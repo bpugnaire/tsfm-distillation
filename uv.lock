@@ -1883,6 +1883,17 @@ wheels = [
 ]
 
 [[package]]
+name = "timestral"
+version = "1.0.0"
+source = { git = "https://github.com/mistralai/timestral.git?rev=a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff#a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "safetensors" },
+    { name = "torch" },
+]
+
+[[package]]
 name = "tinycast"
 version = "0.1.0"
 source = { editable = "." }
@@ -1906,6 +1917,7 @@ teachers = [
     { name = "jaxtyping" },
     { name = "setuptools" },
     { name = "tfc-t0", extra = ["torch"] },
+    { name = "timestral" },
     { name = "toto-2" },
 ]
 tracking = [
@@ -1935,6 +1947,7 @@ requires-dist = [
     { name = "setuptools", marker = "extra == 'teachers'", specifier = "<81" },
     { name = "statsforecast", specifier = ">=2.0" },
     { name = "tfc-t0", extras = ["torch"], marker = "extra == 'teachers'", specifier = "==0.6.1" },
+    { name = "timestral", marker = "extra == 'teachers'", git = "https://github.com/mistralai/timestral.git?rev=a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff" },
     { name = "torch", specifier = ">=2.4" },
     { name = "toto-2", marker = "extra == 'teachers'", specifier = "==2.0.0" },
     { name = "wandb", marker = "extra == 'tracking'", specifier = ">=0.18" },
