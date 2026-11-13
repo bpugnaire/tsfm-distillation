@@ -2,11 +2,8 @@
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
   Study queue running on the Mac (no overlap): Stage D pilot (fine-tuning on your data) -> Stage C-lite (scale) ->
-  Stage B (teachers x alpha, 3 seeds). Log: runs/queue.log. Results appear on the Study page as each stage ends.
+  Stage B (teachers x alpha, 3 seeds) -> final Stage D (warm + cold start). Log: runs/queue.log. Results appear on the Study page as each stage ends.
 pending_decisions:
-  - id: stage-d-design
-    question: "Final Stage D: what does '1 week of your data' mean? (a) supervision AND contexts limited to that week (pilot), or (b) full past contexts, supervision limited to the last N targets?"
-    note: The pilot used (a); its short-history failures look like a context-length mismatch with the 512-step test contexts (journal 2026-11-13).
   - id: after-queue
     question: After D, C-lite and B, which recipe goes to the full Stage C (scale) and the final Stage D (3 seeds)?
     note: decided on validation; results on the Study page
@@ -36,5 +33,6 @@ decided:
   - {date: "2026-11-13", what: "Paper framing: broad ablations, paired effects, headline = student + light fine-tuning vs teachers zero-shot", ref: docs/paper/outline.md}
   - {date: "2026-11-13", what: "Stage A approved and launched (inputs: multidomain / synth / rollouts / noise, ~35 min)", ref: configs/study/stage_a.yaml}
   - {date: "2026-11-13", what: "Stage D pilot + Stage C-lite approved and running; Stage B queued after them (owner: schedule the next runs)", ref: scripts/run_queue.sh}
+  - {date: "2026-11-13", what: "Final Stage D design: warm (full past as context, supervision limited to the history; main, 3 seeds) + cold start (contexts cut at train AND test, zoo on the same cut contexts); init chosen on validation over C-lite + B", ref: scripts/study_configs/make_stage_d_final.py}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}

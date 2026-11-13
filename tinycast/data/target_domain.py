@@ -55,13 +55,24 @@ def history_corpora(
     min_context: int = 32,
     max_windows: int = 20000,
     seed: int = 0,
+    mode: str = "cold",
 ) -> tuple[Corpus, Corpus]:
-    if history < min_context + horizon + 8:
+    """mode "cold": you only have `history` steps (contexts AND targets inside it; the pilot's setting).
+    mode "warm": you have a longer past; contexts may use it (up to context_length), but every *target* used for
+    fine-tuning lies inside the last `history` steps (the amount of supervision is what varies)."""
+    if mode not in ("cold", "warm"):
+        raise ValueError(mode)
+    if mode == "cold" and history < min_context + horizon + 8:
         raise ValueError(f"history {history} too short for horizon {horizon}")
     rng = np.random.default_rng([seed, history, len(domain)])
     tr, va = ([], [], [], []), ([], [], [], [])
     for sid, v, end in _domain_series(domain):
         start, origins = history_origins(end, history, min_context, horizon)
+        if (
+            mode == "warm"
+        ):  # targets [i, i + H) inside the last `history` steps; context from the full past
+            origins = np.arange(max(min_context, end - history), end - horizon + 1)
+            start = 0
         if len(origins) == 0:
             continue
         cut = int(0.8 * len(origins))
@@ -73,7 +84,7 @@ def history_corpora(
                 fut = v[i : i + horizon]
                 if np.isfinite(fut).mean() < 0.9 or np.isfinite(c).sum() < min_context:
                     continue
-                part[0].append(window_id(domain, sid, f"{history}:{i}"))
+                part[0].append(window_id(domain, sid, f"{mode}{history}:{i}"))
                 part[1].append(domain)
                 part[2].append(ctx)
                 part[3].append(fut.astype(np.float32))

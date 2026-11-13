@@ -41,6 +41,31 @@ def arm_config(study: dict, arm: dict) -> TrainConfig:
     return from_dict(TrainConfig, base, where=f"arm {arm['name']}")
 
 
+def run_of(ref: str) -> Path:
+    """'<stage>:<arm>' or 'best_val:<stage>+<stage>' (best validation score; fine-tuned runs excluded)."""
+    if ref.startswith(
+        "best_val:"
+    ):  # the run with the best VALIDATION score across the listed stages
+        cands = []
+        for stage in ref.removeprefix("best_val:").split("+"):
+            for run in json.loads(
+                (ROOT / "results" / "study" / stage / "runs.json").read_text()
+            ).values():
+                m = json.loads((ROOT / run / "metrics.json").read_text())
+                if m.get("finetune") is None and m.get("best_val_wql_geomean") is not None:
+                    cands.append((m["best_val_wql_geomean"], run))
+        best = min(cands)
+        print(
+            f"  init selected on validation: {best[1]} (val WQL {best[0]:.4f}) among {len(cands)} runs",
+            flush=True,
+        )
+        return ROOT / best[1]
+    stage, arm_name = ref.split(":")
+    return (
+        ROOT / json.loads((ROOT / "results" / "study" / stage / "runs.json").read_text())[arm_name]
+    )
+
+
 def finetune_arm(study: dict, arm: dict) -> Path:
     """Stage D: light fine-tuning on a target domain's own history (ground truth), from a distilled student or scratch.
 
@@ -49,17 +74,11 @@ def finetune_arm(study: dict, arm: dict) -> Path:
     """
     from tinycast.data.target_domain import history_corpora
 
-    def run_of(ref: str) -> Path:
-        stage, arm_name = ref.split(":")
-        return (
-            ROOT
-            / json.loads((ROOT / "results" / "study" / stage / "runs.json").read_text())[arm_name]
-        )
-
     init = None if arm["init"] == "scratch" else run_of(arm["init"])
     arch_run = init or run_of(arm["student_from"])
     base = to_dict(load(ROOT / study["base"], TrainConfig))
     base["name"] = f"{study['name']}_{arm['name']}"
+    base["seed"] = arm.get("seed", base["seed"])
     base["student"] = json.loads((arch_run / "student_config.json").read_text())
     base["loss"]["alpha"] = 0.0
     base["data"]["teacher"] = None
@@ -77,8 +96,23 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         arm["history"],
         cfg.student.context_length,
         cfg.student.horizon,
-        seed=cfg.seed,
+        seed=0,  # same fine-tuning windows for every seed; the seed only changes init noise / batch order
+        mode=arm.get("mode", "cold"),
     )
+    if (
+        "epochs" in arm
+    ):  # steps proportional to the data (capped): avoids 170 epochs on a 1-week history
+        import math
+
+        steps = max(
+            100,
+            min(
+                arm["steps"], math.ceil(arm["epochs"] * len(corpora[0].ids) / cfg.optim.batch_size)
+            ),
+        )
+        cfg.optim.max_steps = steps
+        cfg.optim.eval_every = max(25, steps // 20)
+        cfg.optim.warmup_steps = max(10, steps // 20)
     print(
         f"[{arm['name']}] fine-tune {arm['domain']} history={arm['history']} train={len(corpora[0].ids)} init={arm['init']}",
         flush=True,
@@ -88,7 +122,15 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         log_every=100,
         corpora=corpora,
         init_from=init,
-        extra_metrics={"finetune": {k: arm[k] for k in ("domain", "history", "steps", "init")}},
+        extra_metrics={
+            "finetune": {
+                **{k: arm[k] for k in ("domain", "history", "steps", "init")},
+                "mode": arm.get("mode", "cold"),
+                "epochs": arm.get("epochs"),
+                "init_run": str(init) if init else None,
+                "seed": cfg.seed,
+            }
+        },
     )
 
 
@@ -118,7 +160,7 @@ def expand_seeds(study: dict) -> list[dict]:
         return study["arms"]
     out = []
     for arm in study["arms"]:
-        if arm.get("type"):
+        if arm.get("type") and not (arm["type"] == "finetune" and arm.get("seeded", False)):
             out.append(arm)
             continue
         out += [
@@ -150,10 +192,7 @@ if __name__ == "__main__":
         if (
             arm.get("type") == "existing"
         ):  # reuse a run from an earlier stage as an arm (e.g. zero-shot reference)
-            stage, src = arm["run"].split(":")
-            runs[arm["name"]] = json.loads(
-                (ROOT / "results" / "study" / stage / "runs.json").read_text()
-            )[src]
+            runs[arm["name"]] = str(run_of(arm["run"]).relative_to(ROOT))
             runs_file.write_text(json.dumps(runs, indent=1))
             continue
         if arm.get("type") == "finetune":
@@ -179,15 +218,43 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------- evaluate every arm on every suite
     table = {"study": study["name"], "reference_arm": study["reference_arm"], "suites": {}}
     for suite_name in study["eval_suites"]:
-        bcfg = load(ROOT / "configs" / "eval" / f"{suite_name}.yaml", BenchConfig)
+        base_suite, _, cap = suite_name.partition(
+            "@"
+        )  # "fresh_fr_power@168": contexts cut to the last 168 steps
+        bcfg = load(ROOT / "configs" / "eval" / f"{base_suite}.yaml", BenchConfig)
         bcfg.latency = False
         suite = load_suite(bcfg.suite, bcfg)
+        if cap:
+            suite.context[:, : -int(cap)] = (
+                np.nan
+            )  # cold start: only the last `cap` steps are known
+            suite.name = suite_name
         out = sdir / suite_name
         write_suite(suite, out)
         sn = ModelEntry(kind="seasonal_naive", name="seasonal_naive")
         if bcfg.season:
             sn.season = list(suite.season) if bcfg.season == "freq" else bcfg.season
         run_model(build_model(sn), sn, suite, bcfg, out)
+        zoo_dir = ROOT / "results" / suite_name
+        for zname in study.get(
+            "zoo", []
+        ):  # zero-shot references on this exact suite (computed once)
+            if (zoo_dir / f"{zname}.json").exists():
+                continue
+            zentry = (
+                ModelEntry(kind="seasonal_naive", name="seasonal_naive")
+                if zname == "seasonal_naive"
+                else load(ROOT / "configs" / "teachers" / f"{zname}.yaml", ModelEntry)
+            )
+            if zname == "seasonal_naive" and bcfg.season:
+                zentry.season = sn.season
+            if zentry.device == "auto":
+                zentry.device = "cpu"
+            print(f"  zoo {zname} on {suite_name}", flush=True)
+            write_suite(suite, zoo_dir)
+            run_model(build_model(zentry), zentry, suite, bcfg, zoo_dir)
+        if study.get("zoo"):
+            summarize(zoo_dir)
         arm_suites = {x["name"]: x.get("eval_suites") for x in study["arms"]}
         for arm_name, run in runs.items():
             if arm_suites.get(arm_name) and suite_name not in arm_suites[arm_name]:

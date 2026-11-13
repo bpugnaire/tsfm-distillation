@@ -122,3 +122,17 @@ def test_finetune_history_real_domains():
     assert (
         ts[series[0][2] - 1] < load_splits().fresh_start <= ts[series[0][2]]
     )  # history ends right before fresh
+
+
+def test_finetune_warm_mode_targets_in_history_contexts_from_past():
+    from tinycast.data import target_domain as T
+
+    try:
+        tr, va = T.history_corpora("pedestrian", history=168, max_windows=5000, mode="warm")
+        cold, _ = T.history_corpora("pedestrian", history=168, max_windows=5000, mode="cold")
+    except FileNotFoundError:
+        pytest.skip("data not downloaded")
+    # warm contexts use the full past (512 observed steps); cold contexts only the 1-week window
+    assert np.isfinite(tr.context).sum(1).mean() > 400
+    assert np.isfinite(cold.context).sum(1).max() <= 168
+    assert len(tr.ids) and len(va.ids) and not set(tr.ids) & set(va.ids)

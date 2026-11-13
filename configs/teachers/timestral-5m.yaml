@@ -1,0 +1,1 @@
+{kind: timestral, name: timestral-5m, checkpoint: mistralai/Timestral-5M, batch_size: 128, device: cpu}
