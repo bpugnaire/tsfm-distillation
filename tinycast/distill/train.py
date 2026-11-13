@@ -94,7 +94,16 @@ def evaluate(model: Student, ctx: np.ndarray, fut: np.ndarray, device, bs: int =
     }
 
 
-def train(cfg: TrainConfig, out_root: Path | None = None, log_every: int = 50) -> Path:
+def train(
+    cfg: TrainConfig,
+    out_root: Path | None = None,
+    log_every: int = 50,
+    corpora: tuple | None = None,
+    init_from: Path | None = None,
+    extra_metrics: dict | None = None,
+) -> Path:
+    """Train a student. `corpora` = (train, val) Corpus objects to use instead of building them from the config
+    (fine-tuning on a target domain); `init_from` = a run dir whose best.pt initialises the weights."""
     seed_everything(cfg.seed)
     device = pick_device(cfg.device)
     stamp = dt.datetime.now().strftime("%Y-%m-%d")
@@ -118,10 +127,9 @@ def train(cfg: TrainConfig, out_root: Path | None = None, log_every: int = 50) -
 
     tr_spec, va_spec = specs(cfg)
     t0 = time.time()
-    tr, va = build_corpus(tr_spec), build_corpus(va_spec)
-    log(
-        f"corpus train={len(tr.ids)} (key {tr_spec.key()}) val={len(va.ids)} in {time.time() - t0:.0f}s"
-    )
+    tr, va = corpora if corpora is not None else (build_corpus(tr_spec), build_corpus(va_spec))
+    src = "custom" if corpora is not None else f"key {tr_spec.key()}"
+    log(f"corpus train={len(tr.ids)} val={len(va.ids)} ({src}) in {time.time() - t0:.0f}s")
 
     levels = cfg.student.quantile_levels
     teacher_q = None
@@ -139,7 +147,13 @@ def train(cfg: TrainConfig, out_root: Path | None = None, log_every: int = 50) -
         level_idx = [t_levels.index(lv) for lv in levels]
         log(f"teacher {cfg.data.teacher}: native levels {sorted(native)}")
 
-    model = Student(cfg.student).to(device)
+    model = Student(cfg.student)
+    if init_from is not None:
+        model.load_state_dict(
+            torch.load(Path(init_from) / "best.pt", map_location="cpu", weights_only=True)
+        )
+        log(f"initialised from {init_from}")
+    model = model.to(device)
     log(f"student {cfg.student.arch}: {model.n_params() / 1e6:.3f}M params on {device}")
     decay = [p for n, p in model.named_parameters() if p.dim() >= 2]
     no_decay = [p for n, p in model.named_parameters() if p.dim() < 2]
@@ -219,7 +233,11 @@ def train(cfg: TrainConfig, out_root: Path | None = None, log_every: int = 50) -
         "device": str(device),
         "train_windows": len(tr.ids),
         "val_windows": len(va.ids),
-        "corpus_keys": {"train": tr_spec.key(), "val": va_spec.key()},
+        "corpus_keys": {"train": tr_spec.key(), "val": va_spec.key()}
+        if corpora is None
+        else "custom",
+        "init_from": str(init_from) if init_from else None,
+        **(extra_metrics or {}),
         "steps": step + 1,
         "wall_seconds": round(time.time() - t_train, 1),
         "best_val_wql_geomean": best,

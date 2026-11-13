@@ -4,6 +4,14 @@ base: configs/train/study_base_s.yaml
 teacher: timestral-209m          # configs/teachers/<name>.yaml
 reference_arm: kd_multidomain    # paired comparisons are against this arm
 eval_suites: [shapes, multidomain_test, fresh_fr_power]
+# Paired contrasts reported explicitly: [a, b, question]; ratio < 1 means a is better than b on the same windows.
+pairs:
+  - [kd_multidomain, gt_multidomain, "teacher labels vs ground truth, real inputs"]
+  - [kd_synth, gt_synth, "teacher labels vs ground truth, synthetic inputs"]
+  - [kd_synth, kd_multidomain, "synthetic vs real inputs (teacher labels)"]
+  - [gt_synth, gt_multidomain, "synthetic vs real inputs (ground truth)"]
+  - [kd_rollout, kd_multidomain, "teacher rollouts vs real inputs"]
+  - [kd_noise, kd_synth, "white noise vs structured synthetic inputs"]
 arms:
   - {name: kd_multidomain, mix: {multidomain: 30000}, alpha: 1.0}
   - {name: kd_synth,       mix: {synth: 30000},       alpha: 1.0}

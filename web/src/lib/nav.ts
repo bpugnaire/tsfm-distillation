@@ -2,6 +2,7 @@ const pages = [
   ["index.html", "Draw"],
   ["gallery.html", "Gallery"],
   ["results.html", "Results"],
+  ["study.html", "Study"],
   ["learn.html", "Learn"],
   ["notes.html", "Lab notes"],
   ["status.html", "Status"],

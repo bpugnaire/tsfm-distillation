@@ -25,12 +25,32 @@ def cache_dir(teacher: str, corpus_key: str) -> Path:
     return ROOT / "data" / "cache" / teacher / corpus_key
 
 
+ENCODING = "scaled_f16_v2"
+
+
 def _encode(q: np.ndarray) -> list[bytes]:
-    return [row.astype(np.float16).tobytes() for row in q]
+    """Per window: float32 (loc, scale) + float16 of (q - loc) / scale, which lies in [-1, 1].
+
+    v1 stored raw float16, which overflows above 65504 (FRED-MD, rideshare...): 3-5% of real-data labels became inf
+    in Stage A (journal 2026-11-13). Normalising per window keeps float16's size with a range-relative precision.
+    """
+    q = q.astype(np.float64)
+    loc = np.median(q.reshape(len(q), -1), axis=1)
+    scale = np.abs(q - loc[:, None, None]).reshape(len(q), -1).max(axis=1)
+    scale = np.where(scale > 0, scale, 1.0)
+    z = ((q - loc[:, None, None]) / scale[:, None, None]).astype(np.float16)
+    head = np.stack([loc, scale], axis=1).astype(np.float32)
+    return [head[i].tobytes() + z[i].tobytes() for i in range(len(q))]
 
 
 def _decode(blobs, K: int, H: int) -> np.ndarray:
-    return np.stack([np.frombuffer(b, dtype=np.float16).reshape(K, H) for b in blobs])
+    out = np.empty((len(blobs), K, H), dtype=np.float32)
+    for i, b in enumerate(blobs):
+        loc, scale = np.frombuffer(b[:8], dtype=np.float32)
+        out[i] = (
+            np.frombuffer(b[8:], dtype=np.float16).reshape(K, H).astype(np.float32) * scale + loc
+        )
+    return out
 
 
 def ids_fingerprint(ids: np.ndarray) -> str:
@@ -54,10 +74,10 @@ def write_cache(
     d = cache_dir(teacher, corpus_key)
     d.mkdir(parents=True, exist_ok=True)
     man_path = d / "manifest.json"
-    meta = {**meta, "ids_sha": ids_fingerprint(ids)}
+    meta = {**meta, "ids_sha": ids_fingerprint(ids), "encoding": ENCODING}
     man = json.loads(man_path.read_text()) if man_path.exists() else {**meta, "shards": {}}
     if man_path.exists():
-        for k in ("checkpoint", "levels", "horizon", "ids_sha"):
+        for k in ("checkpoint", "levels", "horizon", "ids_sha", "encoding"):
             if man.get(k) != meta.get(k):
                 raise ValueError(
                     f"cache {d} was built with a different {k}: {man.get(k)} != {meta.get(k)}"
@@ -109,7 +129,9 @@ def check_cache(teacher: str, corpus_key: str, expected_n: int) -> dict:
     report = {
         "n": len(q),
         "expected": expected_n,
-        "nan": int(np.isnan(q).sum()),
+        "nan": int(
+            (~np.isfinite(q)).sum()
+        ),  # NaN *and* inf (v1 only checked NaN and missed overflows)
         "non_monotone_frac": float((np.diff(q, axis=1) < -1e-3).mean()),
     }
     if report["n"] != expected_n or report["nan"]:
@@ -135,6 +157,7 @@ def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = pr
     man = d / "manifest.json"
     if (
         man.exists()
+        and json.loads(man.read_text()).get("encoding") == ENCODING
         and json.loads(man.read_text()).get("ids_sha") == ids_fingerprint(corpus.ids)
         and sum(json.loads(man.read_text())["shards"].values()) == len(corpus.ids)
     ):

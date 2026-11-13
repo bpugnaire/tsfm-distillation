@@ -1,0 +1,8 @@
+{
+ "kd_synth": "runs/2026-11-13_stage_a_kd_synth",
+ "kd_noise": "runs/2026-11-13_stage_a_kd_noise",
+ "gt_multidomain": "runs/2026-11-13_stage_a_gt_multidomain",
+ "gt_synth": "runs/2026-11-13_stage_a_gt_synth",
+ "kd_multidomain": "runs/2026-11-13_stage_a_kd_multidomain",
+ "kd_rollout": "runs/2026-11-13_stage_a_kd_rollout"
+}

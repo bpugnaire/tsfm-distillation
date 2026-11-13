@@ -38,6 +38,57 @@ def arm_config(study: dict, arm: dict) -> TrainConfig:
     return from_dict(TrainConfig, base, where=f"arm {arm['name']}")
 
 
+def finetune_arm(study: dict, arm: dict) -> Path:
+    """Stage D: light fine-tuning on a target domain's own history (ground truth), from a distilled student or scratch.
+
+    arm: {name, type: finetune, init: "<stage>:<arm>" | "scratch", student_from: "<stage>:<arm>" (architecture when
+    init = scratch), domain: fr_power | pedestrian, history: <steps>, steps: <int>, lr: <float>}
+    """
+    from tinycast.data.target_domain import history_corpora
+
+    def run_of(ref: str) -> Path:
+        stage, arm_name = ref.split(":")
+        return (
+            ROOT
+            / json.loads((ROOT / "results" / "study" / stage / "runs.json").read_text())[arm_name]
+        )
+
+    init = None if arm["init"] == "scratch" else run_of(arm["init"])
+    arch_run = init or run_of(arm["student_from"])
+    base = to_dict(load(ROOT / study["base"], TrainConfig))
+    base["name"] = f"{study['name']}_{arm['name']}"
+    base["student"] = json.loads((arch_run / "student_config.json").read_text())
+    base["loss"]["alpha"] = 0.0
+    base["data"]["teacher"] = None
+    base["optim"].update(
+        max_steps=arm["steps"],
+        lr=arm.get("lr", 3e-4),
+        eval_every=max(25, arm["steps"] // 20),
+        warmup_steps=max(10, arm["steps"] // 20),
+        patience=6,
+        batch_size=arm.get("batch_size", 128),
+    )
+    cfg = from_dict(TrainConfig, base, where=f"finetune arm {arm['name']}")
+    corpora = history_corpora(
+        arm["domain"],
+        arm["history"],
+        cfg.student.context_length,
+        cfg.student.horizon,
+        seed=cfg.seed,
+    )
+    print(
+        f"[{arm['name']}] fine-tune {arm['domain']} history={arm['history']} train={len(corpora[0].ids)} init={arm['init']}",
+        flush=True,
+    )
+    return train(
+        cfg,
+        log_every=100,
+        corpora=corpora,
+        init_from=init,
+        extra_metrics={"finetune": {k: arm[k] for k in ("domain", "history", "steps", "init")}},
+    )
+
+
 def per_series(out: Path, model: str, key: str = "wql") -> np.ndarray:
     r = json.loads((out / f"{model}.json").read_text())
     return np.array([np.nan if v is None else v for v in r["per_series"][key]], dtype=float)
@@ -60,6 +111,11 @@ if __name__ == "__main__":
             print(f"[{arm['name']}] done already: {runs[arm['name']]}", flush=True)
             continue
         if a.only_eval:
+            continue
+        if arm.get("type") == "finetune":
+            run = finetune_arm(study, arm)
+            runs[arm["name"]] = str(run.relative_to(ROOT))
+            runs_file.write_text(json.dumps(runs, indent=1))
             continue
         cfg = arm_config(study, arm)
         tr_spec, va_spec = specs(cfg)
@@ -112,8 +168,18 @@ if __name__ == "__main__":
                         "rel_wql_ci": r["rel_wql_ci"],
                         "n_params": r["n_params"],
                     }
+        contrasts = []
+        for a_arm, b_arm, question in study.get("pairs", []):
+            if a_arm in runs and b_arm in runs:
+                p, lo, hi = M.paired_ratio_ci(
+                    per_series(out, a_arm), per_series(out, b_arm), groups=groups
+                )
+                contrasts.append(
+                    {"a": a_arm, "b": b_arm, "question": question, "ratio": [p, lo, hi]}
+                )
         table["suites"][suite_name] = {
             "arms": rows,
+            "pairs": contrasts,
             "zero_shot_models": teach,
             "n_windows": len(suite.ids),
             "flag": suite.flag,
@@ -148,6 +214,20 @@ if __name__ == "__main__":
                     )
                 ),
             ]
+        if d["pairs"]:
+            lines += [
+                "",
+                "| contrast (paired, same windows) | ratio a/b | 95% CI | verdict |",
+                "|---|---|---|---|",
+            ]
+            for c in d["pairs"]:
+                p, lo, hi = c["ratio"]
+                verdict = (
+                    "a better" if hi < 1 else "b better" if lo > 1 else "no detectable difference"
+                )
+                lines.append(
+                    f"| {c['question']}: `{c['a']}` vs `{c['b']}` | {p:.3f} | [{lo:.3f}, {hi:.3f}] | {verdict} |"
+                )
         lines.append("")
     (sdir / "table.md").write_text("\n".join(lines))
     print("\n".join(lines))

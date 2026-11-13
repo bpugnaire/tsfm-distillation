@@ -1,12 +1,11 @@
 # Hand-maintained project status for the website Status page (web/status.html).
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
-  Distillation study design (ADR 0005, proposed): which inputs (real multi-domain, synthetic, teacher rollouts) and
-  which teachers give the best small student. Stage A (~30 min) waits for approval. Electricity is the final demonstrator only.
+  Paper-style distillation study (docs/paper/outline.md). Stage A done (results on the Study page); next stages wait for approval.
 pending_decisions:
-  - id: approve-stage-a
-    question: Approve Stage A of the distillation study (input sources, ~30 min on the Mac GPU)?
-    note: docs/decisions/0005-distillation-study-design.md
+  - id: approve-next-stages
+    question: "After Stage A: run the Stage D pilot (fine-tuning on your data, ~20 min) and Stage C-lite (scale: bigger student, mixed data, ~1.5 h) before Stage B?"
+    note: results/study/stage_a/table.md; docs/journal.md 2026-11-13
   - id: fair-comparison
     question: How do we compare an in-domain student with zero-shot teachers fairly?
     options: [report both explicitly, also train a synthetic-only student, evaluate on a held-out domain]
@@ -30,5 +29,7 @@ decided:
   - {date: "2026-11-13", what: "Timestral enabled as a comparator (owner: personal project, licence clause does not apply)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Ask the owner before any long run on the Mac; learn step by step", ref: docs/journal.md}
   - {date: "2026-11-13", what: "Baseline season from sampling frequency on real data (hourly -> 24); auto only for synthetic shapes", ref: configs/eval/fresh_fr_power.yaml}
+  - {date: "2026-11-13", what: "Paper framing: broad ablations, paired effects, headline = student + light fine-tuning vs teachers zero-shot", ref: docs/paper/outline.md}
+  - {date: "2026-11-13", what: "Stage A approved and launched (inputs: multidomain / synth / rollouts / noise, ~35 min)", ref: configs/study/stage_a.yaml}
   - {date: "2026-11-13", what: "Timestral allowed as a distillation teacher (owner)", ref: docs/decisions/0001-project-scope.md}
   - {date: "2026-11-13", what: "Electricity (RTE) = final demonstrator, not the focus: the study must be multi-domain / generator-based", ref: docs/journal.md}

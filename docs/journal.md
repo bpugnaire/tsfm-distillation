@@ -91,3 +91,32 @@ internally for long horizons) nor independent sampling produces realistic long s
 Public corpora are likely in the teachers' pretraining: fine for *training* the student, not for headline *evaluation*.
 
 **Next:** owner approval of ADR 0005 Stage A.
+
+## 2026-11-13 — Stage A (which inputs should the teacher label?) + cache overflow bug
+
+**Did:** Stage A of the study (`configs/study/stage_a.yaml`): teacher Timestral-209M, student s (0.22M), 30k windows/arm, 3000 steps,
+1 seed. Arms: KD on real multi-domain / synthetic / teacher rollouts / white noise; ground truth (GT) on multi-domain / synthetic.
+Zero-shot zoo benchmarked on the held-out multi-domain test.
+
+**BUG found and fixed:** teacher caches stored raw float16 → overflow above 65504: 2.9% (multi-domain) and 4.9% (rollout)
+of labels were inf (integrity check only tested NaN; pinball gradients stay finite so training did not crash).
+Fix: per-window normalised float16 + float32 loc/scale (`cache.py`, ENCODING scaled_f16_v2), finite check, regression test.
+The two affected arms were re-run; invalid runs kept as `runs/INVALID_fp16overflow_*`.
+
+**Result (`results/study/stage_a/table.md`; paired ratio a/b, cluster bootstrap 95% CI; <1 = a better):**
+- Teacher labels vs ground truth, **real** inputs: 0.83 [0.80, 0.87] shapes, 0.86 [0.83, 0.88] fresh electricity, 0.97 [0.93, 1.01] multi-domain.
+- Teacher labels vs ground truth, **synthetic** inputs: 1.12 [1.10, 1.15] shapes (GT better), 1.00 elsewhere (no difference).
+- Synthetic vs real inputs (KD): 0.43 shapes, 1.23 multi-domain test, 1.00 fresh electricity → each wins on its own distribution.
+- Rollouts vs real inputs (KD): 1.06 shapes, 1.09 multi-domain, 0.98 [0.95, 1.01] fresh → no gain at this scale.
+- White noise vs synthetic (KD): 5.7× shapes, 1.46× multi-domain, 1.48× fresh → worst everywhere (as predicted).
+- Absolute level: best student on fresh electricity ≈ seasonal naive (1.02–1.04) vs teachers zero-shot 0.61–0.71.
+  On the multi-domain test: best student 0.734 vs Toto-4m 0.721, Timestral-5M 0.660, t0-gamma 0.511 (best there).
+
+**Surprise / learned:**
+1. Distillation helps most when inputs are **real**: the teacher's distribution is a cleaner target than one noisy observed future.
+   On synthetic inputs the generator's own future is already a good target, so teacher labels add nothing (or hurt on shapes).
+2. No single input source wins: each is best on its own distribution → mixing sources is the obvious next step.
+3. t0-gamma is the best zero-shot model on the multi-domain test (0.511) but among the worst on fresh electricity (0.668).
+4. A 0.22M student at 30k windows does not transfer zero-shot to electricity (≈ naive). Scale (data/size) and fine-tuning are open.
+
+**Next:** propose Stage D pilot (fine-tuning, headline) and Stage C (scale) before B; owner approval needed.

@@ -273,6 +273,11 @@ if __name__ == "__main__":
     (data / "results.json").write_text(json.dumps(results(), separators=(",", ":")))
     (data / "code.json").write_text(json.dumps(code_snippets(), separators=(",", ":")))
     (data / "status.json").write_text(json.dumps(status(), separators=(",", ":")))
+    study = {}
+    for t in sorted((ROOT / "results" / "study").glob("*/table.json")):
+        if t.parent.name != "smoke":
+            study[t.parent.name] = json.loads(t.read_text())
+    (data / "study.json").write_text(json.dumps(study, separators=(",", ":")))
     for name in ("input_families.json", "rollouts.json"):
         src = ROOT / "results" / name
         if src.exists():

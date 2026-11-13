@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Distillation study</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <h1>The distillation study</h1>
+    <p class="lede">A research-paper-style study: many ablations, one factor at a time, and an honest ranking of what moved the needle.
+      Hypothesis to test: <em>a ~1M-parameter student distilled from several foundation models, after a light fine-tuning on your own history,
+      matches the large models' out-of-the-box accuracy on your data.</em></p>
+    <div class="card small">
+      <b>How to read the results.</b> Each <em>arm</em> is one training recipe. Scores are relative WQL vs seasonal naive (lower is better).
+      The key column is the <b>paired ratio vs the reference arm</b>: both are scored on the <em>same</em> windows, so window difficulty cancels out.
+      Below 1 = better than the reference; an effect counts only if its 95% interval excludes 1.
+      Background: <a href="learn-2-scoring.html#uncertainty">Learn 2 · error bars</a>, <a href="learn-4-distillation.html">Learn 4 · distillation</a>.
+    </div>
+    <h2>Research questions</h2>
+    <div class="table-wrap card"><table>
+      <thead><tr><th>RQ</th><th>question</th><th>stage</th><th>status</th></tr></thead>
+      <tbody id="rq"></tbody></table></div>
+    <div id="stages"></div>
+  </main>
+  <div class="tooltip" id="tip"></div>
+  <script type="module" src="/src/pages/study.ts"></script>
+</body>
+</html>

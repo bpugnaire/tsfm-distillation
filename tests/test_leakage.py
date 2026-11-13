@@ -93,3 +93,32 @@ def test_multidomain_windows_exact_count_and_split_positions():
                 hi * L
             )  # target inside the split
     assert not any(s.dataset in H.HELD_OUT for s in series)
+
+
+@pytest.mark.parametrize("history", [100, 168, 720, 8760])
+def test_finetune_history_origins_never_reach_the_test(history):
+    from tinycast.data.target_domain import history_origins
+
+    end = 20000
+    start, origins = history_origins(end, history, min_context=32, horizon=64)
+    assert start == end - history
+    assert (origins + 64 <= end).all()  # every target ends before the test starts
+    assert (origins - 32 >= start).all()  # contexts only use the user's history window
+
+
+def test_finetune_history_real_domains():
+    from tinycast.data import target_domain as T
+    from tinycast.data.splits import load_splits
+
+    try:
+        tr, va = T.history_corpora("fr_power", history=720, max_windows=2000)
+        series = T._domain_series("fr_power")
+    except FileNotFoundError:
+        pytest.skip("data not downloaded")
+    assert len(tr.ids) and len(va.ids) and not set(tr.ids) & set(va.ids)
+    from tinycast.data.sources.rte_eco2mix import series_arrays
+
+    ts, _ = series_arrays()[series[0][0]]
+    assert (
+        ts[series[0][2] - 1] < load_splits().fresh_start <= ts[series[0][2]]
+    )  # history ends right before fresh

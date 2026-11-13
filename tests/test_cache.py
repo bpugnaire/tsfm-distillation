@@ -40,3 +40,14 @@ def test_roundtrip_resume_and_alignment(tmp_root):
         )
     with pytest.raises(ValueError):  # same key, different corpus content -> refuse to mix
         C.write_cache("t", "k", ids[::-1], ctx, _fn(calls), meta, log=lambda s: None)
+
+
+def test_large_values_survive_encoding():
+    """Regression: v1 float16 overflowed above 65504 (Stage A). Values up to 1e9 must round-trip finitely and precisely."""
+    rng = np.random.default_rng(0)
+    base = rng.choice([1e-3, 1.0, 7e4, 3e6, 1e9], size=(20, 1, 1))
+    q = np.sort(base * (1 + 0.1 * rng.standard_normal((20, 13, 64))), axis=1)
+    out = C._decode(C._encode(q), 13, 64)
+    assert np.isfinite(out).all()
+    spread = q.max(axis=(1, 2), keepdims=True) - q.min(axis=(1, 2), keepdims=True)
+    assert (np.abs(out - q) <= 1e-3 * spread + 1e-6 * np.abs(q)).all()
