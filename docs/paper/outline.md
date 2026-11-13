@@ -7,7 +7,10 @@ so that the analysis plan is fixed in advance (what we compare, how, with which 
 - **C1 (simplicity).** A standard recipe (teacher cache + pinball-based distillation loss + a small patch transformer)
   trains a useful student in < 1 GPU-hour, without per-teacher tricks.
 - **C2 (what matters).** A ranked list of the ingredients that move accuracy the most, with paired effect sizes and CIs.
-- **C3 (headline).** After a *light* fine-tuning on a target domain's own history (minutes of compute, ≤ 1 year of data),
+- **C3' (headline, revised 2026-11-13, ADR 0007).** Distil a small student, then fine-tune it on your own real history: this is
+  more **efficient** (fine-tuning and inference cost) and more **robust** (seed stability, cheap ensembling) than fine-tuning the SOTA
+  teacher on the same data, at comparable accuracy. Tested against teachers fine-tuned on the same history (new Stage F).
+- ~~C3 (original)~~ After a *light* fine-tuning on a target domain's own history (minutes of compute, ≤ 1 year of data),
   the distilled student matches the **zero-shot** accuracy of the large teachers on that domain's future, at ~100–1000× fewer
   parameters and a fraction of the latency.
 - **C4 (honesty).** Where the student does *not* match (domains, horizons, tails), and why.

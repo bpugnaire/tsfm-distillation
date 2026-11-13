@@ -265,3 +265,10 @@ once (73k windows, ~10 min CPU). References: Stage-D fine-tunes on the real futu
    picks kd (1.06). Choosing on test would have inflated the headline by ~4%. Recorded as a cautionary example; not claimed.
 2. Teacher labels act as a regulariser on your own data: the 1-month idiosyncrasy that made raw fine-tuning hurt disappears.
 3. The contrasts mix-vs-zoo and "kd 1 month vs gt 1 year" were added after a first read of the results (descriptive; no selection).
+
+## 2026-11-13 — Owner reframing: student+FT vs teacher+FT; robustness from existing runs
+
+Owner: fine-tune on real data (not teacher outputs); target claim "distil then fine-tune is more efficient and robust than fine-tuning
+the SOTA teacher" (ADR 0007). Checked: only Chronos-2 ships fine-tuning (`fit`, full / LoRA); Toto 2.0, t0, Timestral are inference-only.
+Robustness from existing Stage-D runs (`scripts/robustness_check.py`): 3-seed ensemble = free 5% gain on electricity 1 y (0.686 → 0.659),
+≤ 0.7% elsewhere; forgetting is strong (3.5× worse on shapes, 1.2–1.5× on other domains after a 1-year fine-tune).
