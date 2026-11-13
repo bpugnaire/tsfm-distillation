@@ -503,8 +503,10 @@ if ($("w-sa") || document.querySelector("[data-pair],[data-arm],[data-zoo]") || 
     }
     for (const el of document.querySelectorAll<HTMLElement>("[data-arm]")) {
       const [stage, suite, arm] = el.dataset.arm!.split("|");
-      const r = st[stage]?.suites[suite]?.arms[arm];
-      el.textContent = r ? r.rel_wql.toFixed(2) : "(n/a)";
+      const arms = st[stage]?.suites[suite]?.arms ?? {};
+      // multi-seed arms are stored as <arm>_s0, <arm>_s1...: report their mean
+      const vals = arms[arm] ? [arms[arm].rel_wql] : Object.keys(arms).filter((k) => k.startsWith(`${arm}_s`)).map((k) => arms[k].rel_wql);
+      el.textContent = vals.length ? (vals.reduce((x, y) => x + y, 0) / vals.length).toFixed(2) : "(n/a)";
     }
     for (const el of document.querySelectorAll<HTMLElement>("[data-zoo]")) {
       const [stage, suite, m] = el.dataset.zoo!.split("|");
@@ -616,5 +618,81 @@ if ($("w-levers") || $("w-vsbig")) {
     };
     if ($("w-levers")) chart("w-levers", [["kd_mix_m_30k", "10× more data (300k vs 30k)"], ["gt_mix_m_300k", "teacher labels vs ground truth"], ["kd_mix_s_300k", "4× bigger student (0.95M vs 0.22M)"]]);
     if ($("w-vsbig")) chart("w-vsbig", [["zoo:toto-2.0-4m", "vs Toto 2.0 4m (4.1M)"], ["zoo:timestral-5m", "vs Timestral 5M (5.2M)"], ["zoo:timestral-209m", "vs its teacher Timestral 209M"]]);
+  });
+}
+
+// ch6: Stage B contrasts and Stage D fine-tuning curves -----------------------------------------------------------------
+if ($("w-sb") || $("w-sd")) {
+  interface R { rel_wql: number }
+  interface P { a: string; b: string; question: string; ratio: [number, number, number] }
+  type St = Record<string, { suites: Record<string, { arms: Record<string, R>; pairs?: P[]; zero_shot_models: Record<string, R> }> }>;
+  loadJSON<St>("study.json").then((st) => {
+    if ($("w-sb")) {
+      const draw = () => {
+        const suite = (ctrl("sb-suite") as unknown as HTMLSelectElement).value;
+        const pairs = st.stage_b?.suites[suite]?.pairs ?? [];
+        const W = 720, rowH = 34, H = pairs.length * rowH + 30, ml = 330;
+        const svg = svgOf("w-sb", W, H)!;
+        svg.selectAll("*").remove();
+        const x = scaleLinear().domain([Math.log(0.8), Math.log(1.25)]).range([ml, W - 50]);
+        const lx = (v: number) => x(Math.log(Math.min(1.25, Math.max(0.8, v))));
+        svg.append("line").attr("x1", lx(1)).attr("x2", lx(1)).attr("y1", 4).attr("y2", H - 22).attr("stroke", cssVar("--ink")).attr("stroke-dasharray", "3 3");
+        for (const t of [0.8, 0.9, 1, 1.1, 1.25]) svg.append("text").attr("x", lx(t)).attr("y", H - 6).attr("text-anchor", "middle").text(t);
+        pairs.forEach((p, i) => {
+          const y = 18 + i * rowH, [r, lo, hi] = p.ratio;
+          const col = hi < 1 ? cssVar("--student") : lo > 1 ? cssVar("--teacher") : cssVar("--baseline");
+          svg.append("text").attr("x", ml - 10).attr("y", y - 3).attr("text-anchor", "end").style("fill", cssVar("--ink")).text(p.question);
+          svg.append("text").attr("x", ml - 10).attr("y", y + 11).attr("text-anchor", "end").text(`${p.a} vs ${p.b}`);
+          svg.append("line").attr("x1", lx(lo)).attr("x2", lx(hi)).attr("y1", y).attr("y2", y).attr("stroke", col).attr("stroke-width", 3);
+          svg.append("circle").attr("cx", lx(r)).attr("cy", y).attr("r", 5).attr("fill", col);
+          svg.append("text").attr("x", lx(hi) + 6).attr("y", y + 4).text(r.toFixed(2));
+        });
+      };
+      $("sb-suite")!.addEventListener("input", draw);
+      draw();
+    }
+    if ($("w-sd")) {
+      const mean = (arms: Record<string, R>, base: string) => {
+        const v = Object.keys(arms).filter((k) => k === base || k.startsWith(`${base}_s`)).map((k) => arms[k].rel_wql);
+        return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN;
+      };
+      const draw = () => {
+        const d = (ctrl("sd-domain") as unknown as HTMLSelectElement).value;
+        const suite = d === "fr" ? "fresh_fr_power" : "pedestrian_test";
+        const t = st.stage_d_final?.suites[suite];
+        if (!t) return;
+        const hs = ["1w", "1m", "1y"], labels = ["1 week", "1 month", "1 year"];
+        const dist = hs.map((h) => mean(t.arms, `ft_warm_${d}_${h}_distilled`));
+        const scr = hs.map((h) => mean(t.arms, `ft_warm_${d}_${h}_scratch`));
+        const zs = t.arms.distilled_zero_shot?.rel_wql;
+        const big: [string, string][] = [["toto-2.0-4m", "Toto 2.0 4m"], ["timestral-5m", "Timestral 5M"], ["timestral-209m", "Timestral 209M"]];
+        const all = [...dist, ...scr, zs, ...big.map(([k]) => t.zero_shot_models[k]?.rel_wql)].filter((v): v is number => Number.isFinite(v));
+        const W = 720, H = 260, ml = 44, mr = 130;
+        const svg = svgOf("w-sd", W, H)!;
+        svg.selectAll("*").remove();
+        const x = scaleLinear().domain([0, 2]).range([ml + 30, W - mr - 30]);
+        const y = scaleLinear().domain([Math.min(...all) * 0.9, Math.max(...all) * 1.05]).nice().range([H - 26, 10]);
+        grid(svg, y, y.ticks(5), ml, W - mr, (v) => v.toFixed(2));
+        labels.forEach((l, i) => svg.append("text").attr("x", x(i)).attr("y", H - 8).attr("text-anchor", "middle").text(l));
+        big.forEach(([k, l]) => {
+          const v = t.zero_shot_models[k]?.rel_wql;
+          if (v === undefined) return;
+          svg.append("line").attr("x1", ml).attr("x2", W - mr).attr("y1", y(v)).attr("y2", y(v)).attr("stroke", k === "toto-2.0-4m" ? cssVar("--comparator") : cssVar("--teacher")).attr("stroke-dasharray", "5 4");
+          svg.append("text").attr("x", W - mr + 6).attr("y", y(v) + 4).text(l);
+        });
+        if (zs !== undefined) {
+          svg.append("line").attr("x1", ml).attr("x2", W - mr).attr("y1", y(zs)).attr("y2", y(zs)).attr("stroke", cssVar("--student")).attr("stroke-dasharray", "2 3");
+          svg.append("text").attr("x", W - mr + 6).attr("y", y(zs) + 4).style("fill", cssVar("--ink-2")).text("student, no fine-tune");
+        }
+        const series: [number[], string, string][] = [[dist, cssVar("--student"), "fine-tuned, distilled start"], [scr, cssVar("--baseline"), "from scratch"]];
+        series.forEach(([v, c, l], k) => {
+          svg.append("path").attr("d", line<number>().x((_, i) => x(i)).y((q) => y(q))(v)).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2.2);
+          v.forEach((q, i) => svg.append("circle").attr("cx", x(i)).attr("cy", y(q)).attr("r", 4.5).attr("fill", c));
+          svg.append("text").attr("x", x(0) - 8).attr("y", y(v[0]) + (k ? 14 : -8)).attr("text-anchor", "end").style("fill", c).text(l);
+        });
+      };
+      $("sd-domain")!.addEventListener("input", draw);
+      draw();
+    }
   });
 }

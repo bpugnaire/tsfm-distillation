@@ -125,6 +125,57 @@
   One seed. The intervals cover the randomness of the <em>test windows</em>, not of training: a second seed could move each arm by a few percent.
   Effects of 10–25% (data, teacher labels on shapes) are safe; the 3% size effect on the multi-domain test needs more seeds before it can be trusted (Stage B uses 3 seeds, but for other factors).</div>
 
+<h2 id="stage-b">Stage B: which teacher, and how much of it? (3 seeds)</h2>
+<p>Fixed: Stage A's setting (small student, 30,000 real multi-domain windows). Changed: the <b>teacher</b> (Timestral-209M, Toto 2.0 313m, t0-gamma, the average of the three,
+  or a per-window weighted combination) and <b>α</b> (1 = teacher only, 0.5 = half teacher, half truth). Every arm is trained with <b>3 seeds</b>, and contrasts use the seed-averaged scores.</p>
+<div class="card widget">
+  <div class="widget-controls"><label>test suite <select id="sb-suite"><option value="fresh_fr_power">fresh French electricity</option><option value="multidomain_test">held-out multi-domain</option><option value="shapes">synthetic shapes</option></select></label></div>
+  <svg id="w-sb"></svg>
+  <p class="small muted">Paired ratios on seed-averaged scores (below 1 = the first arm is better). Source: <code>results/study/stage_b/table.json</code>.</p>
+</div>
+<ul>
+  <li><b>Teacher labels beat the truth, confirmed with 3 seeds</b>: <b data-pair="stage_b|fresh_fr_power|kd_timestral|gt"></b> on electricity, <b data-pair="stage_b|shapes|kd_timestral|gt"></b> on shapes.
+    With one seed this could have been luck; with three, it is the most robust result of the study.</li>
+  <li><b>Which teacher matters little</b>: Toto vs Timestral <b data-pair="stage_b|fresh_fr_power|kd_toto|kd_timestral"></b>, t0 vs Timestral <b data-pair="stage_b|fresh_fr_power|kd_t0|kd_timestral"></b> (electricity).
+    Surprise: t0-gamma is the best <em>zero-shot</em> model on the multi-domain test, yet the <em>worst teacher</em> for electricity. A teacher's value is how good its labels are <em>on the inputs the student trains on</em>, and how well those transfer to the target, not its leaderboard rank.</li>
+  <li><b>Averaging the three teachers helps a little</b>: <b data-pair="stage_b|fresh_fr_power|kd_ensemble|kd_timestral"></b> (electricity), <b data-pair="stage_b|multidomain_test|kd_ensemble|kd_timestral"></b> (multi-domain).
+    Averaging quantiles level by level cancels part of each teacher's individual errors, the same reason ensembles help everywhere in ML.</li>
+  <li><b>Weighting teachers per window by their error does not help</b>: <b data-pair="stage_b|fresh_fr_power|kd_weighted|kd_ensemble"></b> vs the plain average.
+    The weights are computed from each window's <em>one</em> observed future, the same noisy evidence the teacher labels were meant to smooth. The weights chase the noise.
+    (t0 was the per-window "best" teacher on 55% of windows, and that still did not translate into a better student.)</li>
+  <li><b>α = 1 is best</b>: α = 0.5 vs 1 gives <b data-pair="stage_b|fresh_fr_power|kd_timestral_a05|kd_timestral"></b> (Timestral) and <b data-pair="stage_b|fresh_fr_power|kd_ensemble_a05|kd_ensemble"></b> (ensemble) on electricity.
+    Mixing the noisy truth back in only adds noise to an already better target. Even for Toto, whose 1%/99% levels are not native, α = 0.5 brings almost nothing.</li>
+</ul>
+<div class="callout intuition"><b>Seeds, in numbers</b>
+  Retraining the same arm with another seed moves its score by about ±0.005 on the multi-domain test but by ±0.02–0.10 on shapes and electricity.
+  So on those suites, a single-seed difference below ~5% says nothing. Rule of thumb: <b>estimate the seed spread before trusting small effects</b>.</div>
+
+<h2 id="stage-d">Stage D: a light fine-tuning on <em>your</em> data</h2>
+<p>The headline question. Take the best student so far (Stage C-lite, chosen on validation), and fine-tune it on a target domain's own recent history
+  (1 week, 1 month or 1 year), with plain supervised training on the true future. Compare with the same architecture trained from scratch on that history, and with the big models used as-is.
+  Two domains it never saw in distillation: French electricity, and Melbourne pedestrian counts.</p>
+<div class="callout pitfall"><b>"1 week of your data" has two meanings</b>
+  <b>Warm</b>: you have a long past, but only label the last week for fine-tuning (contexts can use the full past). <b>Cold start</b>: you only <em>have</em> a week.
+  Then contexts are short at training <em>and</em> at test time, and the big models must be scored on the same short contexts to be fair.
+  Our pilot mixed the two (short training contexts, long test contexts) and got misleading failures. The final stage separates them.</div>
+<div class="card widget">
+  <div class="widget-controls"><label>domain <select id="sd-domain"><option value="fr">French electricity</option><option value="ped">pedestrians</option></select></label></div>
+  <svg id="w-sd"></svg>
+  <p class="small muted">Warm fine-tuning, relative WQL (lower is better), mean of 3 seeds. Dashed lines: the big models used as-is on the same test windows. Source: <code>results/study/stage_d_final/table.json</code>.</p>
+</div>
+<ul>
+  <li><b>With a year of history, the student reaches the smallest official model.</b> Electricity: <b data-arm="stage_d_final|fresh_fr_power|ft_warm_fr_1y_distilled"></b>, vs Toto 2.0 4m <b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1y_distilled|zoo:toto-2.0-4m"></b> (a tie).
+    Pedestrians: <b data-arm="stage_d_final|pedestrian_test|ft_warm_ped_1y_distilled"></b>, vs Toto 2.0 4m <b data-pair="stage_d_final|pedestrian_test|ft_warm_ped_1y_distilled|zoo:toto-2.0-4m"></b> (better).</li>
+  <li><b>It does not reach the bigger ones yet</b>: vs Timestral-5M <b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1y_distilled|zoo:timestral-5m"></b>, vs Timestral-209M <b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1y_distilled|zoo:timestral-209m"></b> (electricity).</li>
+  <li><b>Distillation matters most when your data is short.</b> Distilled start vs from scratch with 1 week: <b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1w_distilled|ft_warm_fr_1w_scratch"></b> (electricity);
+    with 1 year: <b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1y_distilled|ft_warm_fr_1y_scratch"></b>. With enough of its own data, a small model can learn the domain by itself; the pretrained start saves you when you have little.</li>
+  <li><b>Cold start favours the giants.</b> With only one week of context, Timestral-209M barely changes (<b data-zoo="stage_d_final|fresh_fr_power@168|timestral-209m"></b> vs <b data-zoo="stage_d_final|fresh_fr_power|timestral-209m"></b> with full context),
+    while Toto 2.0 4m drops (<b data-zoo="stage_d_final|fresh_fr_power@168|toto-2.0-4m"></b> vs <b data-zoo="stage_d_final|fresh_fr_power|toto-2.0-4m"></b>). Large models are robust to short histories; small ones need context.</li>
+</ul>
+<div class="callout pitfall"><b>An anomaly we do not hide</b>
+  On electricity, fine-tuning on the last <em>month</em> makes the student worse than not fine-tuning at all (<b data-pair="stage_d_final|fresh_fr_power|ft_warm_fr_1m_distilled|distilled_zero_shot"></b>),
+  while 1 week and 1 year do not. A result that does not fit a smooth trend is a reason to investigate before concluding anything, which is the next step of the study.</div>
+
 <h2 id="sanity">Sanity checks that saved the study</h2>
 <p>Experiments fail silently far more often than they crash. What caught our bugs:</p>
 <ul>
@@ -133,6 +184,8 @@
   <li><b>Integrity checks must test what can actually go wrong.</b> The cache check looked for NaN, not for infinity. It now rejects any non-finite value.</li>
   <li><b>Run a tiny version first.</b> A 1-minute smoke run of the whole pipeline caught three bugs before the real run: arms of unequal size, a stale cache silently reused, and a float64 array the Mac GPU cannot hold.</li>
   <li><b>Log every component of the loss</b>, not just the total. The <code>inf</code> was visible only in the "kd" column.</li>
+  <li><b>Never silently fix a model's output.</b> In Stage B, Toto 2.0 313m returned non-finite values on the Mac GPU for one perfectly flat series (fine on CPU).
+    The adapter's check refused the output and stopped the run, instead of quietly producing a corrupted teacher. Lesson: changing <em>where</em> a teacher runs can change the teacher.</li>
 </ul>
 
 <h2 id="check">Check yourself</h2>
