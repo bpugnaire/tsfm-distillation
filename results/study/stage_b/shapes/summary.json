@@ -1,0 +1,1333 @@
+{
+ "suite": "shapes",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.16755540000000002,
+   "mean_cov80": 0.76281305,
+   "mean_cov98": 0.95234395,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.3837505313348575,
+   "rel_wql_ci": [
+    1.1590756144616878,
+    1.687223452713098
+   ],
+   "rel_mase": 1.5215144474425042,
+   "rel_mase_ci": [
+    1.290704886816295,
+    1.8326967115947193
+   ],
+   "mean_wql": 0.1313146,
+   "mean_cov80": 0.7695317500000001,
+   "mean_cov98": 0.9285158999999998,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4327303075360576,
+   "rel_wql_ci": [
+    1.2046417914472738,
+    1.7360024524174955
+   ],
+   "rel_mase": 1.597886255565742,
+   "rel_mase_ci": [
+    1.366105026744325,
+    1.9079436572497968
+   ],
+   "mean_wql": 0.12982310000000002,
+   "mean_cov80": 0.76953195,
+   "mean_cov98": 0.9409373500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_a05_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4464680120231865,
+   "rel_wql_ci": [
+    1.192939431801152,
+    1.780185187838525
+   ],
+   "rel_mase": 1.583282419855772,
+   "rel_mase_ci": [
+    1.3208534236022347,
+    1.9282703021523202
+   ],
+   "mean_wql": 0.1365479,
+   "mean_cov80": 0.7532032000000001,
+   "mean_cov98": 0.9218752000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4591160096543572,
+   "rel_wql_ci": [
+    1.1973185583659804,
+    1.7985960899507212
+   ],
+   "rel_mase": 1.575476749107281,
+   "rel_mase_ci": [
+    1.3085551269931768,
+    1.9348740436923975
+   ],
+   "mean_wql": 0.14151534999999998,
+   "mean_cov80": 0.7520317,
+   "mean_cov98": 0.91343775,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4669774047805453,
+   "rel_wql_ci": [
+    1.2276006601793863,
+    1.7883411857823486
+   ],
+   "rel_mase": 1.5489421171939521,
+   "rel_mase_ci": [
+    1.3005618420606586,
+    1.8760099695310657
+   ],
+   "mean_wql": 0.13584040000000003,
+   "mean_cov80": 0.8355472499999999,
+   "mean_cov98": 0.98093765,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_a05_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4834176551017952,
+   "rel_wql_ci": [
+    1.224773870260841,
+    1.8266663451635932
+   ],
+   "rel_mase": 1.581344308744893,
+   "rel_mase_ci": [
+    1.3179337635021828,
+    1.9391399286404059
+   ],
+   "mean_wql": 0.13934765000000002,
+   "mean_cov80": 0.7332036,
+   "mean_cov98": 0.92726585,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4914792700141795,
+   "rel_wql_ci": [
+    1.2477799131431062,
+    1.8174984165397075
+   ],
+   "rel_mase": 1.6677529887955411,
+   "rel_mase_ci": [
+    1.4161812991953886,
+    1.9964048164586228
+   ],
+   "mean_wql": 0.13838085,
+   "mean_cov80": 0.70015675,
+   "mean_cov98": 0.9182812999999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_a05_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4980353284961518,
+   "rel_wql_ci": [
+    1.2402286648028684,
+    1.834566983764968
+   ],
+   "rel_mase": 1.649822428500521,
+   "rel_mase_ci": [
+    1.3798054351413422,
+    1.9931912381793169
+   ],
+   "mean_wql": 0.1386158,
+   "mean_cov80": 0.74843785,
+   "mean_cov98": 0.9328908000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_a05_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.503516291317942,
+   "rel_wql_ci": [
+    1.2392610946997469,
+    1.8510556469448165
+   ],
+   "rel_mase": 1.6138337269644178,
+   "rel_mase_ci": [
+    1.3373745021862395,
+    1.983479410407229
+   ],
+   "mean_wql": 0.13953985,
+   "mean_cov80": 0.76750045,
+   "mean_cov98": 0.9728127000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_a05_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5077544277986756,
+   "rel_wql_ci": [
+    1.2562610561471808,
+    1.847897728217229
+   ],
+   "rel_mase": 1.6601007267981318,
+   "rel_mase_ci": [
+    1.3923768746666874,
+    2.0229389477124147
+   ],
+   "mean_wql": 0.1409882,
+   "mean_cov80": 0.7692972,
+   "mean_cov98": 0.9571097499999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5122643536402127,
+   "rel_wql_ci": [
+    1.2383390322186552,
+    1.875321578518689
+   ],
+   "rel_mase": 1.7184959753528175,
+   "rel_mase_ci": [
+    1.4289784784419222,
+    2.1127646651759187
+   ],
+   "mean_wql": 0.15082165,
+   "mean_cov80": 0.69531305,
+   "mean_cov98": 0.9064847500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5135590465380393,
+   "rel_wql_ci": [
+    1.2478457568581962,
+    1.8739779149819205
+   ],
+   "rel_mase": 1.7175104678017985,
+   "rel_mase_ci": [
+    1.4285281487081178,
+    2.107258229362569
+   ],
+   "mean_wql": 0.14393175,
+   "mean_cov80": 0.804141,
+   "mean_cov98": 0.9512501,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5186571070593822,
+   "rel_wql_ci": [
+    1.2555887119420182,
+    1.8738317450407376
+   ],
+   "rel_mase": 1.6630999674749651,
+   "rel_mase_ci": [
+    1.3886434590372079,
+    2.0316220800760703
+   ],
+   "mean_wql": 0.14549030000000002,
+   "mean_cov80": 0.69625085,
+   "mean_cov98": 0.90320335,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_a05_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.530710728541778,
+   "rel_wql_ci": [
+    1.2634042339113216,
+    1.882655888233069
+   ],
+   "rel_mase": 1.689885730140641,
+   "rel_mase_ci": [
+    1.417948705280484,
+    2.0592585498231557
+   ],
+   "mean_wql": 0.13952385,
+   "mean_cov80": 0.74757845,
+   "mean_cov98": 0.93968785,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5313946103669496,
+   "rel_wql_ci": [
+    1.2693699273298327,
+    1.8805053328467913
+   ],
+   "rel_mase": 1.6832192595499431,
+   "rel_mase_ci": [
+    1.4181486815144144,
+    2.0508140565830417
+   ],
+   "mean_wql": 0.14400495,
+   "mean_cov80": 0.72648485,
+   "mean_cov98": 0.8959376499999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_a05_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5430117946632018,
+   "rel_wql_ci": [
+    1.2622046172148518,
+    1.912042478770833
+   ],
+   "rel_mase": 1.739980313850818,
+   "rel_mase_ci": [
+    1.4344836884087449,
+    2.1432907168315993
+   ],
+   "mean_wql": 0.14481645,
+   "mean_cov80": 0.7671103499999999,
+   "mean_cov98": 0.9534378000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_a05_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5449896176644595,
+   "rel_wql_ci": [
+    1.2852193513611225,
+    1.895110110611742
+   ],
+   "rel_mase": 1.7139721332583993,
+   "rel_mase_ci": [
+    1.4439265904128633,
+    2.0930010544242044
+   ],
+   "mean_wql": 0.14960075,
+   "mean_cov80": 0.7194540500000001,
+   "mean_cov98": 0.9298440500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_a05_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5498074873014904,
+   "rel_wql_ci": [
+    1.2949072756639972,
+    1.8810186789659038
+   ],
+   "rel_mase": 1.6696712924952686,
+   "rel_mase_ci": [
+    1.402190914195538,
+    2.0153996917601487
+   ],
+   "mean_wql": 0.13696075,
+   "mean_cov80": 0.82273475,
+   "mean_cov98": 0.9650782000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5576060968955576,
+   "rel_wql_ci": [
+    1.312992550291626,
+    1.894218708944844
+   ],
+   "rel_mase": 1.6717126581524555,
+   "rel_mase_ci": [
+    1.4239468843377756,
+    1.9993337096634987
+   ],
+   "mean_wql": 0.14231665,
+   "mean_cov80": 0.8193751499999999,
+   "mean_cov98": 0.9671876500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5616946931107778,
+   "rel_wql_ci": [
+    1.2686555631075611,
+    1.9488588530371262
+   ],
+   "rel_mase": 1.7483292267214277,
+   "rel_mase_ci": [
+    1.443498030515565,
+    2.160518824964691
+   ],
+   "mean_wql": 0.15115265,
+   "mean_cov80": 0.6777345,
+   "mean_cov98": 0.9052347000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5652757306780463,
+   "rel_wql_ci": [
+    1.2804189374942472,
+    1.9436351900695326
+   ],
+   "rel_mase": 1.6334020785414054,
+   "rel_mase_ci": [
+    1.3532437280060594,
+    2.016148591088026
+   ],
+   "mean_wql": 0.15341535,
+   "mean_cov80": 0.74867265,
+   "mean_cov98": 0.9126563999999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_weighted_a05_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5756531365810598,
+   "rel_wql_ci": [
+    1.2973416113804201,
+    1.9397469435124388
+   ],
+   "rel_mase": 1.771518632983396,
+   "rel_mase_ci": [
+    1.477098599437333,
+    2.176323226429218
+   ],
+   "mean_wql": 0.14672834999999998,
+   "mean_cov80": 0.7714846,
+   "mean_cov98": 0.94492275,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_a05_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5951094661406984,
+   "rel_wql_ci": [
+    1.3142092949088577,
+    1.9696364977885559
+   ],
+   "rel_mase": 1.7722814890155414,
+   "rel_mase_ci": [
+    1.4777296815974668,
+    2.1696195499499296
+   ],
+   "mean_wql": 0.14999455,
+   "mean_cov80": 0.7603128499999999,
+   "mean_cov98": 0.9645314500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "gt_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.5961399798998355,
+   "rel_wql_ci": [
+    1.309350994168303,
+    1.9760055133704268
+   ],
+   "rel_mase": 1.8140558860205163,
+   "rel_mase_ci": [
+    1.5027679926254087,
+    2.218804823262408
+   ],
+   "mean_wql": 0.14445035,
+   "mean_cov80": 0.7478124500000001,
+   "mean_cov98": 0.94414085,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6026463548653054,
+   "rel_wql_ci": [
+    1.3274062090498027,
+    1.9677557374369719
+   ],
+   "rel_mase": 1.7511752346068057,
+   "rel_mase_ci": [
+    1.465813579328126,
+    2.142603043717332
+   ],
+   "mean_wql": 0.15061650000000001,
+   "mean_cov80": 0.8272662,
+   "mean_cov98": 0.9650001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6036098785456365,
+   "rel_wql_ci": [
+    1.3059136585989386,
+    2.019245191143995
+   ],
+   "rel_mase": 1.743722005954913,
+   "rel_mase_ci": [
+    1.4250693220025106,
+    2.1947327591874695
+   ],
+   "mean_wql": 0.16590215,
+   "mean_cov80": 0.7715631,
+   "mean_cov98": 0.9532031000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_a05_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6045947585429434,
+   "rel_wql_ci": [
+    1.3319051880642094,
+    1.959920154653215
+   ],
+   "rel_mase": 1.7535761894022583,
+   "rel_mase_ci": [
+    1.472078647632746,
+    2.123891939558185
+   ],
+   "mean_wql": 0.14329129999999998,
+   "mean_cov80": 0.78164095,
+   "mean_cov98": 0.9726563500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_ensemble_a05_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6224692188853467,
+   "rel_wql_ci": [
+    1.3252889864230901,
+    2.0195191778377253
+   ],
+   "rel_mase": 1.8057500411194787,
+   "rel_mase_ci": [
+    1.5014999073232047,
+    2.2267071401282195
+   ],
+   "mean_wql": 0.1550632,
+   "mean_cov80": 0.7173446499999998,
+   "mean_cov98": 0.9131248,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_t0_s1",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6239632487022042,
+   "rel_wql_ci": [
+    1.3283467984236361,
+    2.0180989989035587
+   ],
+   "rel_mase": 1.9163937848165506,
+   "rel_mase_ci": [
+    1.5813444414307027,
+    2.355140421988932
+   ],
+   "mean_wql": 0.153897,
+   "mean_cov80": 0.7793757499999999,
+   "mean_cov98": 0.9612499,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_toto_a05_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.657415384798753,
+   "rel_wql_ci": [
+    1.3444370869110203,
+    2.0627698439209556
+   ],
+   "rel_mase": 1.8037434506683947,
+   "rel_mase_ci": [
+    1.4775555472930832,
+    2.2364622464749
+   ],
+   "mean_wql": 0.1573327,
+   "mean_cov80": 0.7250002500000001,
+   "mean_cov98": 0.9132032999999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "gt_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6649149443294924,
+   "rel_wql_ci": [
+    1.3574277567129023,
+    2.070803014179465
+   ],
+   "rel_mase": 1.8692395776833959,
+   "rel_mase_ci": [
+    1.552805784470912,
+    2.298006274590181
+   ],
+   "mean_wql": 0.16026615,
+   "mean_cov80": 0.7557038,
+   "mean_cov98": 0.9227348999999999,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "kd_timestral_a05_s2",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.6782443616026097,
+   "rel_wql_ci": [
+    1.3805194905434557,
+    2.0699896805990643
+   ],
+   "rel_mase": 1.7278398161838302,
+   "rel_mase_ci": [
+    1.4346258126855642,
+    2.1322908436934096
+   ],
+   "mean_wql": 0.15577634999999998,
+   "mean_cov80": 0.7822662499999999,
+   "mean_cov98": 0.9624998000000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "gt_s0",
+   "kind": "student",
+   "n_params": 218816,
+   "size_mb": 0.89,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.7645628824093254,
+   "rel_wql_ci": [
+    1.4608933161546513,
+    2.170278070378919
+   ],
+   "rel_mase": 1.8741632571129745,
+   "rel_mase_ci": [
+    1.5712747941668421,
+    2.2851991220570405
+   ],
+   "mean_wql": 0.1597982,
+   "mean_cov80": 0.73367205,
+   "mean_cov98": 0.94703165,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 200,
+   "n_clusters": 200
+  }
+ ],
+ "git_sha": "02039d69e652f56728d16e5eb06a620087541a5e"
+}

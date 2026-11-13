@@ -1,15 +1,15 @@
 # Hand-maintained project status for the website Status page (web/status.html).
 # Phase progress is NOT here: it is parsed from PLAN.md checkboxes by scripts/build_web_data.py.
 current_focus: >-
-  Study queue running on the Mac (no overlap): Stage D pilot (fine-tuning on your data) -> Stage C-lite (scale) ->
-  Stage B (teachers x alpha, 3 seeds) -> final Stage D (warm + cold start). Log: runs/queue.log. Results appear on the Study page as each stage ends.
+  Stages A, C-lite, B and D done (Study page). Headline so far: 0.95M student + 1 year of fine-tuning matches Toto-2.0-4m
+  (tie on electricity, -9% on pedestrians) but not Timestral-5M or the large models. Next: owner chooses the next lever.
 pending_decisions:
   - id: clean-retrain
     question: Retrain the final student without the 4 datasets that are GIFT-Eval test sets, then evaluate on GIFT-Eval short-term + fev (zero-overlap tasks only)?
     note: docs/decisions/0006-benchmarks-and-contamination.md (~1.5 h retrain + evaluation harness)
-  - id: after-queue
-    question: After D, C-lite and B, which recipe goes to the full Stage C (scale) and the final Stage D (3 seeds)?
-    note: decided on validation; results on the Study page
+  - id: next-lever
+    question: "Which lever next to close the gap to Timestral-5M / the large models: (1) scale student + data (3M, 1M windows, ensemble teacher), (2) teacher labels on YOUR history for fine-tuning, (3) investigate the 1-month electricity anomaly, (4) clean GIFT-Eval retrain + benchmark?"
+    note: journal 2026-11-13 (final D + B)
   - id: fair-comparison
     question: How do we compare an in-domain student with zero-shot teachers fairly?
     options: [report both explicitly, also train a synthetic-only student, evaluate on a held-out domain]

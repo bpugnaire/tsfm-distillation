@@ -195,3 +195,39 @@ MPS returns non-finite values for it, on CPU it is fine.** I had moved teacher c
 run on CPU, as in the benchmarks), partial MPS caches deleted, regression test added. The final Stage D started meanwhile and selects
 its init among C-lite + the 9 finished B runs (s-size, val ≥ 0.144 vs C-lite 0.1377): to re-check once B is complete.
 Lesson: a speed-up that changes *where* a teacher runs changes the teacher; the "never silently fix outputs" check caught it.
+
+## 2026-11-13 — Final Stage D (fine-tuning on "your data") and Stage B (teachers × α, 3 seeds)
+
+**Stage D final** (`results/study/stage_d_final/table.md`): init = C-lite student (0.95M, selected on validation, val WQL 0.1377);
+warm = full past as context, fine-tuning targets limited to the last week/month/year (3 seeds); cold = only that period exists
+(contexts cut at train AND test; zero-shot models scored on the same cut contexts). Steps = 20 epochs, cap 1500.
+| warm, relative WQL (seed range) | electricity | vs Toto-4m | vs Timestral-5M | vs Timestral-209M | pedestrians | vs Toto-4m | vs Timestral-5M |
+|---|---|---|---|---|---|---|---|
+| zero-shot student | 0.795 | | | | 0.759 | | |
+| 1 week | 0.788 (0.78–0.81) | 1.12 | 1.24 | 1.29 | 0.659 | 1.02 (tie) | 1.22 |
+| 1 month | 0.907 (0.88–0.93) | 1.28 | 1.42 | 1.48 | 0.619 | 0.96 | 1.15 |
+| 1 year | **0.686 (0.66–0.70)** | **0.98 (tie)** | 1.09 | 1.13 | **0.591** | **0.91** | 1.10 |
+- Distilled init vs scratch: decisive with little data (electricity 1 week 0.54, cold 1 week 0.68; pedestrians cold 1 week 0.78),
+  ~equal with a year (electricity 1.04, pedestrians 0.95).
+- Cold start: electricity 1 week 0.966 (1.18× Toto-4m on the same 1-week contexts), pedestrians 1 week 0.816 (ties Toto-4m).
+  The large teachers barely suffer from 1-week contexts (Timestral-209M 0.615 vs 0.614); Toto-4m does (0.816 vs 0.709).
+- **Anomaly:** electricity, 1 *month* of fine-tuning is worse than none (1.14× zero-shot) while 1 week and 1 year help or are
+  neutral; scratch is worse too. Hypothesis (untested): the last month before the test (mid-Sep → mid-Oct) is a seasonal regime
+  that differs from the test (mid-Oct → Nov), and real-time RTE data are provisional. To investigate before any claim.
+
+**Stage B** (`results/study/stage_b/table.md`; student s, 30k real multi-domain windows, 3 seeds; paired on seed means):
+- Teacher labels vs ground truth, confirmed with 3 seeds: 0.91 shapes, 0.97 multi-domain, 0.88 electricity.
+- Teacher choice matters little: Toto-313m vs Timestral-209M 0.95 / 1.02 / 0.98; t0-gamma vs Timestral 1.03 / 1.00 / **1.07**
+  (t0 is the best zero-shot model on the multi-domain test but the worst teacher for electricity).
+- Ensemble of 3 vs Timestral alone: 0.98 / **0.98** / **0.98** (small, significant on two suites). Per-window error weighting vs plain
+  ensemble: no gain (1.00 / 0.995 / 1.017), although t0 was the per-window best on 55% of training windows.
+- α = 0.5 vs 1: never better on shapes or electricity (1.02–1.10); pure distillation (α = 1) wins, even for Toto whose tails are
+  not native (only +1.3% for α = 0.5 on the multi-domain test).
+- Seed-to-seed spread: ±0.002–0.013 on the multi-domain test, ±0.02–0.10 on shapes / electricity: 1-seed differences < 5% there are noise.
+
+**What moved the needle (all stages):** data ×10 (9–26%) > teacher labels vs truth (3–15%) > student ×4 (3–8%) ≈ fine-tuning with a
+year of your data (12–22%) > ensemble of teachers (~2%) ≈ which teacher (2–7%) > α (1 is best) > per-window weighting (none).
+
+**Headline verdict so far:** with a year of its own history, the 0.95M student **matches Toto-2.0-4m on electricity and beats it by 9% on
+pedestrians**, i.e. it matches the out-of-the-box accuracy of the *smallest* official checkpoint at 4.3× fewer parameters. It does **not**
+yet reach Timestral-5M (9–10% behind) or the 200–300M models (13–29% behind).

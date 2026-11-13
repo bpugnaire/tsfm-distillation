@@ -3,6 +3,119 @@
  "baseline": "seasonal_naive",
  "rows": [
   {
+   "model": "toto-2.0-313m",
+   "kind": "toto",
+   "n_params": 312684608,
+   "size_mb": 1250.76,
+   "native_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+   ],
+   "rel_wql": 0.6091261459520202,
+   "rel_wql_ci": [
+    0.5742346828525465,
+    0.6433179485205693
+   ],
+   "rel_mase": 0.6984392578159986,
+   "rel_mase_ci": [
+    0.6619246146802308,
+    0.7348354050399403
+   ],
+   "mean_wql": 0.047303846153846155,
+   "mean_cov80": 0.7320214743589742,
+   "mean_cov98": 0.9534757051282051,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "timestral-209m",
+   "kind": "timestral",
+   "n_params": 209312256,
+   "size_mb": 837.27,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.6151254054170334,
+   "rel_wql_ci": [
+    0.5808268163562861,
+    0.6481659286584515
+   ],
+   "rel_mase": 0.6949282861687524,
+   "rel_mase_ci": [
+    0.6579983808570516,
+    0.7318351098128089
+   ],
+   "mean_wql": 0.04737,
+   "mean_cov80": 0.7882615384615385,
+   "mean_cov98": 0.9851264102564102,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "timestral-5m",
+   "kind": "timestral",
+   "n_params": 5208960,
+   "size_mb": 20.84,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.6496992551969376,
+   "rel_wql_ci": [
+    0.6150837284895787,
+    0.6861235767739269
+   ],
+   "rel_mase": 0.7484504421587126,
+   "rel_mase_ci": [
+    0.7120790547652658,
+    0.785556387244418
+   ],
+   "mean_wql": 0.05008217948717948,
+   "mean_cov80": 0.7099358333333333,
+   "mean_cov98": 0.9480172435897436,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
    "model": "toto-2.0-4m",
    "kind": "toto",
    "n_params": 4144448,
@@ -77,5 +190,5 @@
    "n_clusters": 13
   }
  ],
- "git_sha": "514fde07c0ae8875eda6199875ab09e203c4c13f-dirty"
+ "git_sha": "02039d69e652f56728d16e5eb06a620087541a5e"
 }

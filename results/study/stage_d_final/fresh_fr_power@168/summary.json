@@ -1,0 +1,163 @@
+{
+ "suite": "fresh_fr_power@168",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "distilled_zero_shot",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.8232320395466949,
+   "rel_wql_ci": [
+    0.800233117997287,
+    0.8457159851925224
+   ],
+   "rel_mase": 0.9462363521170215,
+   "rel_mase_ci": [
+    0.9186916329536865,
+    0.9745222281807503
+   ],
+   "mean_wql": 0.06074262820512821,
+   "mean_cov80": 0.8031849038461539,
+   "mean_cov98": 0.9882815064102565,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "ft_cold_fr_1w_distilled",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.9663290808303479,
+   "rel_wql_ci": [
+    0.9282183253776267,
+    1.0064434322696254
+   ],
+   "rel_mase": 1.046616756384224,
+   "rel_mase_ci": [
+    1.0095715718541616,
+    1.0840939366996463
+   ],
+   "mean_wql": 0.07140679487179487,
+   "mean_cov80": 0.41441288461538467,
+   "mean_cov98": 0.7925180128205128,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.08016621794871795,
+   "mean_cov80": 0.38301282051282054,
+   "mean_cov98": 0.9270834935897435,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "ft_cold_fr_1w_scratch",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.4141390900664963,
+   "rel_wql_ci": [
+    1.3135218901814338,
+    1.5334352639694941
+   ],
+   "rel_mase": 1.5789812260502274,
+   "rel_mase_ci": [
+    1.4571096246871327,
+    1.723062919913859
+   ],
+   "mean_wql": 0.1003299358974359,
+   "mean_cov80": 0.7735883012820514,
+   "mean_cov98": 0.9649947435897435,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  }
+ ],
+ "git_sha": "02039d69e652f56728d16e5eb06a620087541a5e"
+}
