@@ -1,0 +1,63 @@
+# Data v2 (Stage C2): extra real training series from Salesforce/GiftEvalPretrain (Apache-2.0; built not to overlap GIFT-Eval test).
+# Selection rules (ADR 0005 updates, 2026-11-14):
+#  - diverse domains, each subset < ~700 MB (skip buildings_900k 63 GB, residential_* 1.5-1.8 GB, wind_farms 0.7 GB for now);
+#  - EXCLUDED as fev test tasks (we keep fev complete): m5, favorita_sales, favorita_transactions (retail),
+#    bull, cockatoo, hog, pdb, gfc12_load, gfc14_load, gfc17_load (= fev proenfo_*), kdd2022 (= fev kdd_cup_2022);
+#  - EXCLUDED as our own target / held-out series: pedestrian_counts;
+#  - SKIPPED as duplicates of datasets we already load from chronos_datasets: traffic_hourly, taxi_30min, weather,
+#    rideshare_with_missing, tourism_monthly, fred_md;
+#  - every series is additionally checked against GIFT-Eval + fev content (series with any overlapping chunk are dropped).
+repo: Salesforce/GiftEvalPretrain
+subsets:
+  # web
+  wiki-rolling_nips: web
+  kaggle_web_traffic_weekly: web
+  # road sensors / transit
+  PEMS03: traffic
+  PEMS04: traffic
+  PEMS08: traffic
+  PEMS_BAY: traffic
+  LOS_LOOP: traffic
+  traffic_weekly: traffic
+  BEIJING_SUBWAY_30MIN: transit
+  SHMETRO: transit
+  HZMETRO: transit
+  uber_tlc_hourly: mobility
+  uber_tlc_daily: mobility
+  # environment / climate
+  beijing_air_quality: air
+  china_air_quality: air
+  subseasonal: climate
+  subseasonal_precip: climate
+  sunspot_with_missing: nature
+  # health
+  cdc_fluview_ilinet: health
+  cdc_fluview_who_nrevss: health
+  project_tycho: health
+  covid_mobility: health
+  # business / finance / competitions
+  godaddy: business
+  bitcoin_with_missing: finance
+  nn5_daily_with_missing: finance
+  m1_monthly: competition
+  monash_m3_monthly: competition
+  monash_m3_quarterly: competition
+  tourism_quarterly: tourism
+  cif_2016_12: competition
+  # energy (allowed since 2026-11-14; never the RTE target series)
+  solar_power: energy
+  wind_power: energy
+  lcl: energy
+  london_smart_meters_with_missing: energy
+  australian_electricity_demand: energy
+  bdg-2_panther: energy
+  bdg-2_bear: energy
+  bdg-2_fox: energy
+  bdg-2_rat: energy
+  ideal: energy
+  spain: energy
+  elecdemand: energy
+  sceaux: energy
+  borealis: energy
+  smart: energy
+  covid19_energy: energy

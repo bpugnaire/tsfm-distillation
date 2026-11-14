@@ -24,7 +24,7 @@ from tinycast.data.synthetic import TRAIN_SEED_MAX, synthetic_batch
 from tinycast.data.windows import window_id
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCES = ("multidomain", "synth", "rollout", "noise", "rte")
+SOURCES = ("multidomain", "multidomain_v2", "synth", "rollout", "noise", "rte")
 
 
 @dataclass(frozen=True)
@@ -97,6 +97,21 @@ def _multidomain(spec: CorpusSpec, n: int, salt: int = 0):
     )
     # with-replacement draws can repeat a window: the draw index keeps ids unique
     return [window_id("md", f"{i}#{j}", salt) for j, i in enumerate(ids)], ctx, fut
+
+
+def _multidomain_v2(spec: CorpusSpec, n: int):
+    """Data v2 (Stage C2): more domains incl. energy, series-level contamination filter, no near-duplicate windows."""
+    from tinycast.data.sources import data_v2 as V
+
+    ctx, fut, ids, _, quota = V.windows_v2(
+        V.load_v2(), spec.split, n, spec.seed, spec.context_length, spec.horizon
+    )
+    if len(ids) < n:
+        print(
+            f"  multidomain_v2: only {len(ids)} distinct windows available (asked {n})", flush=True
+        )
+    print(f"  multidomain_v2 windows per dataset: {quota}", flush=True)
+    return [window_id("md2", i, 0) for i in ids], ctx, fut
 
 
 def _synth(spec: CorpusSpec, n: int):
@@ -173,6 +188,7 @@ def _rollout(spec: CorpusSpec, n: int, log=print):
 
 BUILDERS = {
     "multidomain": _multidomain,
+    "multidomain_v2": _multidomain_v2,
     "synth": _synth,
     "noise": _noise,
     "rte": _rte,
