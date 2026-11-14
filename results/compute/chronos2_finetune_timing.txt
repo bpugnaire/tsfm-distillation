@@ -1,0 +1,8 @@
+autogluon/chronos-2-small mps full: 1.06 s/step -> 1000 steps ~ 18 min
+autogluon/chronos-2-small mps lora: 1.03 s/step -> 1000 steps ~ 17 min
+autogluon/chronos-2-small cpu full: 6.25 s/step -> 1000 steps ~ 104 min
+autogluon/chronos-2-small cpu lora: 6.05 s/step -> 1000 steps ~ 101 min
+amazon/chronos-2 mps full ERROR OutOfMemoryError MPS command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+amazon/chronos-2 mps lora: 38.96 s/step -> 1000 steps ~ 649 min
+amazon/chronos-2 cpu full: 29.72 s/step -> 1000 steps ~ 495 min
+amazon/chronos-2 cpu lora: 44.24 s/step -> 1000 steps ~ 737 min

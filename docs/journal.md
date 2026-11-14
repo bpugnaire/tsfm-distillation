@@ -272,3 +272,7 @@ Owner: fine-tune on real data (not teacher outputs); target claim "distil then f
 the SOTA teacher" (ADR 0007). Checked: only Chronos-2 ships fine-tuning (`fit`, full / LoRA); Toto 2.0, t0, Timestral are inference-only.
 Robustness from existing Stage-D runs (`scripts/robustness_check.py`): 3-seed ensemble = free 5% gain on electricity 1 y (0.686 → 0.659),
 ≤ 0.7% elsewhere; forgetting is strong (3.5× worse on shapes, 1.2–1.5× on other domains after a 1-year fine-tune).
+
+## 2026-11-13 — Chronos-2 fine-tuning cost on a laptop
+Vendor `fit()` defaults (batch 256, 1000 steps): Chronos-2-small ~18 min/run on MPS; Chronos-2 (120M) does not fit in MPS memory
+for full fine-tuning and needs ~8–12 h per run on CPU (LoRA is not faster here). Our student fine-tunes in ~1 min. (`docs/notes/compute.md`)
