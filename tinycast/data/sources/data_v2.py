@@ -110,6 +110,14 @@ def _forbidden_hashes() -> np.ndarray:
     return np.unique(np.concatenate(hs))
 
 
+def _any_in_sorted(h: np.ndarray, sorted_set: np.ndarray) -> bool:
+    """True if any element of h is in sorted_set (binary search; np.isin would re-sort the big set on every call)."""
+    if len(h) == 0 or len(sorted_set) == 0:
+        return False
+    i = np.minimum(np.searchsorted(sorted_set, h), len(sorted_set) - 1)
+    return bool((sorted_set[i] == h).any())
+
+
 def build_index(log=print) -> dict:
     """Load the candidate pool, drop contaminated series, cache the list of surviving series ids."""
     if INDEX.exists():
@@ -118,10 +126,13 @@ def build_index(log=print) -> dict:
     log(f"forbidden chunk hashes: {len(forbidden):,}")
     pool = [s for name in H.DATASETS if name not in DROP_CHRONOS | H.HELD_OUT for s in H.load(name)]
     pool += load_gift_pretrain()
+    log(f"candidate series: {len(pool):,}")
     keep, dropped = [], {}
-    for s in pool:
+    for n, s in enumerate(pool):
+        if n % 5000 == 0:
+            log(f"  checked {n:,}/{len(pool):,}")
         h = chunk_hashes(s.values[: int(TRAIN_FRACTION * len(s.values))], stride=1)
-        hit = np.isin(h, forbidden, assume_unique=False).any() if len(h) else False
+        hit = _any_in_sorted(h, forbidden)
         if hit:
             dropped[s.dataset] = dropped.get(s.dataset, 0) + 1
         else:
