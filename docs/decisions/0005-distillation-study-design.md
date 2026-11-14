@@ -44,3 +44,11 @@ per-window error weighting}; α ∈ {0.5, 1}; student m; 100k windows; 3 seeds.
 ## Open sub-decisions
 - Baseline season on real data: use the dataset's sampling frequency (hourly → 24, daily → 7…), the GIFT-Eval convention,
   instead of auto-detection (which made ETS non-seasonal on electricity). Recommended.
+
+## Update 2026-11-14 (owner): energy data allowed in distillation
+Rationale (owner): a foundation-style student should be a generalist; the target-specific part is the fine-tuning step.
+Excluding energy also handicapped the student vs teachers that pretrained on energy data, and was not needed against leakage
+(leakage concerns the fresh test *targets*, protected by the time split, not the domain).
+Kept: the 13 RTE French series and the pedestrian series are never used in distillation ("your series" stay unseen until
+fine-tuning); every new subset must pass the content check against GIFT-Eval / fev test sets. Stages A–E were run without energy
+(stated in the paper; their conclusions are about *how* to distil).
