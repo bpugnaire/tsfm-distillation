@@ -305,3 +305,19 @@ gain comes from volume (1M vs 300k: 0.94 / 0.94 / 0.89). Timestral-28M labels co
 Electricity is no longer domain-zero-shot for C2 (data v2 has other energy series; the RTE series stay out).
 **Next:** TTM-r2 (~1M params, the closest-size comparator) needs `granite-tsfm`, which pins torch 2.11 / pandas 3: run it in a separate
 env and score its saved forecasts here. Fine-tuning curve on the site is still the C-lite student: rerun Stage D with C2.
+
+## 2026-11-16 — Long horizons: rolling the 64-step student out vs native long decoding
+**Did:** `tinycast/models/rollout.py` (median feedback, or 100 sampled paths with an AR(1) Gaussian copula, rho 0.9) and
+`scripts/long_horizon.py`: C2 student vs Timestral-28M / 5M (one block up to 1024 steps), Toto-2.0-4m and Chronos-Bolt-tiny
+(their own decoding), horizons 64/128/256/512, same 512-step context for all. Read Timestral's source to see how it does long
+horizons (patch 32, 32 forecast-query tokens = 1024 steps per block, context up to 32,768, median feedback past 1024).
+**Result:** `results/long_horizon/table.md` (paired ratios on the same windows). Sampled paths beat median feedback by 3–8% and
+fix calibration (cov80 at 512: 0.72 vs 0.30 on shapes, 0.78 vs 0.36 multi-domain). On real data the gap to the teacher stays
+flat: electricity 1.10 -> 0.99, multi-domain 1.09 -> 1.12 from 64 to 512 steps. On synthetic shapes it opens at once: 1.02 at 64,
+1.35 at 128, 1.47 at 512, while the teacher's one-shot score stays at 0.45. Electricity at 512 h: no model beats daily seasonal
+naive (8 origins, 104 windows, every model under-covers: cov80 0.37–0.50).
+**Surprise / learned:** rollout is good enough on seasonal real data; it fails on shapes where the next block depends on a
+long-range trend or phase the student must re-infer from its own sampled continuation. That is the case for multi-token decoding.
+One hour (2026-10-25 00:00 UTC, the DST night) is missing in every RTE series: long fresh windows now accept <= 1% missing targets
+(`min_finite`, headline suite unchanged at 312 windows). Data processing should be fixed at the source.
+**Next:** owner decision on multi-token decoding (ADR) and on GIFT-Eval / other teachers.

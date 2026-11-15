@@ -67,7 +67,9 @@ def main() -> None:
     ap.add_argument("--horizon", type=int, default=64)
     a = ap.parse_args()
     s = json.loads((ROOT / "results" / a.suite / "_suite.json").read_text())
-    ctx = np.array([[np.nan if v is None else v for v in c] for c in s["context"]], dtype=np.float64)
+    ctx = np.array(
+        [[np.nan if v is None else v for v in c] for c in s["context"]], dtype=np.float64
+    )
     T = ctx.shape[1]
     tokens = freq_tokens(a.suite, s["ids"])
     spec = importlib.util.spec_from_file_location("lat", ROOT / "tinycast" / "eval" / "latency.py")
@@ -86,20 +88,25 @@ def main() -> None:
         n_params = sum(p.numel() for p in model.parameters())
 
         class F:  # Forecaster-like wrapper for the shared latency harness
-            tok: np.ndarray | None = None  # per-window frequency tokens; None -> hourly (latency runs)
+            tok: np.ndarray | None = (
+                None  # per-window frequency tokens; None -> hourly (latency runs)
+            )
+
+            def __init__(self, net):
+                self.net = net
 
             @torch.no_grad()
             def forecast(self, x, horizon):
                 xf, obs = fill(np.asarray(x, dtype=np.float64))
                 tk = self.tok if self.tok is not None else np.full(len(xf), TOKEN["h"])
-                out = model(
+                out = self.net(
                     past_values=torch.from_numpy(xf)[..., None],
                     past_observed_mask=torch.from_numpy(obs)[..., None],
                     freq_token=torch.from_numpy(np.asarray(tk, dtype=np.int64)),
                 )
                 return out.prediction_outputs[..., 0].numpy()[:, :horizon]
 
-        f = F()
+        f = F(model)
         t0 = time.perf_counter()
         chunks = []
         for i in range(0, len(ctx), 64):

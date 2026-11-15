@@ -103,8 +103,13 @@ def fresh_test_windows(
     horizon: int = 64,
     stride: int = 24,
     source: str = "rte",
+    min_finite: float = 1.0,
 ) -> list[Window]:
-    """Rolling origins every `stride` hours from fresh_start, aligned to 00:00 UTC."""
+    """Rolling origins every `stride` hours from fresh_start, aligned to 00:00 UTC.
+
+    `min_finite`: share of future values that must be observed (metrics ignore missing targets). 1.0 for the headline
+    suite; the long-horizon study uses 0.99 because one hour (2026-10-25 00:00 UTC, the DST night) is missing in every
+    series and would otherwise remove every window longer than ~10 days."""
     out = []
     for sid, (ts, v) in sorted(series.items()):
         idx = candidate_origins(ts, "fresh", sp, context_length, horizon)
@@ -113,6 +118,6 @@ def fresh_test_windows(
         )
         for i in idx:
             w = make_window(source, sid, ts, v, int(i), context_length, horizon)
-            if np.isfinite(w.future).all():
+            if np.isfinite(w.future).mean() >= min_finite:
                 out.append(w)
     return out

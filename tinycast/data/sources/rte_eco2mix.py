@@ -104,14 +104,16 @@ def read_csv_bytes(b: bytes) -> pd.DataFrame:  # helper kept for tests / debuggi
     return pd.read_csv(io.BytesIO(b))
 
 
-def fresh_suite(cfg: BenchConfig):
+def fresh_suite(cfg: BenchConfig, min_finite: float = 1.0):
     """Rolling-origin windows whose *targets* lie entirely in the fresh test window."""
     from tinycast.data.splits import load_splits
     from tinycast.data.windows import fresh_test_windows
     from tinycast.eval.benchmark import Suite
 
     sp = load_splits()
-    wins = fresh_test_windows(series_arrays(), sp, cfg.context_length, cfg.horizon)
+    wins = fresh_test_windows(
+        series_arrays(), sp, cfg.context_length, cfg.horizon, min_finite=min_finite
+    )
     return Suite(
         name="fresh_fr_power",
         ids=[w.window_id for w in wins],

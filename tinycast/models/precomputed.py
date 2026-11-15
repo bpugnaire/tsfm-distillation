@@ -33,7 +33,9 @@ class PrecomputedForecaster:
         self.n_params = int(meta["n_params"])
         self.size_mb = round(4 * self.n_params / 1e6, 3)  # fp32 weights
         self.meta = meta
-        self.fallbacks = ["point forecast scored as a degenerate distribution (all quantiles = the point)"]
+        self.fallbacks = [
+            "point forecast scored as a degenerate distribution (all quantiles = the point)"
+        ]
         self._lat: dict | None = None
 
     def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
@@ -50,7 +52,9 @@ class PrecomputedForecaster:
                 p = d["point"][:, :horizon]
                 q = np.repeat(p[:, None, :], len(QUANTILE_LEVELS), axis=1)
                 return check_output(q, len(x), horizon, self.name)
-        raise ValueError(f"{self.name}: no precomputed forecasts for these {len(x)} contexts in {self.dir}")
+        raise ValueError(
+            f"{self.name}: no precomputed forecasts for these {len(x)} contexts in {self.dir}"
+        )
 
     @property
     def precomputed_latency(self) -> dict | None:

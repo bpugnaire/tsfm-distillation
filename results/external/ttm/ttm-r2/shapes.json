@@ -7,27 +7,27 @@
  "torch": "2.11.0",
  "latency": {
   "threads1_batch1": {
-   "p50_ms": 1.2530209496617317,
-   "p95_ms": 1.7018188082147387,
+   "p50_ms": 1.2363960267975926,
+   "p95_ms": 1.5770374739076942,
    "n_runs": 50
   },
   "threads1_batch32": {
-   "p50_ms": 8.166958519723266,
-   "p95_ms": 10.891891986830158,
+   "p50_ms": 8.047270530369133,
+   "p95_ms": 10.71285638026893,
    "n_runs": 50
   },
   "threads8_batch1": {
-   "p50_ms": 2.9853954911231995,
-   "p95_ms": 3.879900294123217,
+   "p50_ms": 2.7940834988839924,
+   "p95_ms": 3.570562781533226,
    "n_runs": 50
   },
   "threads8_batch32": {
-   "p50_ms": 11.2026670249179,
-   "p95_ms": 12.529082980472594,
+   "p50_ms": 11.679582996293902,
+   "p95_ms": 12.917237530928105,
    "n_runs": 50
   }
  },
- "wall_seconds_full_suite": 0.077,
+ "wall_seconds_full_suite": 0.071,
  "kind": "point forecast (scored as a degenerate distribution: all quantiles = the point)",
  "freq_tokens": "per window from the dataset frequency (shapes and monthly: oov)"
 }
