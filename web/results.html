@@ -8,34 +8,26 @@
 </head>
 <body>
   <main>
-    <h1>Results</h1>
-    <p class="lede">How the 0.95M-parameter students compare with forecasting foundation models 4× to 330× their size.
-      Score: <strong>relative WQL</strong>, the probabilistic forecast error divided by the error of "repeat the last season"
-      (lower is better; 0.5 = half the naive error). Whiskers are 95% bootstrap intervals over whole series.
-      Every number is read from <code>results/</code>.</p>
+    <section class="intro">
+      <h1>How it compares</h1>
+      <p class="lede">Each score is the forecast error divided by the error of a naive forecast that repeats the last season. Lower is better: 0.5 means half the naive error.</p>
+    </section>
 
-    <div class="toolbar" style="margin:16px 0 4px" id="tabs"></div>
-    <p class="small" id="suite-note" style="color:var(--ink-2); max-width:90ch; margin:6px 0 0"></p>
+    <h2>Against models of its size</h2>
+    <p class="section-lede" id="small-lede"></p>
+    <div class="small-multiples" id="small"></div>
 
-    <h2>Accuracy vs speed</h2>
-    <p class="small muted" id="pareto-sub"></p>
-    <div class="card"><svg id="pareto"></svg></div>
-
-    <h2>Leaderboard</h2>
-    <div class="card table-wrap" id="board"></div>
-
-    <h2>How much of your own data does it take?</h2>
-    <p class="small muted" style="max-width:90ch">Fine-tuning the student on the target series' own history (warm start: the history ends where the test starts).
-      Lines: mean of 3 seeds, shaded: min–max over seeds. Dotted lines: foundation models zero-shot, no fine-tuning.</p>
+    <h2>Fine-tuned on your own data</h2>
+    <p class="section-lede">The student fine-tuned on the history of the series it will forecast, from the distilled weights or from random weights. Dotted lines: other models, used as they are. Measured with the previous version of the student (300k training windows).</p>
     <div class="toolbar" id="ft-tabs" style="margin-bottom:8px"></div>
-    <div class="card"><svg id="ft"></svg><p class="small muted" id="ft-note" style="margin:6px 0 0"></p></div>
+    <svg id="ft"></svg>
+    <p class="small muted" id="ft-note"></p>
 
-    <h2>Where each model wins and fails</h2>
-    <p class="small muted">Relative WQL per shape (geometric mean over 10 seeds). Blue: better than seasonal naive, red: worse, gray: about the same.</p>
-    <div class="card table-wrap" id="heat"></div>
-
-    <h2>The fresh split</h2>
-    <div class="card small" id="splits"></div>
+    <details class="more">
+      <summary>All models, with exact scores</summary>
+      <div class="toolbar" style="margin:12px 0 8px" id="tabs"></div>
+      <div class="table-wrap" id="board"></div>
+    </details>
   </main>
   <div class="tooltip" id="tip"></div>
   <script type="module" src="/src/pages/results.ts"></script>

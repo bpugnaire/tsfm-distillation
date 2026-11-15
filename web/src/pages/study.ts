@@ -10,14 +10,6 @@ header();
 const study = await loadJSON<Record<string, Stage>>("study.json");
 const $ = (id: string) => document.getElementById(id)!;
 
-const RQS: [string, string, string[]][] = [
-  ["RQ1", "Which inputs should the teacher label? (real multi-domain, synthetic, teacher rollouts, noise)", ["stage_a"]],
-  ["RQ2", "Teacher labels vs ground truth (α)?", ["stage_a", "stage_b", "stage_c_lite"]],
-  ["RQ3", "Which teacher(s)? Single, ensemble, per-window weighting", ["stage_b"]],
-  ["RQ4", "Scaling: data size, student size", ["stage_c_lite", "stage_c2"]],
-  ["RQ5", "How much fine-tuning on your own data closes the gap to the big models?", ["stage_d_pilot", "stage_d_final"]],
-  ["RQ6", "Fine-tune on the teacher's forecasts of your history instead of the real values?", ["stage_e"]],
-];
 const STAGES: Record<string, string> = {
   stage_a: "Stage A · what should the teacher look at?",
   stage_b: "Stage B · which teacher, which loss weight?",
@@ -27,11 +19,7 @@ const STAGES: Record<string, string> = {
   stage_d_final: "Stage D · fine-tuning on your data (3 seeds)",
   stage_e: "Stage E · fine-tuning on teacher labels of your history",
 };
-const pill = (sts: string[]) => {
-  const done = sts.filter((s) => study[s]);
-  return done.length ? `<span class="status-pill done">answered · ${done.map((s) => `<a href="#${s}">${s.replace("stage_", "").replace("_", " ")}</a>`).join(", ")}</span>` : '<span class="status-pill">not run yet</span>';
-};
-$("rq").innerHTML = RQS.map(([id, q, st]) => `<tr><td><b>${id}</b></td><td>${q}</td><td colspan="2">${pill(st)}</td></tr>`).join("");
+
 
 // ---- key findings: one controlled comparison per card ---------------------------------------------------------
 const res = await loadJSON<{ highlights?: Highlight[] }>("results.json");
@@ -46,8 +34,8 @@ function needle(r: [number, number, number]): string {
 }
 $("findings").innerHTML = (res.highlights ?? []).map((h) => {
   const sig = h.ratio[2] < 1 || h.ratio[1] > 1;
-  return `<div class="finding"><h3>${h.title}</h3><div class="big">${ratioWords(h.ratio[0])} <small>${sig ? "" : "· not significant"}</small></div>
-    ${needle(h.ratio)}<p>${h.text}</p><div class="src"><code>${h.a}</code> vs <code>${h.b}</code> · ${SUITE_SHORT[h.suite] ?? h.suite} · ratio ${h.ratio[0].toFixed(2)} [${h.ratio[1].toFixed(2)}, ${h.ratio[2].toFixed(2)}] · <a href="#${h.stage}">${h.stage.replace("stage_", "stage ").replace("_", " ")}</a></div></div>`;
+  return `<div class="finding"><h3>${h.title}</h3><div class="big">${ratioWords(h.ratio[0])}</div><div class="vs">${h.versus}${sig ? "" : " · within noise"}</div>
+    ${needle(h.ratio)}<p>${h.text}</p><div class="src">${SUITE_SHORT[h.suite] ?? h.suite} · <a href="#${h.stage}" title="${h.a} vs ${h.b}, ratio ${h.ratio[0].toFixed(2)} [${h.ratio[1].toFixed(2)}, ${h.ratio[2].toFixed(2)}]">details</a></div></div>`;
 }).join("");
 
 const SUITE_NAMES: Record<string, string> = { shapes: "Shapes (synthetic, 200 series)", multidomain_test: "Held-out multi-domain test", fresh_fr_power: "Fresh French electricity (zero-shot for everyone)" };
@@ -55,7 +43,7 @@ let html = "";
 const order = Object.keys(STAGES);
 for (const [name, st] of Object.entries(study).sort(([a], [b]) => (order.indexOf(a) + 99) % 99 - (order.indexOf(b) + 99) % 99)) {
   const nArms = Object.keys(Object.values(st.suites)[0]?.arms ?? {}).length;
-  html += `<details class="stage" id="${name}"><summary><b>${STAGES[name] ?? name}</b><span class="q">${nArms} arms · ${Object.keys(st.suites).length} test suites · reference <code>${st.reference_arm}</code></span></summary><div class="body"><p class="small muted">Arms with a <code>_s0/_s1/_s2</code> suffix are seeds; the others are one seed (exploratory): differences smaller than seed-to-seed noise need confirmation.</p>`;
+  html += `<details class="stage" id="${name}"><summary><b>${STAGES[name] ?? name}</b><span class="q">${nArms} variants, ${Object.keys(st.suites).length} test sets</span></summary><div class="body"><p class="small muted">Arms with a <code>_s0/_s1/_s2</code> suffix are seeds; the others are one seed (exploratory): differences smaller than seed-to-seed noise need confirmation.</p>`;
   for (const [suite, t] of Object.entries(st.suites)) {
     const arms = Object.entries(t.arms).filter(([m]) => m !== "seasonal_naive").sort((a, b) => a[1].rel_wql - b[1].rel_wql);
     const teach = Object.entries(t.zero_shot_models).filter(([m]) => m !== "ets").sort((a, b) => a[1].rel_wql - b[1].rel_wql);

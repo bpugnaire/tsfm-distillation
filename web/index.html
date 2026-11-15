@@ -8,60 +8,30 @@
 </head>
 <body>
   <main>
-    <section class="hero">
-      <div>
-        <h1>A 1M-parameter forecaster that learned from a 209M one</h1>
-        <p class="lede">Draw any time series and a tiny network predicts what comes next, with its uncertainty, live in your browser.
-          It was trained by <strong>copying a large forecasting foundation model</strong> (knowledge distillation).</p>
-        <p class="row" style="margin:14px 0 0"><a class="cta" href="play.html">▶ Can you beat it? Play</a>
-          <a class="cta ghost" href="study.html">What we found →</a></p>
-      </div>
-      <div class="kpis" id="kpis"></div>
+    <section class="intro">
+      <h1>A 1M-parameter forecaster, small enough for your browser</h1>
+      <p class="lede">Draw a curve and it predicts what comes next, with its uncertainty. It learned by copying a forecasting model 29 times its size.</p>
+      <p class="stats" id="stats"></p>
     </section>
 
-    <div class="card">
+    <div class="card plain">
       <div class="toolbar">
-        <select id="preset" aria-label="Load a shape"><option value="">Load a shape…</option></select>
-        <button id="random" title="Load a random shape">🎲 Random</button>
-        <span class="sep"></span>
+        <select id="preset" aria-label="Load a shape"><option value="">Pick a shape…</option></select>
+        <button id="random">Random shape</button>
         <button id="clear">Clear</button>
         <button id="undo">Undo</button>
-        <button id="noise">Add noise</button>
-        <button id="repeat" title="Tile your drawing so a seasonal pattern emerges">Repeat pattern</button>
-      </div>
-      <div class="toolbar" style="margin-top:8px">
-        <span class="lbl">Compare with</span>
-        <button class="chip" id="cmp-teacher" aria-pressed="false" disabled title="Load a shape: the teacher's forecast is precomputed for the shapes"><span class="dot" style="background:var(--teacher)"></span>its teacher</button>
-        <button class="chip" id="cmp-gt" aria-pressed="false" title="Same network, same data, trained on the real future instead of the teacher"><span class="dot" style="background:var(--baseline)"></span>same student without the teacher</button>
+        <span style="flex:1"></span>
+        <button class="chip" id="cmp-teacher" aria-pressed="false" disabled><span class="dot" style="background:var(--teacher)"></span>Show the teacher</button>
       </div>
       <div class="pad-wrap" style="margin-top:10px">
         <svg id="pad" style="touch-action:none; cursor:crosshair; display:block; border-radius:8px"></svg>
-        <div class="pad-hint" id="hint">✏️ draw left to right · hover your drawing to backtest</div>
+        <div class="pad-hint" id="hint">Draw left to right. Hover your drawing to forecast from an earlier point.</div>
       </div>
       <div class="legend" id="legend"></div>
-      <div class="row small" style="margin-top:10px; justify-content:space-between">
-        <div class="row">
-          <span class="muted">Weights</span>
-          <button id="m-fp32" aria-pressed="true" title="32-bit floats">fp32</button>
-          <button id="m-int8" aria-pressed="false" title="8-bit quantised: 3× smaller download">int8</button>
-          <label class="row" style="gap:6px"><span class="muted">Horizon</span> <input id="horizon" type="range" min="8" max="64" step="8" value="64" /> <span id="hval">64</span></label>
-        </div>
-        <div id="hud" class="muted" style="font-variant-numeric:tabular-nums">loading model…</div>
-      </div>
     </div>
 
-    <details class="how">
-      <summary>How it works, in four steps</summary>
-      <ol>
-        <li><b>The pen tip is "now".</b> Everything left of it becomes up to 512 numbers, one per time step. Shorter drawings are padded with "missing" values.</li>
-        <li><b>Units do not matter.</b> The model rescales your drawing itself (median and mean absolute deviation, then <code>asinh</code>), so a doodle and a power grid look alike to it.</li>
-        <li><b>A small transformer</b> (4 layers) reads 32 chunks of 16 steps and outputs 13 quantiles per future step: a median plus 12 positive gaps, so the bands can never cross.</li>
-        <li><b>Backtest by hovering:</b> the forecast restarts from the hovered point using only the past, and what you drew afterwards (dashed) is the truth it is judged against.</li>
-      </ol>
-      <p class="small muted">Training: the large teacher labelled 300k windows (synthetic + real data from many domains) once; the student learned to reproduce those labels.
-        <a href="learn-4-distillation.html">Learn how distillation works →</a></p>
-    </details>
-    <p class="fineprint" id="licence"></p>
+    <p class="next-links"><a class="cta" href="play.html">Play: can you beat it?</a>
+      <a href="results.html">How it compares with models of its size →</a></p>
   </main>
   <script type="module" src="/src/pages/draw.ts"></script>
 </body>

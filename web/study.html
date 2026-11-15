@@ -8,26 +8,13 @@
 </head>
 <body>
   <main>
-    <h1>The distillation study</h1>
-    <p class="lede">A research-paper-style study: many ablations, one factor at a time, and an honest ranking of what moved the needle.
-      Hypothesis to test: <em>a ~1M-parameter student distilled from several foundation models, after a light fine-tuning on your own history,
-      matches the large models' out-of-the-box accuracy on your data.</em></p>
-    <div class="card small">
-      <b>How to read the results.</b> Each <em>arm</em> is one training recipe. Scores are relative WQL vs seasonal naive (lower is better).
-      The key column is the <b>paired ratio vs the reference arm</b>: both are scored on the <em>same</em> windows, so window difficulty cancels out.
-      Below 1 = better than the reference; an effect counts only if its 95% interval excludes 1.
-      Background: <a href="learn-2-scoring.html#uncertainty">Learn 2 · error bars</a>, <a href="learn-4-distillation.html">Learn 4 · distillation</a>.
-    </div>
-    <h2>What we found</h2>
-    <p class="small muted" style="max-width:90ch">Each card is one controlled comparison: two recipes that differ in a single factor, scored on the same windows.
-      The bar shows the ratio of their errors (left of the line = the first recipe is better) with its 95% interval.</p>
+    <section class="intro">
+      <h1>What we learned</h1>
+      <p class="lede">We changed one thing at a time (inputs, teacher, data size, fine-tuning) and scored both versions on the same test windows. These are the comparisons that mattered.</p>
+    </section>
     <div class="findings" id="findings"></div>
-    <h2>Research questions</h2>
-    <div class="table-wrap card"><table>
-      <thead><tr><th>RQ</th><th>question</th><th colspan="2">status</th></tr></thead>
-      <tbody id="rq"></tbody></table></div>
     <h2>Every stage, in detail</h2>
-    <p class="small muted">Click a stage to open its full tables and charts.</p>
+    
     <div id="stages"></div>
   </main>
   <div class="tooltip" id="tip"></div>

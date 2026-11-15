@@ -1,0 +1,6 @@
+{
+ "clite_ref": "runs/2026-11-13_stage_c_lite_kd_mix_m_300k",
+ "kd_old_28m": "runs/2026-11-14_stage_c2_kd_old_28m",
+ "kd_v2_300k": "runs/2026-11-14_stage_c2_kd_v2_300k",
+ "kd_v2_1m": "runs/2026-11-15_stage_c2_kd_v2_1m"
+}

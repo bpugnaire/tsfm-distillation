@@ -27,9 +27,7 @@
 <body>
   <main>
     <h1>Can you beat a 1M-parameter model?</h1>
-    <p class="lede">You see the past of a real series (French electricity demand) or a synthetic shape.
-      <strong>Draw what you think happens next.</strong> Then we reveal the truth, and how the tiny distilled model and its 209M-parameter teacher did.
-      8 rounds.</p>
+    <p class="lede">You get the past of a series: French electricity demand or a synthetic shape. Draw what you think comes next, then see what really happened and how the model did. Eight rounds.</p>
     <div class="board" id="board"></div>
     <div class="card" style="margin-top:14px">
       <div class="round-head"><h2 id="title">loading…</h2><span class="small muted" id="meta"></span></div>
@@ -41,9 +39,7 @@
       </div>
       <div id="result"></div>
     </div>
-    <p class="fineprint" style="margin-top:14px">Score: the average distance between a line and what really happened, as a percentage of the chart's height (lower is better).
-      The model's line is its median forecast; its shaded band is where it expects the truth 80% of the time. The teacher's forecasts are precomputed;
-      the small model runs live in your browser. Electricity data: RTE éCO2mix (Licence Ouverte v2.0), from the fresh test period that no model saw in training.</p>
+    <p class="fineprint" style="margin-top:14px">Score: average distance to what really happened, as a share of the chart's height. Electricity data: RTE éCO2mix, October–November 2026.</p>
   </main>
   <script type="module" src="/src/pages/play.ts"></script>
 </body>

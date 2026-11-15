@@ -48,13 +48,10 @@ async function start(): Promise<void> {
 }
 
 function board(): void {
-  const avg = (a: number[]) => (a.length ? `${(a.reduce((s, v) => s + v, 0) / a.length).toFixed(1)}%` : "–");
   $("board").innerHTML = [
     ["Round", `${Math.min(k + 1, ROUNDS)} <small>/ ${ROUNDS}</small>`],
     ["You won", `${tally.you}`],
-    ["Tiny model won", `${tally.model}`],
-    ["Your avg. error", avg(tally.yourErr)],
-    ["Model avg. error", avg(tally.modelErr)],
+    ["Model won", `${tally.model}`],
   ].map(([l, v]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 }
 
@@ -87,7 +84,7 @@ function render(): void {
   svg.append("path").attr("d", line<number>().defined(Number.isFinite).x((_, i) => fx(i)).y((d) => y(d))(guess))
     .attr("fill", "none").attr("stroke", "#c026d3").attr("stroke-width", 2.6).attr("stroke-linecap", "round");
   const items = [`<span><i style="border-color:#c026d3"></i>your guess</span>`];
-  if (revealed) items.push(`<span><i style="border-color:var(--ink)"></i>what happened</span>`, `<span><i style="border-color:var(--student)"></i>tiny model (shaded: 80% band)</span>`, `<span><i class="dash" style="border-color:var(--teacher)"></i>teacher, ${play.teacher}</span>`);
+  if (revealed) items.push(`<span><i style="border-color:var(--ink)"></i>what happened</span>`, `<span><i style="border-color:var(--student)"></i>model</span>`, `<span><i class="dash" style="border-color:var(--teacher)"></i>teacher, ${play.teacher}</span>`);
   $("legend").innerHTML = items.join("");
 }
 
@@ -132,15 +129,15 @@ revealBtn.onclick = () => {
   tally.yourErr.push(you); tally.modelErr.push(mod); tally.teacherErr.push(tch);
   const close = Math.abs(you - mod) < 0.1 * Math.max(you, mod);
   if (close) tally.tie++; else if (you < mod) tally.you++; else tally.model++;
-  const verdict = close ? "🤝 Too close to call" : you < mod ? "🏆 You beat the tiny model!" : "🤖 The tiny model wins this round";
+  const verdict = close ? "Too close to call" : you < mod ? "You beat the model" : "The model wins this round";
   const why = r.kind === "electricity"
-    ? "Electricity demand repeats every day and every week, with a lower level at night and on weekends. The models read 3 weeks of history (more than shown here)."
-    : "Synthetic shapes test one pattern each: seasonality, trends, breaks, spikes, noise.";
+    ? "The models read three weeks of history; the chart shows eight days."
+    : "";
   const max = Math.max(you, mod, tch) * 1.1;
   const bar = (label: string, v: number, c: string) => `<div class="scorebar"><span>${label}</span><div class="track"><div class="fill" style="background:${c}" data-w="${(100 * v) / max}"></div></div><span class="val">${v.toFixed(1)}%</span></div>`;
   $("result").innerHTML = `<div class="verdict pop">${verdict}</div>
-    <div class="scores">${bar("You", you, "#c026d3")}${bar("Tiny model (1M)", mod, cssVar("--student"))}${bar(`Teacher (209M)`, tch, cssVar("--teacher"))}</div>
-    <p class="why" style="margin-top:10px">The truth stayed inside the tiny model's 80% band ${Math.round(inside * 100)}% of the time. ${why}</p>`;
+    <div class="scores">${bar("You", you, "#c026d3")}${bar("Model (1M)", mod, cssVar("--student"))}${bar(`Teacher (${Math.round(play.teacher_params / 1e6)}M)`, tch, cssVar("--teacher"))}</div>
+    <p class="why" style="margin-top:10px">The truth stayed inside the model's shaded band ${Math.round(inside * 100)}% of the time. ${why}</p>`;
   requestAnimationFrame(() => document.querySelectorAll<HTMLElement>(".fill").forEach((f) => { f.style.width = `${f.dataset.w}%`; }));
   revealBtn.style.display = "none"; nextBtn.style.display = ""; nextBtn.textContent = k + 1 < ROUNDS ? "Next round →" : "See final score →";
   justRevealed = true; render(); justRevealed = false; coverage(); board();
@@ -150,13 +147,13 @@ nextBtn.onclick = () => { k++; if (k < ROUNDS) void start(); else final(); };
 function final(): void {
   const mean = (a: number[]) => a.reduce((s, v) => s + v, 0) / a.length;
   const you = mean(tally.yourErr), mod = mean(tally.modelErr), tch = mean(tally.teacherErr);
-  const msg = tally.you > tally.model ? "You out-forecast a neural network. Impressive." : tally.you === tally.model ? "A draw with a 1M-parameter network." : "The tiny model wins the match. It learned from a model 220× its size.";
+  const msg = tally.you > tally.model ? "You out-forecast the model." : tally.you === tally.model ? "A draw." : "The model wins the match.";
   $("title").textContent = "Final score";
   $("meta").textContent = "";
   select(svgEl).selectAll("*").remove(); select(svgEl).attr("viewBox", "0 0 10 1");
   $("legend").innerHTML = "";
-  $("result").innerHTML = `<div class="final pop"><div class="big">${tally.you} – ${tally.model}</div><p>you – tiny model${tally.tie ? ` · ${tally.tie} too close to call` : ""}</p>
-    <p class="verdict">${msg}</p><p class="why" style="margin:6px auto">Average error: you ${you.toFixed(1)}%, tiny model ${mod.toFixed(1)}%, teacher ${tch.toFixed(1)}%.</p>
+  $("result").innerHTML = `<div class="final pop"><div class="big">${tally.you} – ${tally.model}</div><p>you – model${tally.tie ? ` · ${tally.tie} too close to call` : ""}</p>
+    <p class="verdict">${msg}</p><p class="why" style="margin:6px auto">Average error: you ${you.toFixed(1)}%, model ${mod.toFixed(1)}%, teacher ${tch.toFixed(1)}%.</p>
     <p class="row" style="justify-content:center;margin-top:16px"><button class="cta" id="again" style="border:0">Play again</button><a class="cta ghost" href="index.html">Draw your own →</a></p></div>`;
   nextBtn.style.display = "none"; revealBtn.style.display = "none";
   $("again").onclick = () => { rounds = pick(); k = 0; Object.assign(tally, { you: 0, model: 0, tie: 0, yourErr: [], modelErr: [], teacherErr: [] }); void start(); };

@@ -15,13 +15,14 @@ def build_model(entry: ModelEntry):
         from tinycast.models.baselines import ETS
 
         return ETS(entry.name, season=entry.season)
-    if kind in ("toto", "t0", "chronos2", "timestral"):
+    if kind in ("toto", "t0", "chronos2", "chronos_bolt", "timestral"):
         from tinycast.models import teachers as T
 
         cls = {
             "toto": T.TotoAdapter,
             "t0": T.T0Adapter,
             "chronos2": T.Chronos2Adapter,
+            "chronos_bolt": T.ChronosBoltAdapter,
             "timestral": T.TimestralAdapter,
         }[kind]
         return cls(entry.name, entry.checkpoint, device=entry.device, batch_size=entry.batch_size)

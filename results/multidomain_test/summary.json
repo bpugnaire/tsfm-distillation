@@ -120,6 +120,41 @@
    "n_clusters": 425
   },
   {
+   "model": "chronos-bolt-mini",
+   "kind": "chronos_bolt",
+   "n_params": 21236096,
+   "size_mb": 84.96,
+   "native_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+   ],
+   "rel_wql": 0.6368012451377048,
+   "rel_wql_ci": [
+    0.5973881400687853,
+    0.680892791504564
+   ],
+   "rel_mase": 0.7029086063348801,
+   "rel_mase_ci": [
+    0.66474973920664,
+    0.7432045804558921
+   ],
+   "mean_wql": 0.2225734,
+   "mean_cov80": 0.7811136833333334,
+   "mean_cov98": 0.9770645166666666,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 10.701458028052002,
+   "latency_ms_t8_b32": 51.457270921673626,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
    "model": "timestral-28m",
    "kind": "timestral",
    "n_params": 27821184,
@@ -194,6 +229,41 @@
    "tails_extrapolated": false,
    "latency_ms_t1_b1": 20.072854473255575,
    "latency_ms_t8_b32": 98.8507914589718,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "chronos-bolt-tiny",
+   "kind": "chronos_bolt",
+   "n_params": 8652672,
+   "size_mb": 34.62,
+   "native_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+   ],
+   "rel_wql": 0.651481841493244,
+   "rel_wql_ci": [
+    0.617181684250412,
+    0.6894083549454171
+   ],
+   "rel_mase": 0.7196684518599433,
+   "rel_mase_ci": [
+    0.6841123853172563,
+    0.7534305388363887
+   ],
+   "mean_wql": 0.22936073333333334,
+   "mean_cov80": 0.7783677,
+   "mean_cov98": 0.9782356666666665,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 6.403999985195696,
+   "latency_ms_t8_b32": 30.580208520404994,
    "n_windows": 600,
    "n_clusters": 425
   },
@@ -420,5 +490,5 @@
    "n_clusters": 425
   }
  ],
- "git_sha": "5d62b61a45bd0298cf47695a3ae940efc1afe29c-dirty"
+ "git_sha": "22bb64a1315f8c60c07eb137ca2f61ae842cdbca-dirty"
 }

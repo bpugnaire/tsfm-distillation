@@ -273,20 +273,12 @@ STUDENTS = [
     {
         "name": "student-distilled",
         "label": "Distilled student",
-        "stage": "stage_c_lite",
-        "arm": "kd_mix_m_300k",
-        "onnx": "clite_kd_mix_m_300k",
-        "teacher": "timestral-209m",
-        "blurb": "trained to copy the teacher's forecasts (all 13 quantiles) on 300k windows: 150k synthetic + 150k real multi-domain",
-    },
-    {
-        "name": "student-gt-only",
-        "label": "Same student, ground truth only",
-        "stage": "stage_c_lite",
-        "arm": "gt_mix_m_300k",
-        "onnx": "clite_gt_mix_m_300k",
-        "teacher": None,
-        "blurb": "same network, same 300k windows, trained on what actually happened instead of on the teacher",
+        "stage": "stage_c2",
+        "arm": "kd_v2_1m",
+        "onnx": "c2_kd_v2_1m",
+        "teacher": "timestral-28m",
+        "teacher_label": "Timestral-28M",
+        "blurb": "copies the teacher's forecasts on 1M windows (half synthetic, half real data from ~40 public datasets)",
     },
 ]
 PREVIEW = "student-preview-gt-m"
@@ -438,7 +430,8 @@ def models_manifest() -> dict:
                 "scores": scores,
             }
         )
-    teacher = json.loads((ROOT / "results" / "shapes" / "timestral-209m.json").read_text())
+    tname = STUDENTS[0]["teacher"]
+    teacher = json.loads((ROOT / "results" / "shapes" / f"{tname}.json").read_text())
     if not out:  # fresh clone without the distilled ONNX files
         out.append(
             {
@@ -456,12 +449,10 @@ def models_manifest() -> dict:
         "models": out,
         "default": out[0]["key"],
         "teacher": {
-            "name": "timestral-209m",
-            "label": "Timestral-209M",
+            "name": tname,
+            "label": STUDENTS[0]["teacher_label"],
             "n_params": teacher["n_params"],
         },
-        "teacher_licence": "Timestral is released by Mistral AI under a modified MIT licence (revenue clause). "
-        "A student distilled from it is shared with that notice and under the same conditions.",
     }
 
 
@@ -511,33 +502,36 @@ def finetune_curves() -> dict:
 # Key findings: the sentence is ours, every number is read from the study table (paired ratio a/b and its 95% CI).
 HIGHLIGHTS = [
     ("stage_c_lite", "shapes", "kd_mix_m_300k", "gt_mix_m_300k",
-     "Copying the teacher beats learning from the real answers",
+     "Copying the teacher beats learning from the real answers", "than training on the real answers",
      "Same 0.95M network, same 300k windows. Only the training target changes: the teacher's forecast instead of what actually happened."),
     ("stage_a", "shapes", "kd_noise", "kd_synth",
-     "Random noise teaches nothing",
+     "Random noise teaches nothing", "than structured synthetic inputs",
      "The teacher answers every noise input the same way, so the student learns one flat forecast. Structured synthetic series work."),
     ("stage_c_lite", "shapes", "kd_mix_m_300k", "kd_mix_m_30k",
-     "More data is the biggest lever",
-     "300k distillation windows vs 30k, same student. Bigger than changing the teacher, the loss or the student size."),
+     "More data is the biggest lever", "than 30k windows",
+     "300k training windows instead of 30k, same student. No other change we tried moved the score as much."),
+    ("stage_c2", "fresh_fr_power", "kd_v2_1m", "kd_v2_300k",
+     "And it keeps paying off", "than 300k windows",
+     "1M windows from about 40 datasets instead of 300k, same student. Measured on the fresh French electricity test, whose series were never in training."),
     ("stage_b", "multidomain_test", "kd_ensemble", "kd_timestral",
-     "Which teacher you pick matters little",
+     "Which teacher you pick matters little", "than Timestral alone",
      "Averaging three teachers (Timestral, Toto, t0) beats Timestral alone, but only by about 2%."),
     ("stage_d_final", "fresh_fr_power", "ft_warm_fr_1w_distilled", "ft_warm_fr_1w_scratch",
-     "Little data? Start from the distilled student",
+     "Little data? Start from the distilled student", "than starting from random weights",
      "Fine-tuning on one week of electricity history (3 seeds): from random weights it does worse than naive; "
      "from the distilled student it keeps its zero-shot accuracy."),
     ("stage_e", "fresh_fr_power", "kd_fr_1m", "gt_fr_1y",
-     "One month of teacher labels ≈ one year of real data",
+     "One month of teacher labels ≈ one year of real data", "than 12 months of real values",
      "Fine-tuning on the teacher's forecasts of 1 month of history scores like fine-tuning on 12 months of real values."),
     ("stage_d_final", "fresh_fr_power", "ft_warm_fr_1y_distilled", "ft_warm_fr_1y_scratch",
-     "With a full year of data, the head start is gone",
+     "With a full year of data, the head start is gone", "than starting from random weights",
      "Honest limit: with enough history, training from scratch is as good or slightly better."),
 ]  # fmt: skip
 
 
 def highlights() -> list[dict]:
     out = []
-    for stage, suite, a, b, title, text in HIGHLIGHTS:
+    for stage, suite, a, b, title, versus, text in HIGHLIGHTS:
         t = ROOT / "results" / "study" / stage / "table.json"
         if not t.exists():
             continue
@@ -548,6 +542,7 @@ def highlights() -> list[dict]:
         out.append(
             {
                 "title": title,
+                "versus": versus,
                 "text": text,
                 "stage": stage,
                 "suite": suite,
@@ -565,7 +560,8 @@ def play() -> dict:
     keep = [QUANTILE_LEVELS.index(v) for v in (0.1, 0.5, 0.9)]
     rounds = []
     s = json.loads((ROOT / "results" / "fresh_fr_power" / "_suite.json").read_text())
-    tch = json.loads((ROOT / "results" / "fresh_fr_power" / "timestral-209m.json").read_text())
+    tname = STUDENTS[0]["teacher"]
+    tch = json.loads((ROOT / "results" / "fresh_fr_power" / f"{tname}.json").read_text())
     assert tch["ids"] == s["ids"]
     n = len(s["ids"])
     seen = set()
@@ -591,7 +587,7 @@ def play() -> dict:
             }
         )
     g = json.loads((ROOT / "results" / "shapes" / "_suite.json").read_text())
-    gt = json.loads((ROOT / "results" / "shapes" / "timestral-209m.json").read_text())
+    gt = json.loads((ROOT / "results" / "shapes" / f"{tname}.json").read_text())
     for k, sid in enumerate(g["ids"]):
         name, seed = sid.split("#")
         if seed != "1":  # seed 0 is in the gallery: use another draw of each shape
@@ -609,7 +605,12 @@ def play() -> dict:
                 "teacher": [[sig(v) for v in q[i]] for i in keep],
             }
         )
-    return {"levels": [0.1, 0.5, 0.9], "teacher": "Timestral-209M", "rounds": rounds}
+    return {
+        "levels": [0.1, 0.5, 0.9],
+        "teacher": STUDENTS[0]["teacher_label"],
+        "teacher_params": tch["n_params"],
+        "rounds": rounds,
+    }
 
 
 if __name__ == "__main__":

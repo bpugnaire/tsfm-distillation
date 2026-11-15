@@ -13,6 +13,8 @@ models:
   - {kind: t0, name: t0-gamma, checkpoint: theforecastingcompany/t0-gamma}
   - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
   - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
+  - {kind: chronos_bolt, name: chronos-bolt-tiny, checkpoint: amazon/chronos-bolt-tiny}
+  - {kind: chronos_bolt, name: chronos-bolt-mini, checkpoint: amazon/chronos-bolt-mini}
   # Timestral: comparator only (owner confirmed licence eligibility 2026-11-13, personal project)
   - {kind: timestral, name: timestral-5m, checkpoint: mistralai/Timestral-5M}
   - {kind: timestral, name: timestral-28m, checkpoint: mistralai/Timestral-28M}

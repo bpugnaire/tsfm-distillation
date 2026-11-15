@@ -37,10 +37,10 @@ export interface BrowserModel {
   size_mb: { fp32?: number; int8?: number }; int8_p99_rel_diff?: number; cpu_ms_python?: number | null;
   scores: Record<string, { rel_wql: number; ci: [number, number] }>;
 }
-export interface Manifest { models: BrowserModel[]; default: string; teacher: { name: string; label: string; n_params: number }; teacher_licence: string }
+export interface Manifest { models: BrowserModel[]; default: string; teacher: { name: string; label: string; n_params: number } }
 export interface PlayRound { kind: "electricity" | "shape"; title: string; unit: string; step: string; start: string; context: (number | null)[]; future: number[]; teacher: number[][] }
-export interface Play { levels: number[]; teacher: string; rounds: PlayRound[] }
-export interface Highlight { title: string; text: string; stage: string; suite: string; a: string; b: string; ratio: [number, number, number] }
+export interface Play { levels: number[]; teacher: string; teacher_params: number; rounds: PlayRound[] }
+export interface Highlight { title: string; versus: string; text: string; stage: string; suite: string; a: string; b: string; ratio: [number, number, number] }
 export interface FtCurvePoint { amount: string; mean: number; min: number; max: number; n: number }
 export interface FtSuite { zero_shot_student: number | null; curves: Record<string, FtCurvePoint[]>; zoo: Record<string, number> }
 

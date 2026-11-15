@@ -231,3 +231,21 @@ details.stage > .body .card { background: var(--page); }
 button.cta, button.cta:hover { background: var(--ink); color: var(--page); border: 0; }
 button.cta:hover { opacity: .85; }
 button.cta:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ---------- lighter layout (2026-11-16) ---------- */
+.intro { max-width: 760px; margin: 18px 0 20px; }
+.intro h1 { font-size: 32px; letter-spacing: -0.025em; line-height: 1.15; margin: 0 0 10px; }
+.intro .lede { font-size: 18px; margin: 0 0 10px; }
+.stats { color: var(--ink-2); font-size: 14px; margin: 0; font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.stats .sep { margin: 0 9px; color: var(--axis); }
+.card.plain { border: 0; background: transparent; padding: 0; }
+.next-links { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-top: 22px; }
+@media (max-width: 720px) { .intro h1 { font-size: 26px; } }
+.section-lede { color: var(--ink-2); max-width: 70ch; margin: 0 0 12px; }
+.small-multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 22px; }
+.small-multiples h3 { margin: 0 0 2px; font-size: 15px; }
+.small-multiples .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; }
+details.more { margin-top: 14px; }
+details.more > summary { cursor: pointer; color: var(--ink-2); font-size: 14px; }
+.finding .vs { font-size: 13px; color: var(--muted); margin-top: -4px; }

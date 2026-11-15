@@ -55,6 +55,7 @@ export const modelRoles: Record<string, keyof typeof roles> = {
   "toto-2.0-4m": "comparator",
   "toto-2.0-22m": "comparator",
   "chronos-2": "comparator",
+  "chronos-bolt": "comparator",
   "timestral": "comparator",
   "seasonal_naive": "baseline",
   "ets": "baseline"

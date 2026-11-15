@@ -289,3 +289,19 @@ results yet" banners removed. Study page height 38.8k px -> 2.2k px; no horizont
 student only matches its zero-shot score. Card reworded. The distilled ONNX files are git-ignored (`web/public/models/clite_*`) until
 the owner decides whether a Timestral-distilled student may be published (data/LICENSES.md note).
 **Next:** swap in the Stage C2 winner if it beats C-lite on validation; owner decision on publishing the student.
+
+## 2026-11-16 — Stage C2 results, Chronos-Bolt comparators, lighter site
+**Did:** Stage C2 finished (student m, Timestral-28M labels). Added Chronos-Bolt tiny (8.7M) and mini (21M) as zero-shot comparators
+(`ChronosBoltAdapter`: native 0.1–0.9 levels only, IQF tails, crossing rate recorded). Site: Draw now runs the C2 1M-window student,
+Results opens on a "models of its size" chart (everything ≤ 30M params), Study shows findings only, licence and model-detail text removed.
+**Result:** `results/study/stage_c2/table.md`. `kd_v2_1m` (1M windows of data v2): shapes 0.458, multi-domain 0.697, fresh electricity
+0.675 (C-lite: 0.460 / 0.703 / 0.795). Validation (same 2000 windows for every run): 0.1369 vs C-lite 0.1377, so it replaces C-lite on
+the site by validation, not by test. vs same-size zero-shot models (`results/{shapes,fresh_fr_power,multidomain_test}/summary.json`):
+best on shapes (Toto-4m 0.519, Timestral-5M 0.492, Bolt-tiny 0.686, Bolt-mini 0.651); electricity behind Timestral-5M 0.641 and
+Bolt-mini 0.651, tied with Bolt-tiny 0.674, ahead of Toto-4m 0.709; multi-domain behind Bolt (0.651 / 0.637, likely trained on these
+series) and Timestral-5M 0.660, ahead of Toto-4m 0.721.
+**Surprise / learned:** data v2 at 300k was *worse* than the old data on multi-domain (1.05) and only helped on electricity (0.94): the
+gain comes from volume (1M vs 300k: 0.94 / 0.94 / 0.89). Timestral-28M labels cost 7% on shapes vs 209M and nothing elsewhere.
+Electricity is no longer domain-zero-shot for C2 (data v2 has other energy series; the RTE series stay out).
+**Next:** TTM-r2 (~1M params, the closest-size comparator) needs `granite-tsfm`, which pins torch 2.11 / pandas 3: run it in a separate
+env and score its saved forecasts here. Fine-tuning curve on the site is still the C-lite student: rerun Stage D with C2.

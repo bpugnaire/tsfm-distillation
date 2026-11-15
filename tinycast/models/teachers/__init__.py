@@ -137,6 +137,47 @@ class Chronos2Adapter:
         return check_output(q, len(context), horizon, self.name)
 
 
+class ChronosBoltAdapter:
+    """Amazon Chronos-Bolt (tiny 9M / mini 21M / small 48M; `chronos-forecasting` ChronosBoltPipeline), comparator.
+
+    Trained on 9 levels 0.1..0.9. Like Chronos-2, `predict_quantiles` silently clamps levels outside that range, so we
+    request the native levels only and extend the 1/5/95/99% tails with IQF exponential tails (as for Toto).
+    """
+
+    quantile_levels = QUANTILE_LEVELS
+
+    def __init__(self, name: str, checkpoint: str, device: str = "cpu", batch_size: int = 32):
+        from chronos import ChronosBoltPipeline
+
+        self.name = name
+        self.device = _device(device)
+        self.pipe = ChronosBoltPipeline.from_pretrained(checkpoint, device_map=str(self.device))
+        trained = [float(v) for v in self.pipe.quantiles]
+        self.native_levels = tuple(
+            lv for lv in QUANTILE_LEVELS if any(abs(lv - t) < 1e-9 for t in trained)
+        )
+        self.batch_size = batch_size
+        self.n_params = sum(p.numel() for p in self.pipe.model.parameters())
+        self.fallbacks: list[str] = []
+
+    @torch.no_grad()
+    def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
+        out = []
+        for sl in _batches(len(context), self.batch_size):
+            x = torch.as_tensor(np.asarray(context[sl], dtype=np.float32))
+            qs, _ = self.pipe.predict_quantiles(
+                x, prediction_length=horizon, quantile_levels=list(self.native_levels)
+            )
+            out.append(qs.float().cpu().numpy())  # (b, H, n_native)
+        qn = np.concatenate(out)
+        crossing = float((np.diff(qn, axis=-1) < 0).mean())
+        if crossing > 0:
+            self.fallbacks.append(f"sorted crossing quantiles: {100 * crossing:.2f}% of cells")
+        qn = np.sort(qn, axis=-1)
+        q = extend_tails_exponential(self.native_levels, qn, QUANTILE_LEVELS).transpose(0, 2, 1)
+        return check_output(q, len(context), horizon, self.name)
+
+
 class TimestralAdapter:
     """Mistral Timestral (`timestral` from GitHub, pinned commit), comparator.
 
