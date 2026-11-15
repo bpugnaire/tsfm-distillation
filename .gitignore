@@ -27,3 +27,6 @@ results/study/*/*/*.json
 # Timestral-distilled students: not released until the owner decides (docs/status.yaml clean-retrain)
 web/public/models/clite_*
 web/public/models/c2_*
+
+# separate env for IBM TTM (granite-tsfm pins torch/pandas versions that clash with ours)
+.venv-ttm/

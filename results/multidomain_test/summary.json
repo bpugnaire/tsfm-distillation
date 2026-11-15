@@ -412,6 +412,60 @@
    "n_clusters": 425
   },
   {
+   "model": "ttm-r2.1-l1",
+   "kind": "precomputed",
+   "n_params": 855100,
+   "size_mb": 3.42,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 0.8841637695318783,
+   "rel_wql_ci": [
+    0.803068425969192,
+    0.9684980647405936
+   ],
+   "rel_mase": 0.7880056252773908,
+   "rel_mase_ci": [
+    0.7416473356155313,
+    0.8413316984665278
+   ],
+   "mean_wql": 0.26510435,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.3215410290285945,
+   "latency_ms_t8_b32": 13.094958500005305,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "ttm-r2",
+   "kind": "precomputed",
+   "n_params": 805280,
+   "size_mb": 3.221,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 0.9730120205777204,
+   "rel_wql_ci": [
+    0.9167989443791442,
+    1.0226900651649133
+   ],
+   "rel_mase": 0.867213148372987,
+   "rel_mase_ci": [
+    0.8005411610197133,
+    0.9393237992411058
+   ],
+   "mean_wql": 0.35827455,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.2611874844878912,
+   "latency_ms_t8_b32": 11.171979014761746,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
    "model": "seasonal_naive",
    "kind": "seasonal_naive",
    "n_params": 0,
@@ -490,5 +544,5 @@
    "n_clusters": 425
   }
  ],
- "git_sha": "22bb64a1315f8c60c07eb137ca2f61ae842cdbca-dirty"
+ "git_sha": "b4da0a1b44cdb50c9cdd376abb9c376378274b72-dirty"
 }

@@ -137,7 +137,7 @@ def run_model(model, entry, suite: Suite, cfg: BenchConfig, out_dir: Path) -> di
         "quantile_levels": list(QUANTILE_LEVELS),
         "native_levels": list(getattr(model, "native_levels", QUANTILE_LEVELS)),
         "n_params": getattr(model, "n_params", 0),
-        "size_mb": checkpoint_size_mb(entry.checkpoint),
+        "size_mb": getattr(model, "size_mb", None) or checkpoint_size_mb(entry.checkpoint),
         "fallbacks": sorted(set(getattr(model, "fallbacks", []))),
         "wall_seconds_full_suite": round(wall, 3),
         "hardware": L.hardware(),
@@ -148,7 +148,9 @@ def run_model(model, entry, suite: Suite, cfg: BenchConfig, out_dir: Path) -> di
         "groups": [m.get("series_id", i) for m, i in zip(suite.meta, suite.ids, strict=True)],
         "forecasts_f16": np.asarray(q, dtype=np.float16).tolist(),
     }
-    if cfg.latency:
+    if getattr(model, "precomputed_latency", None):  # measured in the model's own env, same harness
+        res["latency"] = model.precomputed_latency
+    elif cfg.latency:
         res["latency"] = L.measure(model, cfg.context_length, cfg.horizon)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{entry.name}.json").write_text(json.dumps(res))

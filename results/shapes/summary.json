@@ -605,7 +605,61 @@
    "latency_ms_t8_b32": 8228.464708547108,
    "n_windows": 200,
    "n_clusters": 200
+  },
+  {
+   "model": "ttm-r2",
+   "kind": "precomputed",
+   "n_params": 805280,
+   "size_mb": 3.221,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 1.380395331118599,
+   "rel_wql_ci": [
+    1.236397037030756,
+    1.5528736122821867
+   ],
+   "rel_mase": 1.294516762318371,
+   "rel_mase_ci": [
+    1.1668974639489462,
+    1.4447141569032624
+   ],
+   "mean_wql": 0.16377695000000003,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.2530209496617317,
+   "latency_ms_t8_b32": 11.2026670249179,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "ttm-r2.1-l1",
+   "kind": "precomputed",
+   "n_params": 855100,
+   "size_mb": 3.42,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 1.7895335137015174,
+   "rel_wql_ci": [
+    1.5141461018183862,
+    2.134746331738395
+   ],
+   "rel_mase": 1.6781800571776297,
+   "rel_mase_ci": [
+    1.445495908925462,
+    1.9643022445458016
+   ],
+   "mean_wql": 0.1510595,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.3490834971889853,
+   "latency_ms_t8_b32": 12.716791534330696,
+   "n_windows": 200,
+   "n_clusters": 200
   }
  ],
- "git_sha": "22bb64a1315f8c60c07eb137ca2f61ae842cdbca-dirty"
+ "git_sha": "b4da0a1b44cdb50c9cdd376abb9c376378274b72-dirty"
 }

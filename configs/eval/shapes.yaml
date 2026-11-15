@@ -15,6 +15,9 @@ models:
   - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
   - {kind: chronos_bolt, name: chronos-bolt-tiny, checkpoint: amazon/chronos-bolt-tiny}
   - {kind: chronos_bolt, name: chronos-bolt-mini, checkpoint: amazon/chronos-bolt-mini}
+  # IBM TTM-r2: forecasts made in .venv-ttm by scripts/ttm_forecast.py (dependency clash), scored here
+  - {kind: precomputed, name: ttm-r2, checkpoint: results/external/ttm/ttm-r2}
+  - {kind: precomputed, name: ttm-r2.1-l1, checkpoint: results/external/ttm/ttm-r2.1-l1}
   # Timestral: comparator only (owner confirmed licence eligibility 2026-11-13, personal project)
   - {kind: timestral, name: timestral-5m, checkpoint: mistralai/Timestral-5M}
   - {kind: timestral, name: timestral-28m, checkpoint: mistralai/Timestral-28M}

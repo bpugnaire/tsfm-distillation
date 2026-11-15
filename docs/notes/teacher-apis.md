@@ -42,3 +42,21 @@ All installed together in one Python 3.12 env (`uv sync --extra teachers`).
 - Block-autoregressive decoding with median feedback beyond 32 patches (1024 steps); horizon 64 is one shot.
 - **Does not run on Apple MPS** (uses float64 internally; MPS has no float64). CPU throughput (M1 Pro, batch 128):
   209M ≈ 124 windows/s, 28M ≈ 524 windows/s; faster than Toto-313m (54) and t0-gamma (83) on CPU.
+
+## Chronos-Bolt (tiny 9M, mini 21M) — comparator, checked 2026-11-16 on chronos-forecasting 2.3.2
+- `ChronosBoltPipeline.from_pretrained("amazon/chronos-bolt-tiny")`; `predict_quantiles(x, prediction_length, quantile_levels)`.
+- Trained levels 0.1..0.9. Requested levels outside that range are **clamped with only a log warning** (same trap as
+  Chronos-2): we request the 9 native levels and extend 1/5/95/99% with our IQF exponential tails (`ChronosBoltAdapter`).
+- Horizon 64 is native (no autoregression). NaN context values are treated as missing by the pipeline.
+
+## IBM Granite TTM-r2 — comparator, checked 2026-11-16 on granite-tsfm 0.3.12 (separate env `.venv-ttm`)
+- Dependency clash: granite-tsfm 0.3.12 pins torch 2.11 and pandas 3; runs in `.venv-ttm`, writes forecasts that our env
+  scores (`scripts/ttm_forecast.py` -> `results/external/ttm/`, `kind: precomputed`).
+- `tsfm_public.toolkit.get_model.get_model(repo, context_length=512, prediction_length=64)` -> checkpoint `512-96-r2`
+  (805,280 params), output cut to 64 via `prediction_filter_length`. `prefer_l1_loss=True` -> `512-96-ft-l1-r2.1`
+  (855,100 params), which is frequency-prefix tuned and **raises without `freq_token`** (map: oov 0, 30min 6, h 7, d 8;
+  monthly is not in the map -> oov).
+- Point forecasts only (loss mse / l1; the `student_t` distribution head in the config is unused). Internal std scaler
+  honours `past_observed_mask`; NaN inputs propagate, so we interpolate gaps and pass the mask.
+- Scored as a degenerate distribution (all quantiles = the point), recorded in `fallbacks`. Sanity: clean 24-period sine,
+  MAE 0.19 for amplitude 10.

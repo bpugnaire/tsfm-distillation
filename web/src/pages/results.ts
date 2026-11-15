@@ -20,6 +20,7 @@ const SUITES: [string, string, string][] = [
   ["multidomain_test", "Nine public datasets", "Weather, traffic, taxis, exchange rates. Some models were trained on these."],
 ];
 const SMALL = 30e6; // "its size": up to ~30x the student
+const POINT = new Set(["ttm-r2", "ttm-r2.1-l1"]); // point forecasts only: scored with all quantiles on the one line
 const rowsOf = (s: string): SummaryRow[] => (res.suites[s]?.rows ?? []).filter((r) => !r.model.endsWith("-onnx-fp32") && !r.model.endsWith("-onnx-int8"));
 
 // ---- small multiples: models up to 30M parameters, plus the best large model as a reference line ---------------
@@ -27,7 +28,7 @@ const rowsOf = (s: string): SummaryRow[] => (res.suites[s]?.rows ?? []).filter((
   const host = document.getElementById("small")!;
   const ours = rowsOf("shapes").find((r) => r.model === OURS);
   document.getElementById("small-lede")!.textContent = ours
-    ? `Our student has ${fmtParams(ours.n_params)} parameters. Here it is against every forecasting model we tested with up to 30M, sorted by size. Bars show the 95% interval; the dashed line is the best large model.`
+    ? `Our student has ${fmtParams(ours.n_params)} parameters. Here it is against every forecasting model we tested with up to 30M, sorted by size. Bars show the 95% interval; the dashed line is the best large model. Models marked · give a single line with no uncertainty, which this score penalises; ▸ means off the scale.`
     : "";
   for (const [key, title, sub] of SUITES) {
     const all = rowsOf(key);
@@ -38,8 +39,11 @@ const rowsOf = (s: string): SummaryRow[] => (res.suites[s]?.rows ?? []).filter((
     fig.innerHTML = `<h3>${title}</h3><p class="sub">${sub}</p><svg></svg>`;
     host.append(fig);
     const W = 390, rowH = 26, m = { l: 168, r: 46, t: 6, b: 24 }, Hh = small.length * rowH + m.t + m.b;
-    const vals = [...small.flatMap((r) => r.rel_wql_ci), big?.rel_wql ?? 1];
-    const x = scaleLinear().domain([Math.min(...vals) * 0.93, Math.max(...vals) * 1.03]).nice().range([m.l, W - m.r]);
+    // point-only models (TTM) can sit far to the right: cap the axis just past the others and mark them off-scale
+    const prob = small.filter((r) => !POINT.has(r.model));
+    const vals = [...prob.flatMap((r) => r.rel_wql_ci), big?.rel_wql ?? 1];
+    const x = scaleLinear().domain([Math.min(...vals) * 0.93, Math.max(...vals) * 1.03]).nice().range([m.l, W - m.r]).clamp(true);
+    const off = (v: number) => v > x.domain()[1];
     const svg = select(fig.querySelector("svg") as SVGSVGElement).attr("viewBox", `0 0 ${W} ${Hh}`).attr("width", "100%");
     for (const t of x.ticks(4)) {
       svg.append("line").attr("x1", x(t)).attr("x2", x(t)).attr("y1", m.t).attr("y2", Hh - m.b).attr("stroke", cssVar("--grid"));
@@ -53,10 +57,11 @@ const rowsOf = (s: string): SummaryRow[] => (res.suites[s]?.rows ?? []).filter((
     small.forEach((r, i) => {
       const yy = m.t + i * rowH + rowH / 2, isOurs = r.model === OURS, c = roleColor(r.role);
       if (isOurs) svg.append("rect").attr("x", 0).attr("y", yy - rowH / 2 + 1).attr("width", W).attr("height", rowH - 2).attr("rx", 5).attr("fill", cssVar("--accent-wash"));
-      svg.append("text").attr("x", 6).attr("y", yy + 4).style("fill", isOurs ? cssVar("--ink") : cssVar("--ink-2")).style("font-size", "11.5px").style("font-weight", isOurs ? "650" : "400").text(nice(r.model));
+      svg.append("text").attr("x", 6).attr("y", yy + 4).style("fill", isOurs ? cssVar("--ink") : cssVar("--ink-2")).style("font-size", "11.5px").style("font-weight", isOurs ? "650" : "400").text(nice(r.model) + (POINT.has(r.model) ? " ·" : ""));
       svg.append("text").attr("x", m.l - 8).attr("y", yy + 4).attr("text-anchor", "end").style("font-size", "11px").text(fmtParams(r.n_params));
       svg.append("line").attr("x1", x(r.rel_wql_ci[0])).attr("x2", x(r.rel_wql_ci[1])).attr("y1", yy).attr("y2", yy).attr("stroke", c).attr("stroke-width", 2.5).attr("opacity", 0.5).attr("stroke-linecap", "round");
-      svg.append("circle").attr("cx", x(r.rel_wql)).attr("cy", yy).attr("r", isOurs ? 6 : 5).attr("fill", c).attr("stroke", cssVar("--surface")).attr("stroke-width", 2);
+      if (off(r.rel_wql)) svg.append("path").attr("d", `M${W - m.r - 2},${yy - 5} L${W - m.r + 6},${yy} L${W - m.r - 2},${yy + 5} Z`).attr("fill", c);
+      else svg.append("circle").attr("cx", x(r.rel_wql)).attr("cy", yy).attr("r", isOurs ? 6 : 5).attr("fill", POINT.has(r.model) ? cssVar("--surface") : c).attr("stroke", POINT.has(r.model) ? c : cssVar("--surface")).attr("stroke-width", 2);
       svg.append("text").attr("x", W - 4).attr("y", yy + 4).attr("text-anchor", "end").style("fill", isOurs ? cssVar("--ink") : cssVar("--ink-2")).style("font-size", "12px").style("font-weight", isOurs ? "650" : "400").text(r.rel_wql.toFixed(2));
       svg.append("rect").attr("x", 0).attr("y", yy - rowH / 2).attr("width", W).attr("height", rowH).attr("fill", "transparent")
         .on("mousemove", (e: MouseEvent) => showTip(e, `<b>${nice(r.model)}</b> · ${fmtParams(r.n_params)} params<br>score ${r.rel_wql.toFixed(3)}, 95% interval ${r.rel_wql_ci[0].toFixed(3)} to ${r.rel_wql_ci[1].toFixed(3)}${r.latency_ms_t1_b1 ? `<br>${r.latency_ms_t1_b1.toFixed(1)} ms per forecast on CPU` : ""}`))

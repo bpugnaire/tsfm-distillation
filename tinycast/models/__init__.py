@@ -30,6 +30,10 @@ def build_model(entry: ModelEntry):
         from tinycast.models.student import StudentForecaster
 
         return StudentForecaster.from_run(entry.checkpoint, name=entry.name, device=entry.device)
+    if kind == "precomputed":
+        from tinycast.models.precomputed import PrecomputedForecaster
+
+        return PrecomputedForecaster(entry.name, entry.checkpoint)
     if kind == "student_onnx":
         from tinycast.export.onnx import OnnxForecaster
 

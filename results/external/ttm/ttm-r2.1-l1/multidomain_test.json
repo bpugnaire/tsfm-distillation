@@ -1,0 +1,33 @@
+{
+ "model": "ttm-r2.1-l1",
+ "hf_repo": "ibm-granite/granite-timeseries-ttm-r2",
+ "model_key": "512-96-ft-l1-r2.1",
+ "n_params": 855100,
+ "package": "granite-tsfm==0.3.12",
+ "torch": "2.11.0",
+ "latency": {
+  "threads1_batch1": {
+   "p50_ms": 1.3215410290285945,
+   "p95_ms": 1.9125063961837439,
+   "n_runs": 50
+  },
+  "threads1_batch32": {
+   "p50_ms": 10.024708521086723,
+   "p95_ms": 10.993920644978061,
+   "n_runs": 50
+  },
+  "threads8_batch1": {
+   "p50_ms": 2.956792013719678,
+   "p95_ms": 3.7071062950417395,
+   "n_runs": 50
+  },
+  "threads8_batch32": {
+   "p50_ms": 13.094958500005305,
+   "p95_ms": 16.025268740486354,
+   "n_runs": 50
+  }
+ },
+ "wall_seconds_full_suite": 0.172,
+ "kind": "point forecast (scored as a degenerate distribution: all quantiles = the point)",
+ "freq_tokens": "per window from the dataset frequency (shapes and monthly: oov)"
+}

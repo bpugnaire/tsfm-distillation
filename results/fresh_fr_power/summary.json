@@ -568,6 +568,60 @@
    "n_clusters": 13
   },
   {
+   "model": "ttm-r2.1-l1",
+   "kind": "precomputed",
+   "n_params": 855100,
+   "size_mb": 3.42,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 1.1592465874702031,
+   "rel_wql_ci": [
+    1.102633683598388,
+    1.2161831660505253
+   ],
+   "rel_mase": 0.929235639054331,
+   "rel_mase_ci": [
+    0.8844523728994497,
+    0.9737291782050694
+   ],
+   "mean_wql": 0.07660378205128204,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.4305210206657648,
+   "latency_ms_t8_b32": 13.773729093372822,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "ttm-r2",
+   "kind": "precomputed",
+   "n_params": 805280,
+   "size_mb": 3.221,
+   "native_levels": [
+    0.5
+   ],
+   "rel_wql": 1.1699769875487442,
+   "rel_wql_ci": [
+    1.1246026257959583,
+    1.2211637020900385
+   ],
+   "rel_mase": 0.937839020791774,
+   "rel_mase_ci": [
+    0.9026523804650197,
+    0.9786502040239473
+   ],
+   "mean_wql": 0.07757166666666666,
+   "mean_cov80": 0.0,
+   "mean_cov98": 0.0,
+   "tails_extrapolated": true,
+   "latency_ms_t1_b1": 1.3067920226603746,
+   "latency_ms_t8_b32": 11.838562495540828,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
    "model": "ets",
    "kind": "ets",
    "n_params": 0,
@@ -607,5 +661,5 @@
    "n_clusters": 13
   }
  ],
- "git_sha": "22bb64a1315f8c60c07eb137ca2f61ae842cdbca-dirty"
+ "git_sha": "b4da0a1b44cdb50c9cdd376abb9c376378274b72-dirty"
 }
