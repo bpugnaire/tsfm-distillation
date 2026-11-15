@@ -18,6 +18,8 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from tinycast.config import QUANTILE_LEVELS
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -58,6 +60,69 @@ def ids_fingerprint(ids: np.ndarray) -> str:
     import hashlib
 
     return hashlib.sha1("\n".join(map(str, ids)).encode()).hexdigest()[:16]
+
+
+class GuardedMPS:
+    """Teacher on Apple MPS, with any sub-batch whose output is non-finite recomputed on CPU.
+
+    Opt-in (`device: mps_guarded`) after measuring that MPS and CPU agree on the corpus (runs/mps_check.py, journal
+    2026-11-16). The number of CPU fallbacks is logged; the agreement check is stored in the cache manifest.
+    """
+
+    def __init__(self, entry, sub: int = 64):
+        import dataclasses
+
+        from tinycast.models import build_model
+
+        self.mps = build_model(dataclasses.replace(entry, device="mps"))
+        self._cpu_entry = dataclasses.replace(entry, device="cpu")
+        self._cpu = None
+        self.sub = sub
+        self.native_levels = self.mps.native_levels
+        self.fallback_rows = 0
+        self.check = None
+
+    def _cpu_model(self):
+        if self._cpu is None:
+            from tinycast.models import build_model
+
+            self._cpu = build_model(self._cpu_entry)
+        return self._cpu
+
+    @staticmethod
+    def low_information(context: np.ndarray, min_distinct: int = 64) -> np.ndarray:
+        """Rows with few distinct values (counts, intermittent, near-constant): where MPS and CPU disagree
+        (Toto-313m: 3/1024 windows off by > 10%, all with 9-16 distinct values)."""
+        return np.array([len(np.unique(r[np.isfinite(r)])) < min_distinct for r in context])
+
+    def forecast(self, context, horizon):
+        cpu_rows = self.low_information(context)
+        out = np.empty((len(context), len(QUANTILE_LEVELS), horizon), dtype=np.float32)
+        if cpu_rows.any():
+            out[cpu_rows] = self._cpu_model().forecast(context[cpu_rows], horizon)
+            self.fallback_rows += int(cpu_rows.sum())
+        rows = np.where(~cpu_rows)[0]
+        for i in range(0, len(rows), self.sub):
+            r = rows[i : i + self.sub]
+            try:
+                q = self.mps.forecast(context[r], horizon)
+                if not np.isfinite(q).all():
+                    raise ValueError("non-finite")
+            except ValueError:
+                q = self._cpu_model().forecast(context[r], horizon)
+                self.fallback_rows += len(r)
+            out[r] = q
+        if self.check is None and len(rows):  # agreement on MPS rows, stored in the manifest
+            r = rows[: self.sub]
+            a, b = out[r], self._cpu_model().forecast(context[r], horizon)
+            x = context[r]
+            rel = np.abs(a - b) / (np.abs(b).mean(axis=(1, 2), keepdims=True) + 1e-6)
+            self.check = {
+                "n": len(x),
+                "median_rel_diff": float(np.median(rel)),
+                "max_rel_diff": float(rel.max()),
+            }
+        return out
 
 
 def write_cache(
@@ -163,13 +228,17 @@ def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = pr
     ):
         log(f"[{entry.name}] cache complete: {d}")
         return d
+    import os
+
     import torch
 
+    if entry.device == "auto" and os.environ.get("TINYCAST_CACHE_DEVICE") == "mps_guarded":
+        entry.device = "mps_guarded"  # opt-in per run (Stage C3): MPS + CPU for low-information / non-finite rows
     if entry.device == "auto":
         # CPU (or CUDA), never Apple MPS: Toto-2.0-313m returns non-finite quantiles on MPS for a constant context
         # (CPU is fine; Stage B, 2026-11-13), and the benchmarks ran every teacher on CPU: labels = the measured teacher.
         entry.device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = build_model(entry)
+    model = GuardedMPS(entry) if entry.device == "mps_guarded" else build_model(entry)
     meta = {
         "teacher": entry.name,
         "checkpoint": entry.checkpoint,
@@ -191,5 +260,14 @@ def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = pr
         meta,
         log=log,
     )
+    if isinstance(model, GuardedMPS):  # record how the labels were produced
+        man_path = out / "manifest.json"
+        man = json.loads(man_path.read_text())
+        man["mps_guard"] = {
+            "check_first_batch": model.check,
+            "cpu_rows_this_run": model.fallback_rows,
+        }
+        man_path.write_text(json.dumps(man, indent=1))
+        log(f"[{entry.name}] MPS guard: {model.fallback_rows} rows on CPU, check {model.check}")
     log(str(check_cache(entry.name, spec.key(), len(corpus.ids))))
     return out

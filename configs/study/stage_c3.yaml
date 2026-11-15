@@ -1,0 +1,27 @@
+# Stage C3 (owner 2026-11-16): other teachers on the C2 recipe. Same 1M windows (500k synthetic + 500k data v2, corpus
+# key 48dd0113d4), same student m (0.95M), same 50k steps: only the teacher changes. Toto-2.0-313m and t0-gamma are
+# Apache-2.0, so a student distilled from them has no Timestral licence question. The ensemble reuses the three caches.
+# Labels on Apple MPS with a CPU guard (TINYCAST_CACHE_DEVICE=mps_guarded, tinycast/data/cache.py GuardedMPS):
+# on 1024 corpus windows MPS vs CPU max rel diff 0.1% (t0) / 0.24% (Toto, after routing <64-distinct-value windows to CPU).
+# Toto has no native 1%/5%/95%/99% levels: at alpha = 1 the student learns our extrapolated tails (Stage B: -5% vs alpha 0.5
+# on shapes for Toto, but the same holds for every teacher; kept at 1 for comparability with C2).
+name: stage_c3
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c2_ref
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: c2_ref, type: existing, run: "stage_c2:kd_v2_1m"}
+  - {name: kd_t0_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0, teacher: t0-gamma,
+     override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500}}}
+  - {name: kd_toto_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0, teacher: toto-2.0-313m,
+     override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500}}}
+  - {name: kd_ens3_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     teacher: "ensemble:timestral-28m+toto-2.0-313m+t0-gamma",
+     override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500}}}
+pairs:
+  - [kd_t0_1m, c2_ref, "teacher: t0-gamma vs Timestral-28M (same 1M windows)"]
+  - [kd_toto_1m, c2_ref, "teacher: Toto-2.0-313m vs Timestral-28M (same 1M windows)"]
+  - [kd_ens3_1m, c2_ref, "ensemble of 3 teachers vs Timestral-28M"]
+  - [kd_ens3_1m, "zoo:toto-2.0-4m", "ensemble student vs Toto-2.0-4m zero-shot"]
+  - [kd_ens3_1m, "zoo:timestral-5m", "ensemble student vs Timestral-5M zero-shot"]
