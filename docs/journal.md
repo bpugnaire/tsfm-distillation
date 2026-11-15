@@ -321,3 +321,21 @@ long-range trend or phase the student must re-infer from its own sampled continu
 One hour (2026-10-25 00:00 UTC, the DST night) is missing in every RTE series: long fresh windows now accept <= 1% missing targets
 (`min_finite`, headline suite unchanged at 312 windows). Data processing should be fixed at the source.
 **Next:** owner decision on multi-token decoding (ADR) and on GIFT-Eval / other teachers.
+
+## 2026-11-16 — GIFT-Eval short-term (official harness) and a t0 labelling bug
+**Did:** official GIFT-Eval code (commit 0b57dd6) in `.venv-gift`, our C2 student as an ONNX GluonTS predictor
+(`scripts/gift_eval_student.py`), 55 short-term configs; comparison with every leaderboard model on the same 55 configs
+(`scripts/gift_eval_table.py`, geometric mean of MASE / CRPS ratios to Seasonal Naive, the leaderboard rule).
+**Result:** `results/gift_eval/table.md`. Student CRPS 0.616, MASE 0.822, rank 141/171. Same configs: Toto-2.0-4m 0.527 / 0.714,
+Timestral-5M 0.494 / 0.673, Timestral-28M (teacher) 0.478 / 0.652, TTM-R2 0.939 / 1.005, Chronos-Bolt-small 0.543.
+Largest losses vs Toto-4m: bizitobs 10 s (x2.7–3.3), covid_deaths (x2.1), jena_weather 10 min (x2.0), us_births daily (x1.9).
+**Surprise / learned:** context length dominates: leaderboard runs gave Toto-2.0 4096 steps and Timestral up to 32,768; our
+student reads 512 (hours to days at 10 s / 10 min). 489 series have no history at all (forecast 0, counted) and 1,387 have
+their last 512 steps missing (we read the last 512 observed values). Caveats: the C2 student's training data is filtered per
+series against GIFT-Eval, but its teacher (Timestral-28M) may have seen test data; checkpoint selection used the old
+multi-domain validation split, which includes earlier windows of 4 GIFT datasets (selection only, not training).
+t0 bug: `t0.quantile.sanitize_predictions` replaces NaN/Inf with 0.0 and logs only; 2 of 360k Stage C3 labels were all-zero
+(bitcoin series at ~1e18 overflow float32 statistics). Adapter now raises on all-zero outputs and rescales rows above 1e12 by
+a power of ten (exact: 2e-7 at 1e15); the 2 windows recomputed (`scripts/repair_cache.py`). Stage B caches and all
+benchmark results checked: no all-zero t0 rows.
+**Next:** same-context comparison (Toto-4m / Timestral-5M at 512 on GIFT) to separate context from distillation quality.
