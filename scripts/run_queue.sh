@@ -11,6 +11,7 @@ for cfg in "$@"; do
   name=$(basename "$cfg" .yaml)
   echo "$(date '+%F %T') start $name" >> runs/queue.log
   uv run python -W ignore scripts/study.py "$cfg" > "runs/$name.log" 2>&1
-  echo "$(date '+%F %T') end $name (exit $?)" >> runs/queue.log
+  rc=$?  # capture before $(date) below resets $?
+  echo "$(date '+%F %T') end $name (exit $rc)" >> runs/queue.log
   uv run python scripts/build_web_data.py > /dev/null 2>&1
 done

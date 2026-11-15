@@ -56,7 +56,9 @@ def season_of(freq: str) -> int:
     return max(1, per_day.get(unit, 1))
 
 
-def _arrow_series(path: Path, name: str, rng: np.random.Generator) -> list[Series]:
+def _arrow_series(
+    path: Path, name: str, rng: np.random.Generator, prefix: str = ""
+) -> list[Series]:
     with ipc.open_stream(path) as r:
         t = r.read_all()
     freq = t.column("freq")[0].as_py() if "freq" in t.column_names else "H"
@@ -71,7 +73,7 @@ def _arrow_series(path: Path, name: str, rng: np.random.Generator) -> list[Serie
             out.append(
                 Series(
                     name,
-                    f"{i}.{j}",
+                    f"{prefix}{i}.{j}",
                     np.array([np.nan if x is None else x for x in v], np.float32),
                     season_of(freq),
                 )
@@ -88,8 +90,9 @@ def load_gift_pretrain(cfg_path: Path | None = None) -> list[Series]:
     rng = np.random.default_rng(0)
     series = []
     for name in cfg["subsets"]:
-        for f in sorted((GP_DIR / name).rglob("data-*.arrow")):
-            series += _arrow_series(f, name, rng)
+        # a subset can span several arrow files: ids must stay unique across files (file 0 keeps its plain ids)
+        for k, f in enumerate(sorted((GP_DIR / name).rglob("data-*.arrow"))):
+            series += _arrow_series(f, name, rng, prefix=f"f{k}:" if k else "")
     return series
 
 
@@ -137,6 +140,8 @@ def build_index(log=print) -> dict:
             dropped[s.dataset] = dropped.get(s.dataset, 0) + 1
         else:
             keep.append(f"{s.dataset}/{s.series_id}")
+    if len(set(keep)) != len(keep):
+        raise ValueError("duplicate series ids in the data v2 pool")
     idx = {
         "kept": keep,
         "dropped_by_dataset": dropped,
@@ -152,7 +157,13 @@ def load_v2() -> list[Series]:
     keep = set(build_index()["kept"])
     pool = [s for name in H.DATASETS if name not in DROP_CHRONOS | H.HELD_OUT for s in H.load(name)]
     pool += load_gift_pretrain()
-    return [s for s in pool if f"{s.dataset}/{s.series_id}" in keep]
+    out = [s for s in pool if f"{s.dataset}/{s.series_id}" in keep]
+    keys = [f"{s.dataset}/{s.series_id}" for s in out]
+    if len(set(keys)) != len(keys):
+        raise ValueError(
+            "duplicate series ids in data v2 (rebuild data/processed/data_v2_index.json)"
+        )
+    return out
 
 
 def windows_v2(
