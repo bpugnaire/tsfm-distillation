@@ -1,6 +1,6 @@
 import { scaleLog } from "d3-scale";
 import { header } from "../lib/nav";
-import { cssVar, loadJSON } from "../lib/data";
+import { cssVar, loadJSON, ratioWords, type Highlight } from "../lib/data";
 
 interface Row { rel_wql: number; rel_wql_ci: [number, number]; cov80: number; vs_reference?: [number, number, number] }
 interface Contrast { a: string; b: string; question: string; ratio: [number, number, number] }
@@ -10,20 +10,52 @@ header();
 const study = await loadJSON<Record<string, Stage>>("study.json");
 const $ = (id: string) => document.getElementById(id)!;
 
-const RQS: [string, string, string][] = [
-  ["RQ1", "Which inputs should the teacher label? (real multi-domain, synthetic, teacher rollouts, noise)", "stage_a"],
-  ["RQ2", "Teacher labels vs ground truth (α)?", "stage_a"],
-  ["RQ3", "Which teacher(s)? Single, ensemble, per-window weighting", "stage_b"],
-  ["RQ4", "Which distillation loss and weighting?", "stage_b"],
-  ["RQ5", "Scaling: data size, student size, rollout length", "stage_c"],
-  ["RQ6", "How much fine-tuning on your data closes the gap to the big models?", "stage_d"],
+const RQS: [string, string, string[]][] = [
+  ["RQ1", "Which inputs should the teacher label? (real multi-domain, synthetic, teacher rollouts, noise)", ["stage_a"]],
+  ["RQ2", "Teacher labels vs ground truth (α)?", ["stage_a", "stage_b", "stage_c_lite"]],
+  ["RQ3", "Which teacher(s)? Single, ensemble, per-window weighting", ["stage_b"]],
+  ["RQ4", "Scaling: data size, student size", ["stage_c_lite", "stage_c2"]],
+  ["RQ5", "How much fine-tuning on your own data closes the gap to the big models?", ["stage_d_pilot", "stage_d_final"]],
+  ["RQ6", "Fine-tune on the teacher's forecasts of your history instead of the real values?", ["stage_e"]],
 ];
-$("rq").innerHTML = RQS.map(([id, q, st]) => `<tr><td><b>${id}</b></td><td>${q}</td><td>${st.replace("_", " ")}</td><td>${study[st] ? "results below" : '<span class="muted">not run</span>'}</td></tr>`).join("");
+const STAGES: Record<string, string> = {
+  stage_a: "Stage A · what should the teacher look at?",
+  stage_b: "Stage B · which teacher, which loss weight?",
+  stage_c_lite: "Stage C-lite · more data, bigger student",
+  stage_c2: "Stage C2 · new, contamination-filtered data",
+  stage_d_pilot: "Stage D pilot · fine-tuning on your data",
+  stage_d_final: "Stage D · fine-tuning on your data (3 seeds)",
+  stage_e: "Stage E · fine-tuning on teacher labels of your history",
+};
+const pill = (sts: string[]) => {
+  const done = sts.filter((s) => study[s]);
+  return done.length ? `<span class="status-pill done">answered · ${done.map((s) => `<a href="#${s}">${s.replace("stage_", "").replace("_", " ")}</a>`).join(", ")}</span>` : '<span class="status-pill">not run yet</span>';
+};
+$("rq").innerHTML = RQS.map(([id, q, st]) => `<tr><td><b>${id}</b></td><td>${q}</td><td colspan="2">${pill(st)}</td></tr>`).join("");
+
+// ---- key findings: one controlled comparison per card ---------------------------------------------------------
+const res = await loadJSON<{ highlights?: Highlight[] }>("results.json");
+const SUITE_SHORT: Record<string, string> = { shapes: "synthetic shapes", multidomain_test: "multi-domain test", fresh_fr_power: "fresh electricity", pedestrian_test: "pedestrian counts" };
+function needle(r: [number, number, number]): string {
+  const W = 300, H = 34, x = scaleLog().domain([0.25, 8]).range([10, W - 10]).clamp(true);
+  const c = r[2] < 1 ? cssVar("--student") : r[1] > 1 ? cssVar("--teacher") : cssVar("--baseline");
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px"><line x1="${x(1)}" x2="${x(1)}" y1="2" y2="${H - 12}" stroke="${cssVar("--ink")}" stroke-dasharray="3 3"/>`;
+  for (const t of [0.25, 0.5, 1, 2, 4, 8]) s += `<text x="${x(t)}" y="${H - 1}" text-anchor="middle" style="font-size:10px">${t}</text>`;
+  s += `<line x1="${x(r[1])}" x2="${x(r[2])}" y1="11" y2="11" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="${x(r[0])}" cy="11" r="6" fill="${c}" stroke="${cssVar("--surface")}" stroke-width="2"/></svg>`;
+  return s;
+}
+$("findings").innerHTML = (res.highlights ?? []).map((h) => {
+  const sig = h.ratio[2] < 1 || h.ratio[1] > 1;
+  return `<div class="finding"><h3>${h.title}</h3><div class="big">${ratioWords(h.ratio[0])} <small>${sig ? "" : "· not significant"}</small></div>
+    ${needle(h.ratio)}<p>${h.text}</p><div class="src"><code>${h.a}</code> vs <code>${h.b}</code> · ${SUITE_SHORT[h.suite] ?? h.suite} · ratio ${h.ratio[0].toFixed(2)} [${h.ratio[1].toFixed(2)}, ${h.ratio[2].toFixed(2)}] · <a href="#${h.stage}">${h.stage.replace("stage_", "stage ").replace("_", " ")}</a></div></div>`;
+}).join("");
 
 const SUITE_NAMES: Record<string, string> = { shapes: "Shapes (synthetic, 200 series)", multidomain_test: "Held-out multi-domain test", fresh_fr_power: "Fresh French electricity (zero-shot for everyone)" };
 let html = "";
-for (const [name, st] of Object.entries(study)) {
-  html += `<h2 id="${name}">${name.replace("_", " ").toUpperCase()}</h2><p class="small muted">Reference arm: <code>${st.reference_arm}</code>. One seed (exploratory): differences smaller than seed-to-seed noise need confirmation.</p>`;
+const order = Object.keys(STAGES);
+for (const [name, st] of Object.entries(study).sort(([a], [b]) => (order.indexOf(a) + 99) % 99 - (order.indexOf(b) + 99) % 99)) {
+  const nArms = Object.keys(Object.values(st.suites)[0]?.arms ?? {}).length;
+  html += `<details class="stage" id="${name}"><summary><b>${STAGES[name] ?? name}</b><span class="q">${nArms} arms · ${Object.keys(st.suites).length} test suites · reference <code>${st.reference_arm}</code></span></summary><div class="body"><p class="small muted">Arms with a <code>_s0/_s1/_s2</code> suffix are seeds; the others are one seed (exploratory): differences smaller than seed-to-seed noise need confirmation.</p>`;
   for (const [suite, t] of Object.entries(st.suites)) {
     const arms = Object.entries(t.arms).filter(([m]) => m !== "seasonal_naive").sort((a, b) => a[1].rel_wql - b[1].rel_wql);
     const teach = Object.entries(t.zero_shot_models).filter(([m]) => m !== "ets").sort((a, b) => a[1].rel_wql - b[1].rel_wql);
@@ -63,5 +95,14 @@ for (const [name, st] of Object.entries(study)) {
         `<tr><td>${m}</td><td class="num">${r.rel_wql.toFixed(3)}</td><td class="num">[${r.rel_wql_ci[0].toFixed(3)}, ${r.rel_wql_ci[1].toFixed(3)}]</td><td class="num">${r.vs_reference ? `${r.vs_reference[0].toFixed(3)} [${r.vs_reference[1].toFixed(3)}, ${r.vs_reference[2].toFixed(3)}]` : "–"}</td><td class="num">${(100 * r.cov80).toFixed(0)}%</td></tr>`).join("")}</tbody></table></div>
       <p class="small muted">Zero-shot foundation models on the same suite: ${teach.map(([m, r]) => `${m} ${r.rel_wql.toFixed(3)}`).join(" · ") || "not benchmarked on this suite yet"}</p></div>`;
   }
+  html += "<!--/stage-->";
 }
-$("stages").innerHTML = html || `<p class="muted">No stage has finished yet.</p>`;
+$("stages").innerHTML = html.replaceAll("<!--/stage-->", "</div></details>") || `<p class="muted">No stage has finished yet.</p>`;
+
+// open a collapsed stage when a link points at it
+function openFromHash(): void {
+  const el = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+  if (el instanceof HTMLDetailsElement) { el.open = true; el.scrollIntoView({ block: "start" }); }
+}
+addEventListener("hashchange", openFromHash);
+openFromHash();

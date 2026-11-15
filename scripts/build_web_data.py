@@ -157,7 +157,7 @@ def crps_bias() -> dict:
 
 def results() -> dict:
     out = {"suites": {}, "per_shape": {}, "splits": {}, "export": {}, "throughput": {}}
-    for s in ("fresh_fr_power", "shapes"):
+    for s in ("fresh_fr_power", "shapes", "multidomain_test"):
         p = ROOT / "results" / s / "summary.json"
         if p.exists():
             summ = json.loads(p.read_text())
@@ -264,13 +264,366 @@ def code_snippets() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Distilled students shown on the site. Same architecture (0.95M params) and the same 300k training windows; the only
+# difference is the target: the teacher's quantiles vs the real future. Their ONNX files are exported by
+# scripts/export.py --run <run> --name <onnx>; if a file is missing (e.g. a fresh clone), the site falls back to the
+# preview student.
+STUDENTS = [
+    {
+        "name": "student-distilled",
+        "label": "Distilled student",
+        "stage": "stage_c_lite",
+        "arm": "kd_mix_m_300k",
+        "onnx": "clite_kd_mix_m_300k",
+        "teacher": "timestral-209m",
+        "blurb": "trained to copy the teacher's forecasts (all 13 quantiles) on 300k windows: 150k synthetic + 150k real multi-domain",
+    },
+    {
+        "name": "student-gt-only",
+        "label": "Same student, ground truth only",
+        "stage": "stage_c_lite",
+        "arm": "gt_mix_m_300k",
+        "onnx": "clite_gt_mix_m_300k",
+        "teacher": None,
+        "blurb": "same network, same 300k windows, trained on what actually happened instead of on the teacher",
+    },
+]
+PREVIEW = "student-preview-gt-m"
+
+
+def _study_run(st: dict, suite: str) -> dict | None:
+    p = ROOT / "results" / "study" / st["stage"] / suite / f"{st['arm']}.json"
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+def _study_row(st: dict, suite: str) -> dict | None:
+    t = ROOT / "results" / "study" / st["stage"] / "table.json"
+    if not t.exists():
+        return None
+    arm = json.loads(t.read_text())["suites"].get(suite, {}).get("arms", {}).get(st["arm"])
+    return arm
+
+
+def _preview_latency(suite: str) -> dict:
+    """Students share the preview's architecture (asserted on n_params), so they share its measured CPU latency."""
+    p = ROOT / "results" / suite / f"{PREVIEW}.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+def students_in_gallery(g: dict) -> dict:
+    d = ROOT / "results" / "shapes"
+    suite = json.loads((d / "_suite.json").read_text())
+    idx_levels = [QUANTILE_LEVELS.index(lv) for lv in SHOWN]
+    rows = [k for k, sid in enumerate(suite["ids"]) if sid.split("#")[1] == "0"]
+    prev = _preview_latency("shapes")
+    added = []
+    for st in STUDENTS:
+        r = _study_run(st, "shapes")
+        if r is None:
+            continue
+        assert r["ids"] == suite["ids"], "study shapes suite differs from the gallery suite"
+        assert not prev or r["n_params"] == prev["n_params"], (
+            "latency reuse needs the same architecture"
+        )
+        lat = prev.get("latency", {}).get("threads1_batch1", {}).get("p50_ms")
+        added.append(
+            {
+                "name": st["name"],
+                "role": "student",
+                "n_params": r["n_params"],
+                "size_mb": r["size_mb"],
+                "latency_ms": sig(lat, 3),
+                "tails_extrapolated": False,
+                "fallbacks": r.get("fallbacks", []),
+            }
+        )
+        g["cells"][st["name"]] = {
+            suite["ids"][k].split("#")[0]: {
+                "q": [
+                    [sig(v) for v in np.array(r["forecasts_f16"][k], dtype=float)[i]]
+                    for i in idx_levels
+                ],
+                "wql": sig(r["per_series"]["wql"][k]),
+                "mase": sig(r["per_series"]["mase"][k]),
+            }
+            for k in rows
+        }
+    if added:  # baselines, then our students, then the foundation models; the preview is superseded
+        base = [m for m in g["models"] if m["role"] == "baseline"]
+        rest = [m for m in g["models"] if m["role"] != "baseline" and PREVIEW not in m["name"]]
+        g["models"] = base + added + rest
+        for k in [k for k in g["cells"] if PREVIEW in k]:
+            del g["cells"][k]
+    return g
+
+
+def students_in_results(out: dict) -> dict:
+    """Add the distilled students' rows (from the study tables) to the leaderboards; drop the superseded preview."""
+    for suite, summ in out["suites"].items():
+        prev = _preview_latency(suite)
+        lat = prev.get("latency", {})
+        new = []
+        for st in STUDENTS:
+            row, run = _study_row(st, suite), _study_run(st, suite)
+            if row is None or run is None:
+                continue
+            new.append(
+                {
+                    "model": st["name"],
+                    "role": "student",
+                    "n_params": run["n_params"],
+                    "rel_wql": row["rel_wql"],
+                    "rel_wql_ci": row["rel_wql_ci"],
+                    "mean_cov80": row["cov80"],
+                    "latency_ms_t1_b1": lat.get("threads1_batch1", {}).get("p50_ms"),
+                    "latency_ms_t8_b32": lat.get("threads8_batch32", {}).get("p50_ms"),
+                    "n_windows": summ["rows"][0]["n_windows"],
+                    "n_clusters": summ["rows"][0]["n_clusters"],
+                    "source": f"results/study/{st['stage']}/table.json",
+                }
+            )
+        if new:
+            summ["rows"] = sorted(
+                [r for r in summ["rows"] if PREVIEW not in r["model"]] + new,
+                key=lambda r: r["rel_wql"],
+            )
+    if out["per_shape"].get("shapes"):
+        per = out["per_shape"]["shapes"]
+        base = json.loads((ROOT / "results" / "shapes" / "seasonal_naive.json").read_text())
+        bw = np.array([np.nan if v is None else v for v in base["per_series"]["wql"]])
+        for st in STUDENTS:
+            r = _study_run(st, "shapes")
+            if r is None:
+                continue
+            w = np.array([np.nan if v is None else v for v in r["per_series"]["wql"]])
+            res = {}
+            for sh in dict.fromkeys(i.split("#")[0] for i in r["ids"]):
+                sel = [k for k, i in enumerate(r["ids"]) if i.split("#")[0] == sh]
+                rel = w[sel] / bw[sel]
+                rel = rel[np.isfinite(rel) & (rel > 0)]
+                res[sh] = sig(float(np.exp(np.log(rel).mean())), 3)
+            per[st["name"]] = res
+        for k in [k for k in per if PREVIEW in k]:
+            del per[k]
+    return out
+
+
+def models_manifest() -> dict:
+    """Browser models for Draw / Play: which ONNX files exist, what they are, and their headline numbers."""
+    mdir = WEB / "public" / "models"
+    out = []
+    for st in STUDENTS:
+        if not (mdir / f"{st['onnx']}.fp32.onnx").exists():
+            continue
+        exp = ROOT / "results" / "export" / f"{st['onnx']}.json"
+        e = json.loads(exp.read_text()) if exp.exists() else {}
+        scores = {}
+        for suite in ("shapes", "multidomain_test", "fresh_fr_power"):
+            row = _study_row(st, suite)
+            if row:
+                scores[suite] = {"rel_wql": row["rel_wql"], "ci": row["rel_wql_ci"]}
+        lat = _preview_latency("shapes").get("latency", {}).get("threads1_batch1", {}).get("p50_ms")
+        out.append(
+            {
+                "key": st["name"],
+                "label": st["label"],
+                "onnx": st["onnx"],
+                "blurb": st["blurb"],
+                "teacher": st["teacher"],
+                "n_params": e.get("n_params"),
+                "size_mb": {k: e[k]["size_mb"] for k in ("fp32", "int8") if k in e},
+                "int8_p99_rel_diff": e.get("int8", {}).get("p99_rel_diff"),
+                "cpu_ms_python": sig(lat, 3) if lat else None,
+                "scores": scores,
+            }
+        )
+    teacher = json.loads((ROOT / "results" / "shapes" / "timestral-209m.json").read_text())
+    if not out:  # fresh clone without the distilled ONNX files
+        out.append(
+            {
+                "key": PREVIEW,
+                "label": "Preview student (ground truth only)",
+                "onnx": "preview_gt_m",
+                "blurb": "pipeline test model",
+                "teacher": None,
+                "n_params": None,
+                "size_mb": {},
+                "scores": {},
+            }
+        )
+    return {
+        "models": out,
+        "default": out[0]["key"],
+        "teacher": {
+            "name": "timestral-209m",
+            "label": "Timestral-209M",
+            "n_params": teacher["n_params"],
+        },
+        "teacher_licence": "Timestral is released by Mistral AI under a modified MIT licence (revenue clause). "
+        "A student distilled from it is shared with that notice and under the same conditions.",
+    }
+
+
+def finetune_curves() -> dict:
+    """Stage D (warm start): rel WQL vs amount of the user's own history, distilled init vs scratch, 3 seeds."""
+    t = ROOT / "results" / "study" / "stage_d_final" / "table.json"
+    if not t.exists():
+        return {}
+    tab = json.loads(t.read_text())["suites"]
+    out = {}
+    for suite, key in (("fresh_fr_power", "fr"), ("pedestrian_test", "ped")):
+        arms = tab[suite]["arms"]
+        zs = arms.get("distilled_zero_shot")
+        curves = {}
+        for init in ("distilled", "scratch"):
+            pts = []
+            for amount in ("1w", "1m", "1y"):
+                vals = [
+                    a["rel_wql"]
+                    for k, a in arms.items()
+                    if k.startswith(f"ft_warm_{key}_{amount}_{init}_s")
+                ]
+                if vals:
+                    pts.append(
+                        {
+                            "amount": amount,
+                            "mean": float(np.mean(vals)),
+                            "min": min(vals),
+                            "max": max(vals),
+                            "n": len(vals),
+                        }
+                    )
+            curves[init] = pts
+        zoo = tab[suite]["zero_shot_models"]
+        out[suite] = {
+            "zero_shot_student": zs["rel_wql"] if zs else None,
+            "curves": curves,
+            "zoo": {
+                k: zoo[k]["rel_wql"]
+                for k in ("toto-2.0-4m", "timestral-5m", "timestral-209m", "chronos-2")
+                if k in zoo
+            },
+        }
+    return out
+
+
+# Key findings: the sentence is ours, every number is read from the study table (paired ratio a/b and its 95% CI).
+HIGHLIGHTS = [
+    ("stage_c_lite", "shapes", "kd_mix_m_300k", "gt_mix_m_300k",
+     "Copying the teacher beats learning from the real answers",
+     "Same 0.95M network, same 300k windows. Only the training target changes: the teacher's forecast instead of what actually happened."),
+    ("stage_a", "shapes", "kd_noise", "kd_synth",
+     "Random noise teaches nothing",
+     "The teacher answers every noise input the same way, so the student learns one flat forecast. Structured synthetic series work."),
+    ("stage_c_lite", "shapes", "kd_mix_m_300k", "kd_mix_m_30k",
+     "More data is the biggest lever",
+     "300k distillation windows vs 30k, same student. Bigger than changing the teacher, the loss or the student size."),
+    ("stage_b", "multidomain_test", "kd_ensemble", "kd_timestral",
+     "Which teacher you pick matters little",
+     "Averaging three teachers (Timestral, Toto, t0) beats Timestral alone, but only by about 2%."),
+    ("stage_d_final", "fresh_fr_power", "ft_warm_fr_1w_distilled", "ft_warm_fr_1w_scratch",
+     "Little data? Start from the distilled student",
+     "Fine-tuning on one week of electricity history (3 seeds): from random weights it does worse than naive; "
+     "from the distilled student it keeps its zero-shot accuracy."),
+    ("stage_e", "fresh_fr_power", "kd_fr_1m", "gt_fr_1y",
+     "One month of teacher labels ≈ one year of real data",
+     "Fine-tuning on the teacher's forecasts of 1 month of history scores like fine-tuning on 12 months of real values."),
+    ("stage_d_final", "fresh_fr_power", "ft_warm_fr_1y_distilled", "ft_warm_fr_1y_scratch",
+     "With a full year of data, the head start is gone",
+     "Honest limit: with enough history, training from scratch is as good or slightly better."),
+]  # fmt: skip
+
+
+def highlights() -> list[dict]:
+    out = []
+    for stage, suite, a, b, title, text in HIGHLIGHTS:
+        t = ROOT / "results" / "study" / stage / "table.json"
+        if not t.exists():
+            continue
+        pairs = json.loads(t.read_text())["suites"].get(suite, {}).get("pairs", [])
+        p = next((p for p in pairs if p["a"] == a and p["b"] == b), None)
+        if p is None:
+            continue
+        out.append(
+            {
+                "title": title,
+                "text": text,
+                "stage": stage,
+                "suite": suite,
+                "a": a,
+                "b": b,
+                "ratio": p["ratio"],
+            }
+        )
+    return out
+
+
+def play() -> dict:
+    """'You vs the model' rounds: real fresh electricity windows (Licence Ouverte) + the canonical shapes.
+    Each round: 512-step context, the 64-step truth and the teacher's precomputed forecast (median, 10%, 90%)."""
+    keep = [QUANTILE_LEVELS.index(v) for v in (0.1, 0.5, 0.9)]
+    rounds = []
+    s = json.loads((ROOT / "results" / "fresh_fr_power" / "_suite.json").read_text())
+    tch = json.loads((ROOT / "results" / "fresh_fr_power" / "timestral-209m.json").read_text())
+    assert tch["ids"] == s["ids"]
+    n = len(s["ids"])
+    seen = set()
+    for k in range(
+        0, n, max(1, n // 40)
+    ):  # spread over series and dates, one window per (series, date)
+        meta = s["meta"][k]
+        key = (meta["series_id"], meta["target_start"][:10])
+        if key in seen:
+            continue
+        seen.add(key)
+        q = np.array(tch["forecasts_f16"][k], dtype=float)
+        rounds.append(
+            {
+                "kind": "electricity",
+                "title": f"Electricity demand · {meta['series_id']}",
+                "unit": "MW",
+                "step": "1 hour",
+                "start": meta["target_start"][:16].replace("T", " "),
+                "context": [sig(v) for v in s["context"][k]],
+                "future": [sig(v) for v in s["future"][k]],
+                "teacher": [[sig(v) for v in q[i]] for i in keep],
+            }
+        )
+    g = json.loads((ROOT / "results" / "shapes" / "_suite.json").read_text())
+    gt = json.loads((ROOT / "results" / "shapes" / "timestral-209m.json").read_text())
+    for k, sid in enumerate(g["ids"]):
+        name, seed = sid.split("#")
+        if seed != "1":  # seed 0 is in the gallery: use another draw of each shape
+            continue
+        q = np.array(gt["forecasts_f16"][k], dtype=float)
+        rounds.append(
+            {
+                "kind": "shape",
+                "title": name.replace("_", " ").capitalize(),
+                "unit": "",
+                "step": "1 step",
+                "start": "",
+                "context": [sig(v) for v in g["context"][k]],
+                "future": [sig(v) for v in g["future"][k]],
+                "teacher": [[sig(v) for v in q[i]] for i in keep],
+            }
+        )
+    return {"levels": [0.1, 0.5, 0.9], "teacher": "Timestral-209M", "rounds": rounds}
+
+
 if __name__ == "__main__":
     palette_ts()
     data = WEB / "public" / "data"
     data.mkdir(parents=True, exist_ok=True)
-    g = gallery()
+    g = students_in_gallery(gallery())
     (data / "gallery.json").write_text(json.dumps(g, separators=(",", ":")))
-    (data / "results.json").write_text(json.dumps(results(), separators=(",", ":")))
+    res = students_in_results(results())
+    res["finetune"] = finetune_curves()
+    res["highlights"] = highlights()
+    (data / "results.json").write_text(json.dumps(res, separators=(",", ":")))
+    (data / "models.json").write_text(json.dumps(models_manifest(), separators=(",", ":")))
+    (data / "play.json").write_text(json.dumps(play(), separators=(",", ":")))
     (data / "code.json").write_text(json.dumps(code_snippets(), separators=(",", ":")))
     (data / "status.json").write_text(json.dumps(status(), separators=(",", ":")))
     study = {}

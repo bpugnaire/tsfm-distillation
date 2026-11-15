@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · Play</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .board { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+    .board .kpi { min-width: 120px; flex: 1 1 120px; }
+    .round-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .round-head h2 { margin: 0; font-size: 18px; }
+    .scores { display: grid; gap: 8px; margin-top: 12px; }
+    .scorebar { display: grid; grid-template-columns: 150px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 14px; }
+    .scorebar .track { height: 14px; background: var(--page); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .scorebar .fill { height: 100%; border-radius: 99px; width: 0; transition: width .7s cubic-bezier(.2,.8,.2,1); }
+    .scorebar .val { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    @media (max-width: 560px) { .scorebar { grid-template-columns: 100px minmax(0, 1fr) 54px; font-size: 13px; } }
+    .verdict { font-size: 20px; font-weight: 650; margin: 14px 0 4px; letter-spacing: -0.01em; }
+    .why { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 75ch; }
+    #pad { touch-action: none; cursor: crosshair; display: block; border-radius: 8px; }
+    .final { text-align: center; padding: 26px 16px; }
+    .final .big { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; }
+    .pop { animation: pop .5s ease; } @keyframes pop { 0% { transform: scale(.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Can you beat a 1M-parameter model?</h1>
+    <p class="lede">You see the past of a real series (French electricity demand) or a synthetic shape.
+      <strong>Draw what you think happens next.</strong> Then we reveal the truth, and how the tiny distilled model and its 209M-parameter teacher did.
+      8 rounds.</p>
+    <div class="board" id="board"></div>
+    <div class="card" style="margin-top:14px">
+      <div class="round-head"><h2 id="title">loading…</h2><span class="small muted" id="meta"></span></div>
+      <svg id="pad"></svg>
+      <div class="legend" id="legend"></div>
+      <div class="row" style="margin-top:10px; justify-content:space-between">
+        <div class="row"><button id="clear">Clear my line</button><span class="small muted" id="coverage"></span></div>
+        <div class="row"><button id="reveal" class="cta" disabled style="border:0">Reveal</button><button id="next" class="cta" style="display:none;border:0">Next round →</button></div>
+      </div>
+      <div id="result"></div>
+    </div>
+    <p class="fineprint" style="margin-top:14px">Score: the average distance between a line and what really happened, as a percentage of the chart's height (lower is better).
+      The model's line is its median forecast; its shaded band is where it expects the truth 80% of the time. The teacher's forecasts are precomputed;
+      the small model runs live in your browser. Electricity data: RTE éCO2mix (Licence Ouverte v2.0), from the fresh test period that no model saw in training.</p>
+  </main>
+  <script type="module" src="/src/pages/play.ts"></script>
+</body>
+</html>

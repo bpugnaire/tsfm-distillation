@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-13_stage_c_lite_gt_mix_m_300k",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 100.0,
+  "max_rel_diff": 9.71200643107295e-05,
+  "p99_rel_diff": 1.1817539871117333e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 2092604.0,
+  "max_rel_diff": 0.08960854262113571,
+  "p99_rel_diff": 0.02741311304271221,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}

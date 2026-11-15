@@ -1,5 +1,6 @@
 const pages = [
   ["index.html", "Draw"],
+  ["play.html", "Play"],
   ["gallery.html", "Gallery"],
   ["results.html", "Results"],
   ["study.html", "Study"],
@@ -15,6 +16,6 @@ export function header(): void {
   h.className = "site";
   h.innerHTML = `<span class="brand">tinycast</span><nav>${pages
     .map(([href, label]) => `<a href="${href}"${href === here ? ' aria-current="page"' : ""}>${label}</a>`)
-    .join("")}</nav><span class="muted small">distilling forecasting foundation models into the browser · work in progress</span>`;
+    .join("")}</nav><span class="muted small tagline">big forecasting models, distilled into your browser</span>`;
   document.body.prepend(h);
 }

@@ -276,3 +276,16 @@ Robustness from existing Stage-D runs (`scripts/robustness_check.py`): 3-seed en
 ## 2026-11-13 — Chronos-2 fine-tuning cost on a laptop
 Vendor `fit()` defaults (batch 256, 1000 steps): Chronos-2-small ~18 min/run on MPS; Chronos-2 (120M) does not fit in MPS memory
 for full fine-tuning and needs ~8–12 h per run on CPU (LoRA is not faster here). Our student fine-tunes in ~1 min. (`docs/notes/compute.md`)
+
+## 2026-11-15 — Website refresh: distilled student on Draw, new Play page, findings-first Study
+**Did:** Draw now runs the Stage C-lite distilled student (0.95M, `kd_mix_m_300k`) instead of the ground-truth preview, with a toggle to
+overlay the same network trained without the teacher (`gt_mix_m_300k`) and the teacher's precomputed forecast. New Play page: the
+visitor draws the next 64 steps of fresh electricity windows or shapes, then sees the truth, the student (live) and Timestral-209M.
+Results: suite tabs (fresh electricity / multi-domain / shapes), students in every leaderboard, decluttered Pareto, a fine-tuning
+curve (Stage D, 3 seeds). Study: 7 key-finding cards (numbers read from the study tables), stages collapsed. Stale "no distillation
+results yet" banners removed. Study page height 38.8k px -> 2.2k px; no horizontal scroll at 390 px.
+**Result:** all numbers via `scripts/build_web_data.py` from `results/` (HIGHLIGHTS list, `finetune_curves`, `play`).
+**Surprise / learned:** the "one week of data halves the error" framing was wrong: the 0.54 ratio is distilled vs *scratch*; the fine-tuned
+student only matches its zero-shot score. Card reworded. The distilled ONNX files are git-ignored (`web/public/models/clite_*`) until
+the owner decides whether a Timestral-distilled student may be published (data/LICENSES.md note).
+**Next:** swap in the Stage C2 winner if it beats C-lite on validation; owner decision on publishing the student.

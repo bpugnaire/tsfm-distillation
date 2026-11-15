@@ -8,23 +8,27 @@
 </head>
 <body>
   <main>
-    <h1>Results so far</h1>
-    <p class="lede">Every number here is read from <code>results/*.json</code>, produced by committed scripts and configs.
-      Scores are <strong>relative WQL</strong>: each window's weighted quantile loss divided by seasonal naive's, aggregated
-      with a geometric mean (lower is better; 0.5 = half the error of "repeat the last season").
-      Brackets and whiskers are 95% bootstrap intervals, resampling whole series.</p>
-    <p class="warn">No distillation results yet. The only student here is the <strong>preview</strong> (ground truth only, 3 minutes, one seed),
-      and it was trained on these 13 series' history while the foundation models forecast zero-shot. It is not a fair comparison yet.</p>
+    <h1>Results</h1>
+    <p class="lede">How the 0.95M-parameter students compare with forecasting foundation models 4× to 330× their size.
+      Score: <strong>relative WQL</strong>, the probabilistic forecast error divided by the error of "repeat the last season"
+      (lower is better; 0.5 = half the naive error). Whiskers are 95% bootstrap intervals over whole series.
+      Every number is read from <code>results/</code>.</p>
 
-    <h2>Accuracy vs CPU latency: fresh French electricity data</h2>
+    <div class="toolbar" style="margin:16px 0 4px" id="tabs"></div>
+    <p class="small" id="suite-note" style="color:var(--ink-2); max-width:90ch; margin:6px 0 0"></p>
+
+    <h2>Accuracy vs speed</h2>
     <p class="small muted" id="pareto-sub"></p>
     <div class="card"><svg id="pareto"></svg></div>
 
-    <h2>Leaderboards</h2>
-    <div class="row" style="align-items:flex-start; gap:16px">
-      <div class="card" style="flex:1 1 440px"><h3 style="margin-top:0">Fresh FR power (headline)</h3><div class="small muted" id="fresh-sub"></div><div class="table-wrap" id="t-fresh"></div></div>
-      <div class="card" style="flex:1 1 440px"><h3 style="margin-top:0">Shapes (20 shapes × 10 seeds)</h3><div class="small muted">200 independent synthetic series</div><div class="table-wrap" id="t-shapes"></div></div>
-    </div>
+    <h2>Leaderboard</h2>
+    <div class="card table-wrap" id="board"></div>
+
+    <h2>How much of your own data does it take?</h2>
+    <p class="small muted" style="max-width:90ch">Fine-tuning the student on the target series' own history (warm start: the history ends where the test starts).
+      Lines: mean of 3 seeds, shaded: min–max over seeds. Dotted lines: foundation models zero-shot, no fine-tuning.</p>
+    <div class="toolbar" id="ft-tabs" style="margin-bottom:8px"></div>
+    <div class="card"><svg id="ft"></svg><p class="small muted" id="ft-note" style="margin:6px 0 0"></p></div>
 
     <h2>Where each model wins and fails</h2>
     <p class="small muted">Relative WQL per shape (geometric mean over 10 seeds). Blue: better than seasonal naive, red: worse, gray: about the same.</p>

@@ -24,7 +24,9 @@ function render(): void {
     const d = document.createElement("div");
     d.className = "hd";
     const rel = relWql.get(m.name);
-    d.innerHTML = `<b><span class="swatch" style="background:${roleColor(m.role)}"></span>${m.name}</b>` +
+    const nice: Record<string, string> = { "student-distilled": "our student · distilled", "student-gt-only": "our student · no teacher" };
+    if (nice[m.name]) d.style.cssText = "background:var(--accent-wash);border-radius:6px";
+    d.innerHTML = `<b><span class="swatch" style="background:${roleColor(m.role)}"></span>${nice[m.name] ?? m.name}</b>` +
       `${fmtParams(m.n_params)} · ${m.latency_ms ?? "–"} ms` + (rel ? ` · rel ${rel.toFixed(2)}` : "") +
       (isPreview(m.name) ? `<br><span class="tag">preview</span>` : "");
     grid.append(d);

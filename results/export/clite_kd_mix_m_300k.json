@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-13_stage_c_lite_kd_mix_m_300k",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 24.0,
+  "max_rel_diff": 9.749590390129015e-05,
+  "p99_rel_diff": 1.277679643862939e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 2213660.0,
+  "max_rel_diff": 0.12023331969976425,
+  "p99_rel_diff": 0.03447398915886879,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}

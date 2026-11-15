@@ -7,6 +7,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         draw: resolve(__dirname, "index.html"),
+        play: resolve(__dirname, "play.html"),
         gallery: resolve(__dirname, "gallery.html"),
         results: resolve(__dirname, "results.html"),
         notes: resolve(__dirname, "notes.html"),
