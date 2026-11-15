@@ -30,3 +30,7 @@ web/public/models/c2_*
 
 # separate env for IBM TTM (granite-tsfm pins torch/pandas versions that clash with ours)
 .venv-ttm/
+
+# third-party repos and envs (GIFT-Eval harness)
+external/
+.venv-gift/

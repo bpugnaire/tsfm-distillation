@@ -86,13 +86,27 @@ class T0Adapter:
 
     @torch.no_grad()
     def forecast(self, context, horizon, past_covariates=None, future_covariates=None):
+        # Huge magnitudes (~1e18 in the bitcoin series) overflow t0's float32 statistics. t0 normalises each series by
+        # its own scale, so we divide such rows by a power of ten and multiply the forecast back (exact for a
+        # scale-equivariant model; rows below 1e12 are untouched).
+        x = np.asarray(context, dtype=np.float64)
+        absmax = np.nan_to_num(np.abs(x)).max(axis=1)
+        k = np.where(absmax > 1e12, np.floor(np.log10(np.maximum(absmax, 1.0))), 0.0)
+        s = 10.0**k
+        xs = (x / s[:, None]).astype(np.float32)
         out = []
         for sl in _batches(len(context), self.batch_size):
-            fc = self.model.predict(
-                np.asarray(context[sl], dtype=np.float32), horizon, quantile_levels=QUANTILE_LEVELS
-            )
+            fc = self.model.predict(xs[sl], horizon, quantile_levels=QUANTILE_LEVELS)
             out.append(np.asarray(fc.quantiles.float().cpu()))  # (b, H, Q)
-        q = np.concatenate(out).transpose(0, 2, 1)
+        q = (np.concatenate(out).transpose(0, 2, 1) * s[:, None, None]).astype(np.float32)
+        # t0's `sanitize_predictions` replaces NaN/Inf with 0.0 and only logs a warning: a window that failed comes
+        # back as an all-zero forecast. Detect it and raise (callers decide: CPU retry or stop), never pass it on.
+        ctx = np.asarray(context, dtype=np.float32)
+        zero = (q == 0).all(axis=(1, 2)) & (np.nan_to_num(np.abs(ctx)).max(axis=1) > 0)
+        if zero.any():
+            raise ValueError(
+                f"{self.name}: {int(zero.sum())} window(s) came back all-zero (non-finite inside t0)"
+            )
         return check_output(q, len(context), horizon, self.name)
 
 
