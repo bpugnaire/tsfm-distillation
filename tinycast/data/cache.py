@@ -170,6 +170,53 @@ def write_cache(
     return d
 
 
+def ensemble_cache_name(members: list[str]) -> str:
+    return "ensemble-" + "+".join(members)
+
+
+def build_ensemble_cache(
+    members: list[str], corpus_key: str, log: Callable[[str], None] = print
+) -> Path:
+    """Mean of several teachers' caches, written as one cache, shard by shard.
+
+    Reading every member in full and stacking them needs ~4x one cache in RAM (1M windows x 3 teachers: > 20 GB; it
+    froze a 16 GB Mac into a watchdog panic on 2026-11-16). Streaming keeps one shard per member in memory.
+    """
+    name = ensemble_cache_name(members)
+    out = cache_dir(name, corpus_key)
+    mans = [json.loads((cache_dir(m, corpus_key) / "manifest.json").read_text()) for m in members]
+    for k in ("levels", "horizon", "ids_sha", "encoding", "shards"):
+        if any(m.get(k) != mans[0].get(k) for m in mans):
+            raise ValueError(f"ensemble members differ in {k}: cannot combine {members}")
+    man_path = out / "manifest.json"
+    if man_path.exists() and json.loads(man_path.read_text()).get("shards") == mans[0]["shards"]:
+        log(f"[{name}] cache complete: {out}")
+        return out
+    out.mkdir(parents=True, exist_ok=True)
+    K, H = len(mans[0]["levels"]), mans[0]["horizon"]
+    for shard in sorted(mans[0]["shards"]):
+        tables = [pq.read_table(cache_dir(m, corpus_key) / shard) for m in members]
+        ids = tables[0]["window_id"].to_numpy(zero_copy_only=False)
+        if any(
+            not np.array_equal(t["window_id"].to_numpy(zero_copy_only=False), ids)
+            for t in tables[1:]
+        ):
+            raise ValueError(f"window ids differ in {shard}")
+        q = np.mean([_decode(t["q"].to_pylist(), K, H).astype(np.float32) for t in tables], axis=0)
+        pq.write_table(
+            pa.table({"window_id": pa.array(ids.tolist()), "q": pa.array(_encode(q), pa.binary())}),
+            out / shard,
+        )
+    man = {
+        "teacher": name, "members": members, "combination": "mean of quantiles", "checkpoint": "+".join(m.get("checkpoint", "") for m in mans),
+        "levels": mans[0]["levels"], "horizon": H, "ids_sha": mans[0]["ids_sha"], "encoding": mans[0]["encoding"],
+        "native_levels": sorted(set.intersection(*(set(m["native_levels"]) for m in mans))), "shards": mans[0]["shards"],
+    }  # fmt: skip
+    man_path.write_text(json.dumps(man, indent=1))
+    log(f"[{name}] built from {len(members)} caches: {out}")
+    return out
+
+
 def read_cache(
     teacher: str, corpus_key: str, ids: np.ndarray | None = None
 ) -> tuple[np.ndarray, dict]:

@@ -144,6 +144,13 @@ def train(
 
         kind, members, tau = parse(cfg.data.teacher)
         mans, qs = [], []
+        if (
+            kind == "ensemble"
+        ):  # averaged on disk, shard by shard: one cache in RAM instead of len(members) + a stack
+            from tinycast.data.cache import build_ensemble_cache, ensemble_cache_name
+
+            build_ensemble_cache(members, teacher_corpus_key or tr_spec.key(), log=log)
+            members, kind = [ensemble_cache_name(members)], "single"
         for name in members:
             q_m, man = read_cache(name, teacher_corpus_key or tr_spec.key(), tr.ids)
             qs.append(q_m)
