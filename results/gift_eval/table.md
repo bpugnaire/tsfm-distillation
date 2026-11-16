@@ -146,30 +146,33 @@
 | 142 | Migas-1.0 | Synthefy |  | No | 0.620 | 0.667 |
 | 143 | ValBestSingle-cmtt | N/A |  | No | 0.621 | 0.677 |
 | 144 | FLAIR | Mellon Inc. |  | No | 0.623 | 0.832 |
-| 145 | PatchTST | Princeton University |  | No | 0.628 | 0.833 |
-| 146 | TimesFM | Google Research |  | Yes | 0.635 | 0.823 |
-| 147 | Reverso | MIT |  | No | 0.651 | 0.700 |
-| 148 | TFT | Google Research |  | No | 0.651 | 0.884 |
-| 149 | Lingjiang | Alibaba Cloud |  | No | 0.664 | 0.954 |
-| 150 | Moirai_small | Salesforce AI Research |  | No | 0.666 | 0.888 |
-| 151 | Reverso-Small | MIT |  | No | 0.668 | 0.716 |
-| 152 | DLinear-t | Big Data CBNU |  | No | 0.669 | 0.864 |
-| 153 | iTransformer | Tsinghua University |  | No | 0.672 | 0.889 |
-| 154 | FFM | IBM Research |  | No | 0.684 | 0.924 |
-| 155 | Reverso-Nano | MIT |  | No | 0.709 | 0.753 |
-| 156 | Super-Linear | Ben-Gurion University of the Negev |  | Yes | 0.793 | 0.850 |
-| 157 | Auto_Arima |  |  | No | 0.808 | 0.935 |
-| 158 | N-BEATS | ServiceNow |  | No | 0.823 | 0.863 |
-| 159 | VisionTS | Zhejiang University |  | No | 0.825 | 0.872 |
-| 160 | DLinear | The Chinese University of Hong Kong |  | No | 0.873 | 1.016 |
-| 161 | DeepAR | Amazon Research |  | No | 0.874 | 1.200 |
-| 162 | TIDE | Google Research |  | No | 0.874 | 1.140 |
-| 163 | Auto_Theta |  |  | No | 0.897 | 0.955 |
-| 164 | TTM-R1-Pretrained | IBM Research |  | Yes | 0.904 | 0.994 |
-| 165 | TTM-R2-Pretrained | IBM Research | 0.8M | Yes | 0.939 | 1.005 |
-| 166 | Lag-Llama | Morgan Stanley & Service Now |  | Yes | 0.963 | 1.262 |
-| 167 | Seasonal_Naive |  |  | No | 1.000 | 1.000 |
-| 168 | Naive |  |  | No | 1.202 | 1.143 |
-| 169 | VISIT-1.0 |  |  | No | 1.202 | 1.143 |
-| 170 | Auto_ETS |  |  | No | 1.481 | 0.984 |
-| 171 | Crossformer | Shanghai Jiao Tong University |  | No | 4.407 | 3.575 |
+| 145 | **tinycast-c3-kd_ens3_1m** | this project |  | see note | 0.627 | 0.829 |
+| 146 | **tinycast-c3-kd_toto_1m** | this project |  | see note | 0.627 | 0.830 |
+| 147 | PatchTST | Princeton University |  | No | 0.628 | 0.833 |
+| 148 | TimesFM | Google Research |  | Yes | 0.635 | 0.823 |
+| 149 | **tinycast-c3-kd_t0_1m** | this project |  | see note | 0.640 | 0.856 |
+| 150 | Reverso | MIT |  | No | 0.651 | 0.700 |
+| 151 | TFT | Google Research |  | No | 0.651 | 0.884 |
+| 152 | Lingjiang | Alibaba Cloud |  | No | 0.664 | 0.954 |
+| 153 | Moirai_small | Salesforce AI Research |  | No | 0.666 | 0.888 |
+| 154 | Reverso-Small | MIT |  | No | 0.668 | 0.716 |
+| 155 | DLinear-t | Big Data CBNU |  | No | 0.669 | 0.864 |
+| 156 | iTransformer | Tsinghua University |  | No | 0.672 | 0.889 |
+| 157 | FFM | IBM Research |  | No | 0.684 | 0.924 |
+| 158 | Reverso-Nano | MIT |  | No | 0.709 | 0.753 |
+| 159 | Super-Linear | Ben-Gurion University of the Negev |  | Yes | 0.793 | 0.850 |
+| 160 | Auto_Arima |  |  | No | 0.808 | 0.935 |
+| 161 | N-BEATS | ServiceNow |  | No | 0.823 | 0.863 |
+| 162 | VisionTS | Zhejiang University |  | No | 0.825 | 0.872 |
+| 163 | DLinear | The Chinese University of Hong Kong |  | No | 0.873 | 1.016 |
+| 164 | DeepAR | Amazon Research |  | No | 0.874 | 1.200 |
+| 165 | TIDE | Google Research |  | No | 0.874 | 1.140 |
+| 166 | Auto_Theta |  |  | No | 0.897 | 0.955 |
+| 167 | TTM-R1-Pretrained | IBM Research |  | Yes | 0.904 | 0.994 |
+| 168 | TTM-R2-Pretrained | IBM Research | 0.8M | Yes | 0.939 | 1.005 |
+| 169 | Lag-Llama | Morgan Stanley & Service Now |  | Yes | 0.963 | 1.262 |
+| 170 | Seasonal_Naive |  |  | No | 1.000 | 1.000 |
+| 171 | Naive |  |  | No | 1.202 | 1.143 |
+| 172 | VISIT-1.0 |  |  | No | 1.202 | 1.143 |
+| 173 | Auto_ETS |  |  | No | 1.481 | 0.984 |
+| 174 | Crossformer | Shanghai Jiao Tong University |  | No | 4.407 | 3.575 |

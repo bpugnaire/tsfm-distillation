@@ -1500,6 +1500,26 @@
    "CRPS_rank": 144
   },
   {
+   "model": "tinycast-c3-kd_ens3_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8285739736388339,
+   "CRPS": 0.6268247537097752,
+   "CRPS_rank": 145
+  },
+  {
+   "model": "tinycast-c3-kd_toto_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8297885944725183,
+   "CRPS": 0.6272477024283242,
+   "CRPS_rank": 146
+  },
+  {
    "model": "PatchTST",
    "org": "Princeton University",
    "leakage": "No",
@@ -1507,7 +1527,7 @@
    "params": NaN,
    "MASE": 0.8326738167195255,
    "CRPS": 0.6283270010107336,
-   "CRPS_rank": 145
+   "CRPS_rank": 147
   },
   {
    "model": "TimesFM",
@@ -1517,7 +1537,17 @@
    "params": NaN,
    "MASE": 0.8228131426172967,
    "CRPS": 0.6347188201903912,
-   "CRPS_rank": 146
+   "CRPS_rank": 148
+  },
+  {
+   "model": "tinycast-c3-kd_t0_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8562186055078308,
+   "CRPS": 0.6402099091747867,
+   "CRPS_rank": 149
   },
   {
    "model": "Reverso",
@@ -1527,7 +1557,7 @@
    "params": NaN,
    "MASE": 0.6995439337496708,
    "CRPS": 0.650791381825969,
-   "CRPS_rank": 147
+   "CRPS_rank": 150
   },
   {
    "model": "TFT",
@@ -1537,7 +1567,7 @@
    "params": NaN,
    "MASE": 0.8835123766149493,
    "CRPS": 0.6511902205802675,
-   "CRPS_rank": 148
+   "CRPS_rank": 151
   },
   {
    "model": "Lingjiang",
@@ -1547,7 +1577,7 @@
    "params": NaN,
    "MASE": 0.9543787768885983,
    "CRPS": 0.6642597603719385,
-   "CRPS_rank": 149
+   "CRPS_rank": 152
   },
   {
    "model": "Moirai_small",
@@ -1557,7 +1587,7 @@
    "params": NaN,
    "MASE": 0.8879840736810806,
    "CRPS": 0.6658504600998629,
-   "CRPS_rank": 150
+   "CRPS_rank": 153
   },
   {
    "model": "Reverso-Small",
@@ -1567,7 +1597,7 @@
    "params": NaN,
    "MASE": 0.7156109099829426,
    "CRPS": 0.6682340130910365,
-   "CRPS_rank": 151
+   "CRPS_rank": 154
   },
   {
    "model": "DLinear-t",
@@ -1577,7 +1607,7 @@
    "params": NaN,
    "MASE": 0.8636559666281439,
    "CRPS": 0.6689273135400142,
-   "CRPS_rank": 152
+   "CRPS_rank": 155
   },
   {
    "model": "iTransformer",
@@ -1587,7 +1617,7 @@
    "params": NaN,
    "MASE": 0.8892681405773504,
    "CRPS": 0.6716196240036643,
-   "CRPS_rank": 153
+   "CRPS_rank": 156
   },
   {
    "model": "FFM",
@@ -1597,7 +1627,7 @@
    "params": NaN,
    "MASE": 0.923576547689876,
    "CRPS": 0.6839742142201662,
-   "CRPS_rank": 154
+   "CRPS_rank": 157
   },
   {
    "model": "Reverso-Nano",
@@ -1607,7 +1637,7 @@
    "params": NaN,
    "MASE": 0.7525711780591182,
    "CRPS": 0.7087361025327182,
-   "CRPS_rank": 155
+   "CRPS_rank": 158
   },
   {
    "model": "Super-Linear",
@@ -1617,7 +1647,7 @@
    "params": NaN,
    "MASE": 0.8502295201229189,
    "CRPS": 0.793398163924396,
-   "CRPS_rank": 156
+   "CRPS_rank": 159
   },
   {
    "model": "Auto_Arima",
@@ -1627,7 +1657,7 @@
    "params": NaN,
    "MASE": 0.9347324171156448,
    "CRPS": 0.8078795816884224,
-   "CRPS_rank": 157
+   "CRPS_rank": 160
   },
   {
    "model": "N-BEATS",
@@ -1637,7 +1667,7 @@
    "params": NaN,
    "MASE": 0.8625300579438975,
    "CRPS": 0.8227984876939313,
-   "CRPS_rank": 158
+   "CRPS_rank": 161
   },
   {
    "model": "VisionTS",
@@ -1647,7 +1677,7 @@
    "params": NaN,
    "MASE": 0.8715509564019739,
    "CRPS": 0.825484155938255,
-   "CRPS_rank": 159
+   "CRPS_rank": 162
   },
   {
    "model": "DLinear",
@@ -1657,7 +1687,7 @@
    "params": NaN,
    "MASE": 1.015570849621848,
    "CRPS": 0.8727962794943187,
-   "CRPS_rank": 160
+   "CRPS_rank": 163
   },
   {
    "model": "DeepAR",
@@ -1667,7 +1697,7 @@
    "params": NaN,
    "MASE": 1.2002655080353948,
    "CRPS": 0.8736725181205658,
-   "CRPS_rank": 161
+   "CRPS_rank": 164
   },
   {
    "model": "TIDE",
@@ -1677,7 +1707,7 @@
    "params": NaN,
    "MASE": 1.1398711556773333,
    "CRPS": 0.8743823798212633,
-   "CRPS_rank": 162
+   "CRPS_rank": 165
   },
   {
    "model": "Auto_Theta",
@@ -1687,7 +1717,7 @@
    "params": NaN,
    "MASE": 0.9551772322284189,
    "CRPS": 0.8971768298890479,
-   "CRPS_rank": 163
+   "CRPS_rank": 166
   },
   {
    "model": "TTM-R1-Pretrained",
@@ -1697,7 +1727,7 @@
    "params": NaN,
    "MASE": 0.9936056389434986,
    "CRPS": 0.9040054230458878,
-   "CRPS_rank": 164
+   "CRPS_rank": 167
   },
   {
    "model": "TTM-R2-Pretrained",
@@ -1707,7 +1737,7 @@
    "params": 810000.0,
    "MASE": 1.004836805381401,
    "CRPS": 0.9388348115231201,
-   "CRPS_rank": 165
+   "CRPS_rank": 168
   },
   {
    "model": "Lag-Llama",
@@ -1717,7 +1747,7 @@
    "params": NaN,
    "MASE": 1.2624385445054338,
    "CRPS": 0.9634057942339791,
-   "CRPS_rank": 166
+   "CRPS_rank": 169
   },
   {
    "model": "Seasonal_Naive",
@@ -1727,7 +1757,7 @@
    "params": NaN,
    "MASE": 1.0,
    "CRPS": 1.0,
-   "CRPS_rank": 167
+   "CRPS_rank": 170
   },
   {
    "model": "Naive",
@@ -1737,7 +1767,7 @@
    "params": NaN,
    "MASE": 1.1425182697241645,
    "CRPS": 1.201752715186074,
-   "CRPS_rank": 168
+   "CRPS_rank": 171
   },
   {
    "model": "VISIT-1.0",
@@ -1747,7 +1777,7 @@
    "params": NaN,
    "MASE": 1.142518269710601,
    "CRPS": 1.2017527160643093,
-   "CRPS_rank": 169
+   "CRPS_rank": 172
   },
   {
    "model": "Auto_ETS",
@@ -1757,7 +1787,7 @@
    "params": NaN,
    "MASE": 0.9837443474036679,
    "CRPS": 1.481078907615344,
-   "CRPS_rank": 170
+   "CRPS_rank": 173
   },
   {
    "model": "Crossformer",
@@ -1767,7 +1797,7 @@
    "params": NaN,
    "MASE": 3.575237724363516,
    "CRPS": 4.40657384451057,
-   "CRPS_rank": 171
+   "CRPS_rank": 174
   }
  ]
 }

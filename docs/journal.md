@@ -339,3 +339,16 @@ t0 bug: `t0.quantile.sanitize_predictions` replaces NaN/Inf with 0.0 and logs on
 a power of ten (exact: 2e-7 at 1e15); the 2 windows recomputed (`scripts/repair_cache.py`). Stage B caches and all
 benchmark results checked: no all-zero t0 rows.
 **Next:** same-context comparison (Toto-4m / Timestral-5M at 512 on GIFT) to separate context from distillation quality.
+
+## 2026-11-16 — Stage C3: other teachers on the C2 recipe (+ a memory crash)
+**Did:** same 1M windows and student as C2, labels from Toto-2.0-313m, t0-gamma, and the mean of three teachers (+ Timestral-28M).
+Scored on our 3 suites (`results/study/stage_c3/table.md`) and GIFT-Eval short-term, 55 configs (`results/gift_eval/table.md`).
+**Result:** vs the C2 student (Timestral-28M labels), paired ratios: Toto 0.99 shapes (ns) / 1.03 multi-domain / 0.97 electricity;
+t0 1.12 / 1.00 (ns) / 1.05; ensemble 1.00 (ns) / 0.99 (ns) / 1.03. GIFT-Eval CRPS (ratio to Seasonal Naive): C2 0.616, Toto
+0.627, ensemble 0.627, t0 0.640; per-config paired vs C2: Toto 1.019 [1.002, 1.039], ensemble 1.018 [1.004, 1.035], t0 1.040
+[1.009, 1.074]. Validation ranked the ensemble first (0.1342 vs 0.1369 for C2): validation did not predict test here.
+**Surprise / learned:** at 1M windows the teacher barely matters (all within 4%), and the Stage B ensemble gain (+2% at 30k
+windows) disappears. The Apache-only student (Toto labels) is within 2% of the Timestral-taught one on GIFT-Eval and better on
+electricity: a publishable option. The first ensemble attempt loaded 3 full caches and stacked them (> 20 GB): the Mac froze and
+rebooted on a watchdog panic. Ensemble caches are now averaged shard by shard on disk (530 MB peak).
+**Next:** owner decision: publish the Toto student (Apache teachers) or keep C2 on the site; same-context GIFT comparison.

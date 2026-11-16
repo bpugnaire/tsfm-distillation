@@ -43,6 +43,19 @@ def main() -> None:
     naive = pd.read_csv(LB / "Seasonal_Naive" / "all_results.csv").set_index("dataset").loc[configs]
     rows = []
     entries = [(a.ours, ours, {"testdata_leakage": "see note", "org": "this project"})]
+    for d in sorted(
+        (ROOT / "results" / "gift_eval").glob("tinycast-*")
+    ):  # our other students, same configs
+        if d.name != a.ours and (d / "all_results.csv").exists():
+            df = pd.read_csv(d / "all_results.csv").set_index("dataset")
+            if set(configs) <= set(df.index):
+                entries.append(
+                    (
+                        d.name,
+                        df.loc[configs],
+                        {"testdata_leakage": "see note", "org": "this project"},
+                    )
+                )
     for d in sorted(LB.iterdir()):
         f = d / "all_results.csv"
         if not f.exists():
@@ -86,7 +99,7 @@ def main() -> None:
             else ""
         )
         md.append(
-            f"| {r['CRPS_rank']} | {'**' + r['model'] + '**' if r['model'] == a.ours else r['model']} | {r['org'] or ''} | {p} | {r['leakage'] or ''} | {r['CRPS']:.3f} | {r['MASE']:.3f} |"
+            f"| {r['CRPS_rank']} | {'**' + r['model'] + '**' if r['model'].startswith('tinycast') else r['model']} | {r['org'] or ''} | {p} | {r['leakage'] or ''} | {r['CRPS']:.3f} | {r['MASE']:.3f} |"
         )
     (ROOT / "results" / "gift_eval" / "table.md").write_text("\n".join(md))
     print(
