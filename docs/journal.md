@@ -352,3 +352,14 @@ windows) disappears. The Apache-only student (Toto labels) is within 2% of the T
 electricity: a publishable option. The first ensemble attempt loaded 3 full caches and stacked them (> 20 GB): the Mac froze and
 rebooted on a watchdog panic. Ensemble caches are now averaged shard by shard on disk (530 MB peak).
 **Next:** owner decision: publish the Toto student (Apache teachers) or keep C2 on the site; same-context GIFT comparison.
+
+## 2026-11-16 — GIFT-Eval gap to Toto-2.0-4m, decomposed
+**Did:** ran Toto-2.0-4m on the same 55 short-term configs with the leaderboard notebook's code (`scripts/gift_eval_toto.py`,
+`.venv-gift-toto`; gluonts 0.17 needed an axis swap for multivariate forecasts). Context 4096 on 4 configs reproduces the
+leaderboard to 4 decimals (`results/gift_eval/repro_toto4m_ctx4096`), then context 512 multivariate and 512 univariate.
+**Result:** CRPS (ratio to Seasonal Naive): Toto 4096 multivariate 0.527, 512 multivariate 0.563, 512 univariate 0.563; our C2
+student (512, univariate) 0.616. Paired student / Toto@512-univariate: 1.093 [1.047, 1.146], student better on 16/55 configs.
+Teacher labelling speed at 2048 vs 512 context: Timestral-28M CPU 116 vs 372 w/s, Toto-313m guarded MPS 57 vs 138 w/s.
+**Surprise / learned:** reading variates jointly gives Toto nothing here; context length is worth ~7% for Toto; 9% remains at equal
+context and equal univariate setup (size, data coverage: worst on covid_deaths, us_births/D, 10 s and 10 min data).
+**Next:** pilot of a 2048-context student (patch 64, same 32 tokens) on the C2 300k windows, proposed to the owner.

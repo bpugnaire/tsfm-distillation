@@ -75,7 +75,7 @@ def main() -> None:
         uni = a.univariate and Dataset(name=ds_name, term="short", to_univariate=False, storage_env_var="GIFT_EVAL").target_dim != 1
         ds = Dataset(name=ds_name, term="short", to_univariate=uni, storage_env_var="GIFT_EVAL")
         cfg = Toto2GluonTSModelConfig(prediction_length=ds.prediction_length, context_length=a.context,
-                                      target_dim=ds.target_dim, past_feat_dynamic_real_dim=ds.past_feat_dynamic_real_dim)  # fmt: skip
+                                      target_dim=1 if uni else ds.target_dim, past_feat_dynamic_real_dim=ds.past_feat_dynamic_real_dim)  # fmt: skip
         predictor = AxisFix(Toto2GluonTSModel(model, cfg).eval().create_predictor(batch_size=512, device="cpu"))
         if "/" in ds_name:
             key, freq = ds_name.split("/")

@@ -1,0 +1,10 @@
+{
+ "model": "Toto-2.0-4m",
+ "context_length": 512,
+ "device": "cpu",
+ "gift_eval_commit": "0b57dd6",
+ "gluonts": "0.17.0",
+ "toto": "toto-2==2.0.0",
+ "univariate": false,
+ "wall_seconds": 793.0
+}
