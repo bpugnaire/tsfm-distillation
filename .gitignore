@@ -34,3 +34,4 @@ web/public/models/c2_*
 # third-party repos and envs (GIFT-Eval harness)
 external/
 .venv-gift/
+web/public/models/c3_*

@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-16_stage_c3_kd_ens3_1m_2",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 11.0,
+  "max_rel_diff": 9.759722888702527e-05,
+  "p99_rel_diff": 1.382243681291584e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 391093.5,
+  "max_rel_diff": 0.12797321379184723,
+  "p99_rel_diff": 0.03838399425148964,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}

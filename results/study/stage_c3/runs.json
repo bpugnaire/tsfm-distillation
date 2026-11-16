@@ -1,0 +1,6 @@
+{
+ "c2_ref": "runs/2026-11-15_stage_c2_kd_v2_1m",
+ "kd_t0_1m": "runs/2026-11-16_stage_c3_kd_t0_1m",
+ "kd_toto_1m": "runs/2026-11-16_stage_c3_kd_toto_1m",
+ "kd_ens3_1m": "runs/2026-11-16_stage_c3_kd_ens3_1m_2"
+}

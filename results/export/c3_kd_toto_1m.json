@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-16_stage_c3_kd_toto_1m",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 16.5,
+  "max_rel_diff": 9.758006490301341e-05,
+  "p99_rel_diff": 1.3872828503735946e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 899561.5,
+  "max_rel_diff": 0.1634577512741089,
+  "p99_rel_diff": 0.04177147522568703,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}
