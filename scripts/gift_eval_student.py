@@ -173,6 +173,7 @@ def main() -> None:
     ap.add_argument("--name", required=True)
     ap.add_argument("--terms", default="short")
     ap.add_argument("--datasets", default=None)
+    ap.add_argument("--context", type=int, default=512, help="history the ONNX student reads (its trained context)")
     a = ap.parse_args()
     metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(), RMSE(),
                NRMSE(), ND(), MeanWeightedSumQuantileLoss(quantile_levels=GIFT_LEVELS)]  # fmt: skip
@@ -196,7 +197,7 @@ def main() -> None:
             ds = Dataset(name=ds_name, term=term, to_univariate=uni)
             t0 = time.time()
             res = evaluate_model(
-                OnnxStudentPredictor(a.onnx, ds.prediction_length), test_data=ds.test_data, metrics=metrics,
+                OnnxStudentPredictor(a.onnx, ds.prediction_length, context=a.context), test_data=ds.test_data, metrics=metrics,
                 batch_size=1024, axis=None, mask_invalid_label=True, allow_nan_forecast=False,
                 seasonality=get_seasonality(ds.freq),
             )  # fmt: skip
@@ -212,7 +213,7 @@ def main() -> None:
         w.writeheader()
         w.writerows(rows)
     (out_dir / "config.json").write_text(json.dumps({
-        "model": a.name, "onnx": a.onnx, "context_length": 512, "horizon": 64, "terms": a.terms,
+        "model": a.name, "onnx": a.onnx, "context_length": a.context, "horizon": 64, "terms": a.terms,
         "gift_eval_commit": "0b57dd6937eb9a69a3ae771f73ab36188bb33e47", "wall_seconds": round(time.time() - t_all, 1),
         "empty_context_rows": int(sum(EMPTY)), "empty_context_rule": "no observed history at all: forecast 0",
         "gap_skipped_rows": int(sum(GAP)), "gap_rule": "last 512 steps all missing: last 512 observed values",

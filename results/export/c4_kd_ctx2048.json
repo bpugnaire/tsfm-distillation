@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-18_stage_c4_ctx_kd_ctx2048",
+ "n_params": 970944,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 393216.0,
+  "max_rel_diff": 9.760389366419986e-05,
+  "p99_rel_diff": 1.1815255902547506e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 4.013
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 5994643456.0,
+  "max_rel_diff": 0.1309177726507187,
+  "p99_rel_diff": 0.024628443643450737,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.368
+ }
+}

@@ -36,3 +36,4 @@ external/
 .venv-gift/
 web/public/models/c3_*
 .venv-gift-toto/
+web/public/models/c4_*

@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-18_stage_c4_ctx_kd_ctx2048_trunc",
+ "n_params": 970944,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 393216.0,
+  "max_rel_diff": 9.759231033967808e-05,
+  "p99_rel_diff": 1.184687107524951e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 4.013
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 4989288448.0,
+  "max_rel_diff": 0.10210344195365906,
+  "p99_rel_diff": 0.023817643523216248,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.368
+ }
+}

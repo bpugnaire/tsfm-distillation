@@ -1,0 +1,5 @@
+{
+ "c2_ctx512": "runs/2026-11-14_stage_c2_kd_v2_300k",
+ "kd_ctx2048": "runs/2026-11-18_stage_c4_ctx_kd_ctx2048",
+ "kd_ctx2048_trunc": "runs/2026-11-18_stage_c4_ctx_kd_ctx2048_trunc"
+}
