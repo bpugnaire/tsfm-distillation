@@ -46,25 +46,39 @@ class AxisFix:
 
 def main() -> None:
     import torch
-    from gluonts.ev.metrics import MAE, MAPE, MASE, MSE, MSIS, ND, NRMSE, RMSE, SMAPE, MeanWeightedSumQuantileLoss
+    from gift_eval.data import Dataset
+    from gluonts.ev.metrics import (
+        MAE,
+        MAPE,
+        MASE,
+        MSE,
+        MSIS,
+        ND,
+        NRMSE,
+        RMSE,
+        SMAPE,
+        MeanWeightedSumQuantileLoss,
+    )
     from gluonts.model import evaluate_model
     from gluonts.time_feature import get_seasonality
     from toto2 import Toto2GluonTSModel, Toto2GluonTSModelConfig, Toto2Model
-
-    from gift_eval.data import Dataset
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--size", default="4m")
     ap.add_argument("--context", type=int, required=True)
     ap.add_argument("--datasets", default=None)
     ap.add_argument("--out", default=None)
-    ap.add_argument("--univariate", action="store_true", help="split multivariate series like our student does")
+    ap.add_argument(
+        "--univariate", action="store_true", help="split multivariate series like our student does"
+    )
     a = ap.parse_args()
     torch.set_num_threads(8)
     metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(),
                RMSE(forecast_type="mean"), NRMSE(forecast_type="mean"), ND(),
                MeanWeightedSumQuantileLoss(quantile_levels=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])]  # fmt: skip
-    props = json.loads((ROOT / "external" / "gift-eval" / "notebooks" / "dataset_properties.json").read_text())
+    props = json.loads(
+        (ROOT / "external" / "gift-eval" / "notebooks" / "dataset_properties.json").read_text()
+    )
     name = f"Toto-2.0-{a.size}"
     model = Toto2Model.from_pretrained(f"Datadog/{name}", map_location="cpu").eval()
     tag = f"{name}@ctx{a.context}" + ("-univariate" if a.univariate else "")
@@ -72,11 +86,19 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     rows, t_all = [], time.time()
     for ds_name in a.datasets.split(",") if a.datasets else SHORT:
-        uni = a.univariate and Dataset(name=ds_name, term="short", to_univariate=False, storage_env_var="GIFT_EVAL").target_dim != 1
+        uni = (
+            a.univariate
+            and Dataset(
+                name=ds_name, term="short", to_univariate=False, storage_env_var="GIFT_EVAL"
+            ).target_dim
+            != 1
+        )
         ds = Dataset(name=ds_name, term="short", to_univariate=uni, storage_env_var="GIFT_EVAL")
         cfg = Toto2GluonTSModelConfig(prediction_length=ds.prediction_length, context_length=a.context,
                                       target_dim=1 if uni else ds.target_dim, past_feat_dynamic_real_dim=ds.past_feat_dynamic_real_dim)  # fmt: skip
-        predictor = AxisFix(Toto2GluonTSModel(model, cfg).eval().create_predictor(batch_size=512, device="cpu"))
+        predictor = AxisFix(
+            Toto2GluonTSModel(model, cfg).eval().create_predictor(batch_size=512, device="cpu")
+        )
         if "/" in ds_name:
             key, freq = ds_name.split("/")
             key = PRETTY.get(key.lower(), key.lower())
@@ -92,7 +114,9 @@ def main() -> None:
         rows.append(row)
         print(f"{row['dataset']:40s} MASE {row['eval_metrics/MASE[0.5]']:.4f} "
               f"CRPS {row['eval_metrics/mean_weighted_sum_quantile_loss']:.4f} ({time.time() - t0:.1f}s)", flush=True)  # fmt: skip
-        with open(out_dir / "all_results.csv", "w", newline="") as f:  # rewritten after each config: resumable output
+        with open(
+            out_dir / "all_results.csv", "w", newline=""
+        ) as f:  # rewritten after each config: resumable output
             w = csv.DictWriter(f, fieldnames=list(rows[0]))
             w.writeheader()
             w.writerows(rows)
