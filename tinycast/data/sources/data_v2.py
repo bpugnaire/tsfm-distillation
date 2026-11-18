@@ -187,7 +187,9 @@ def windows_v2(
         for i in range(first + offset, last + 1, horizon):
             if (
                 np.isfinite(s.values[i : i + horizon]).mean() >= 0.9
-                and np.isfinite(s.values[max(0, i - context_length) : i]).sum() >= 32
+                # history check on the last 512 steps whatever the context length: a 2048-context corpus then has
+                # exactly the windows (origins) of the 512 one, so context-length arms compare on the same targets
+                and np.isfinite(s.values[max(0, i - min(context_length, 512)) : i]).sum() >= 32
             ):
                 grids.setdefault(s.dataset, []).append((k, i))
     names = sorted(grids)

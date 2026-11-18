@@ -205,6 +205,19 @@ def train(
         for _ in range(o.grad_accum):
             idx = torch.as_tensor(rng.integers(0, len(tr.ids), o.batch_size))
             x, y = ctx_all[idx].to(device), fut_all[idx].to(device)
+            if (
+                cfg.data.random_truncate > 0
+            ):  # random history length (see DataConfig.random_truncate)
+                T = x.shape[1]
+                g = torch.Generator().manual_seed(int(rng.integers(2**31)))
+                pick = torch.rand(len(x), generator=g) < cfg.data.random_truncate
+                u = torch.rand(len(x), generator=g)
+                keep = torch.exp(math.log(64) + u * (math.log(T) - math.log(64))).round()
+                keep = torch.where(pick, keep, torch.full_like(keep, T)).to(device)
+                cut = (T - keep)[:, None]
+                x = torch.where(
+                    torch.arange(T, device=device)[None] < cut, torch.full_like(x, float("nan")), x
+                )
             with torch.autocast("cuda", enabled=use_amp):
                 zq, loc, scale = model.forward_scaled(x)
             zq = zq.float()

@@ -1,0 +1,23 @@
+# Stage C4 pilot (owner 2026-11-18): does a longer context help the < 1M student?
+# Same 300k windows as C2's kd_v2_300k (150k synthetic + 150k data v2; data v2 origins pinned, see data_v2.windows_v2;
+# synthetic series are regenerated at the longer length), same teacher (Timestral-28M, now reading 2048 steps), same 15k steps.
+# Student: patch 64 x 32 tokens = 2048 steps (C2: patch 16 x 32 = 512), ~0.97M params. Evaluated on 2048-step suites;
+# the 512 student reads the last 512 steps of the same windows.
+name: stage_c4_ctx
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c2_ctx512
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+zoo: [toto-2.0-4m, timestral-5m, timestral-28m]
+arms:
+  - {name: c2_ctx512, type: existing, run: "stage_c2:kd_v2_300k"}
+  - {name: kd_ctx2048, mix: {synth: 150000, multidomain_v2: 150000}, alpha: 1.0,
+     override: {student: {context_length: 2048, patch_size: 64}}}
+  - {name: kd_ctx2048_trunc, mix: {synth: 150000, multidomain_v2: 150000}, alpha: 1.0,
+     override: {student: {context_length: 2048, patch_size: 64}, data: {random_truncate: 0.5}}}
+pairs:
+  - [kd_ctx2048, c2_ctx512, "context 2048 vs 512 (same windows, same teacher)"]
+  - [kd_ctx2048_trunc, kd_ctx2048, "random history truncation (p = 0.5) vs none"]
+  - [kd_ctx2048_trunc, c2_ctx512, "context 2048 + truncation vs 512"]
+  - [kd_ctx2048, "zoo:toto-2.0-4m", "2048 student vs Toto-2.0-4m (2048 context)"]
+  - [kd_ctx2048, "zoo:timestral-5m", "2048 student vs Timestral-5M (2048 context)"]

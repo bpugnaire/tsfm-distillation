@@ -135,6 +135,9 @@ class DataConfig:
     mix: dict[str, int] = dataclasses.field(default_factory=dict)
     val_mix: dict[str, int] = dataclasses.field(default_factory=dict)
     rollout_max_blocks: int = 3
+    # Share of training samples whose history is randomly shortened: keep the last L steps, L log-uniform in
+    # [64, context_length], the rest set to missing. Teaches a long-context student to cope with short series.
+    random_truncate: float = 0.0
 
 
 @dataclasses.dataclass

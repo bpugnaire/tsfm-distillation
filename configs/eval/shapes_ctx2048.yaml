@@ -1,0 +1,8 @@
+# Same suite as shapes.yaml with 2048-step contexts (same targets for fresh_fr_power and multidomain_test;
+# shapes are regenerated at the longer length). For context-length studies (Stage C4).
+suite: shapes
+horizon: 64
+n_seeds: 10
+context_length: 2048
+latency: false
+models: []
