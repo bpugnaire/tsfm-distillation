@@ -254,9 +254,11 @@ if __name__ == "__main__":
             sn.season = list(suite.season) if bcfg.season == "freq" else bcfg.season
         run_model(build_model(sn), sn, suite, bcfg, out)
         zoo_dir = ROOT / "results" / suite_name
-        for zname in study.get(
-            "zoo", []
-        ):  # zero-shot references on this exact suite (computed once)
+        zoo = study.get("zoo", [])
+        zoo = (
+            ["seasonal_naive"] if zoo and "seasonal_naive" not in zoo else []
+        ) + zoo  # summarize() divides by it
+        for zname in zoo:  # zero-shot references on this exact suite (computed once)
             if (zoo_dir / f"{zname}.json").exists():
                 continue
             zentry = (
