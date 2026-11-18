@@ -1,0 +1,18 @@
+# Stage C5a (owner 2026-11-19): the big teacher on the current recipe. Same 1M windows as C2 (corpus key 48dd0113d4:
+# 500k synthetic + 500k data v2), same student m (0.95M, 512 steps), same 50k steps: only the teacher changes,
+# Timestral-28M (C2) -> Timestral-209M (CPU only: Timestral needs float64, ~135 windows/s -> ~2 h of labels).
+# Internal testing only (owner: no publication). Next: C5b, the same with 2048-step contexts (same origins).
+name: stage_c5_209m
+base: configs/train/study_base_m.yaml
+teacher: timestral-209m
+reference_arm: c2_28m
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: c2_28m, type: existing, run: "stage_c2:kd_v2_1m"}
+  - {name: kd_209m_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500}}}
+pairs:
+  - [kd_209m_1m, c2_28m, "teacher: Timestral-209M vs 28M (same 1M windows, 512 steps)"]
+  - [kd_209m_1m, "zoo:toto-2.0-4m", "209M-taught student vs Toto-2.0-4m zero-shot"]
+  - [kd_209m_1m, "zoo:timestral-5m", "209M-taught student vs Timestral-5M zero-shot"]
+  - [kd_209m_1m, "zoo:timestral-209m", "student vs its teacher Timestral-209M"]
