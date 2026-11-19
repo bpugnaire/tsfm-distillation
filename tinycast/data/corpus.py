@@ -196,27 +196,81 @@ BUILDERS = {
 }
 
 
+MMAP_BYTES = (
+    2_000_000_000  # corpora with more context bytes than this live in a memory-mapped .npy on disk
+)
+
+
 def build_corpus(spec: CorpusSpec, cache: bool = True, log=print) -> Corpus:
+    """Build (or load) a corpus. Large ones (e.g. 1M windows x 2048 steps = 8 GB of contexts) are written straight to a
+    memory-mapped file and read lazily: holding them in RAM next to the teacher cache would not fit a 16 GB Mac."""
     path = ROOT / "data" / "processed" / f"corpus_{spec.split}_{spec.key()}.npz"
+    ctx_path = path.with_name(path.stem + "_context.npy")
     if cache and path.exists():
         d = np.load(path, allow_pickle=False)
-        return Corpus(d["ids"], d["source"], d["context"], d["future"])
+        context = np.load(ctx_path, mmap_mode="r") if ctx_path.exists() else d["context"]
+        return Corpus(d["ids"], d["source"], context, d["future"])
+    counts = {k: v for k, v in spec.counts().items() if v}
+    total = sum(counts.values())
+    big = cache and total * spec.context_length * 4 > MMAP_BYTES
+    if big:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = ctx_path.with_suffix(".partial.npy")
+        mm = np.lib.format.open_memmap(
+            tmp, mode="w+", dtype=np.float32, shape=(total, spec.context_length)
+        )
     ids, src, ctx, fut = [], [], [], []
-    for name, n in spec.counts().items():
-        if not n:
-            continue
+    row = 0
+    for name, n in counts.items():
         log(f"  building {n} '{name}' windows ({spec.split})")
-        i, c, f = BUILDERS[name](spec, n)
+        if (
+            big and name == "synth"
+        ):  # each synthetic series depends only on its seed: generate in chunks
+            seeds = _synth_seeds(spec.split, n, spec.seed)
+            i, fs = [], []
+            for k in range(0, n, 50_000):
+                c, f = synthetic_batch(seeds[k : k + 50_000], spec.context_length, spec.horizon)
+                mm[row + k : row + k + len(c)] = c
+                fs.append(np.asarray(f, dtype=np.float32))
+            i = [window_id("synth", str(int(s_)), 0) for s_ in seeds]
+            f = np.concatenate(fs)
+            c = None
+        else:
+            i, c, f = BUILDERS[name](spec, n)
+            c = np.asarray(c, dtype=np.float32)
+            if big:
+                mm[row : row + len(c)] = c
+                c = None
+        if len(i) != n and big:
+            raise ValueError(
+                f"{name}: got {len(i)} windows, expected {n} (memory-mapped corpora need exact counts)"
+            )
         ids += list(i)
         src += [name] * len(i)
-        ctx.append(np.asarray(c, dtype=np.float32))
+        if c is not None:
+            ctx.append(c)
         fut.append(np.asarray(f, dtype=np.float32))
+        row += len(i)
     if len(set(ids)) != len(ids):
         raise ValueError("duplicate window ids in corpus")
-    corpus = Corpus(np.array(ids), np.array(src), np.concatenate(ctx), np.concatenate(fut))
+    if big:
+        mm.flush()
+        del mm
+        tmp.rename(ctx_path)
+        context = np.load(ctx_path, mmap_mode="r")
+    else:
+        context = np.concatenate(ctx)
+    corpus = Corpus(np.array(ids), np.array(src), context, np.concatenate(fut))
     if cache:
         path.parent.mkdir(parents=True, exist_ok=True)
-        np.savez(
-            path, ids=corpus.ids, source=corpus.source, context=corpus.context, future=corpus.future
-        )
+        if big:
+            np.savez(path, ids=corpus.ids, source=corpus.source, future=corpus.future)
+        else:
+            np.savez(
+                path,
+                ids=corpus.ids,
+                source=corpus.source,
+                context=corpus.context,
+                future=corpus.future,
+            )
     return corpus

@@ -190,7 +190,10 @@ def train(
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
     hw = L.horizon_weights(cfg.student.horizon, cfg.loss.horizon_weighting, device)
 
-    ctx_all = torch.as_tensor(tr.context)
+    mmapped = isinstance(
+        tr.context, np.memmap
+    )  # large corpora stay on disk; batches are gathered from the file
+    ctx_all = None if mmapped else torch.as_tensor(tr.context)
     fut_all = torch.as_tensor(tr.future)
     tq_all = torch.as_tensor(teacher_q) if teacher_q is not None else None
     rng = np.random.default_rng(cfg.seed)
@@ -203,8 +206,14 @@ def train(
             g["lr"] = lr_at(step, o.lr, o.warmup_steps, o.max_steps)
         opt.zero_grad(set_to_none=True)
         for _ in range(o.grad_accum):
-            idx = torch.as_tensor(rng.integers(0, len(tr.ids), o.batch_size))
-            x, y = ctx_all[idx].to(device), fut_all[idx].to(device)
+            raw = rng.integers(0, len(tr.ids), o.batch_size)
+            idx = torch.as_tensor(
+                np.sort(raw) if mmapped else raw
+            )  # sorted: sequential-ish reads from the file
+            x = (
+                torch.from_numpy(np.asarray(tr.context[idx.numpy()])) if mmapped else ctx_all[idx]
+            ).to(device)
+            y = fut_all[idx].to(device)
             if (
                 cfg.data.random_truncate > 0
             ):  # random history length (see DataConfig.random_truncate)
