@@ -8,5 +8,10 @@ if [ -n "$py" ]; then
   uv run --quiet ruff check $py || { echo "pre-commit: ruff check failed (try: uv run ruff check --fix <files>)"; exit 1; }
   uv run --quiet ruff format --check $py > /dev/null || { echo "pre-commit: run 'uv run ruff format <files>' first"; exit 1; }
 fi
-big=$(git diff --cached --name-only --diff-filter=AM -z | xargs -0 -I{} sh -c 'test -f "{}" && s=$(wc -c < "{}") && [ "$s" -gt 5000000 ] && echo "{} ($((s/1000000)) MB)"' || true)
-if [ -n "$big" ]; then echo "pre-commit: files over 5 MB staged:"; echo "$big"; exit 1; fi
+big=""
+while IFS= read -r -d '' f; do
+  [ -f "$f" ] || continue
+  sz=$(wc -c < "$f")
+  [ "$sz" -gt 5000000 ] && big="$big $f ($((sz / 1000000)) MB)"
+done < <(git diff --cached --name-only --diff-filter=AM -z)
+if [ -n "$big" ]; then echo "pre-commit: files over 5 MB staged:$big"; exit 1; fi
