@@ -1,0 +1,19 @@
+# Stage C6 (owner 2026-11-19): the long-context student at full scale. Same 1M windows (origins) as C2, teacher
+# Timestral-28M reading 2048 steps (the 209M ties the 28M at 1M windows: Stage C5a), student m with patch 64 x 32 tokens
+# (0.97M params), random history truncation p = 0.5 (better on GIFT-Eval in the C4 pilot), full 50k-step schedule
+# (no early stopping: it cost 3-10% in C5a). Contexts are memory-mapped (8 GB, see tinycast/data/corpus.py).
+name: stage_c6_ctx2048
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c2_ctx512
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+zoo: [toto-2.0-4m, timestral-5m, timestral-28m]
+arms:
+  - {name: c2_ctx512, type: existing, run: "stage_c2:kd_v2_1m"}
+  - {name: kd_ctx2048_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {student: {context_length: 2048, patch_size: 64}, data: {random_truncate: 0.5},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [kd_ctx2048_1m, c2_ctx512, "context 2048 (+ truncation) vs 512, 1M windows, Timestral-28M"]
+  - [kd_ctx2048_1m, "zoo:toto-2.0-4m", "2048 student vs Toto-2.0-4m (2048 context)"]
+  - [kd_ctx2048_1m, "zoo:timestral-5m", "2048 student vs Timestral-5M (2048 context)"]
