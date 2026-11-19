@@ -1,0 +1,13 @@
+{
+ "model": "tinycast-c4-ctx2048-trunc",
+ "onnx": "web/public/models/c4_kd_ctx2048_trunc.fp32.onnx",
+ "context_length": 2048,
+ "horizon": 64,
+ "terms": "short",
+ "gift_eval_commit": "0b57dd6937eb9a69a3ae771f73ab36188bb33e47",
+ "wall_seconds": 589.2,
+ "empty_context_rows": 489,
+ "empty_context_rule": "no observed history at all: forecast 0",
+ "gap_skipped_rows": 1132,
+ "gap_rule": "last 512 steps all missing: last 512 observed values"
+}

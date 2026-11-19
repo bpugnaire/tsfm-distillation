@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-14_stage_c2_kd_v2_300k",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 40.0,
+  "max_rel_diff": 9.76181254372932e-05,
+  "p99_rel_diff": 1.2721427538053831e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 1807504.0,
+  "max_rel_diff": 0.13380631804466248,
+  "p99_rel_diff": 0.03116360306739807,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}
