@@ -4,6 +4,7 @@
 
 | arm | rel. WQL | 95% CI | vs reference | 80% cov. |
 |---|---|---|---|---|
+| kd_209m_1m_full | 0.453 | [0.408, 0.503] | 0.990 [0.959, 1.021] | 0.83 |
 | c2_28m | 0.458 | [0.417, 0.503] | – | 0.83 |
 | kd_209m_1m | 0.506 | [0.461, 0.555] | 1.106 [1.066, 1.149] | 0.85 |
 | seasonal_naive | 1.000 | [1.000, 1.000] | – | 0.76 |
@@ -12,6 +13,8 @@ zero-shot models (same suite, same baseline): timestral-209m 0.402, toto-2.0-313
 
 | contrast (paired, same windows) | ratio a/b | 95% CI | verdict |
 |---|---|---|---|
+| teacher: Timestral-209M vs 28M, full 50k steps for both: `kd_209m_1m_full` vs `c2_28m` | 0.990 | [0.959, 1.021] | no detectable difference |
+| full schedule vs early-stopped (209M labels): `kd_209m_1m_full` vs `kd_209m_1m` | 0.895 | [0.865, 0.925] | a better |
 | teacher: Timestral-209M vs 28M (same 1M windows, 512 steps): `kd_209m_1m` vs `c2_28m` | 1.106 | [1.066, 1.149] | b better |
 | 209M-taught student vs Toto-2.0-4m zero-shot: `kd_209m_1m` vs `zoo:toto-2.0-4m` | 0.975 | [0.935, 1.018] | no detectable difference |
 | 209M-taught student vs Timestral-5M zero-shot: `kd_209m_1m` vs `zoo:timestral-5m` | 1.030 | [0.974, 1.083] | no detectable difference |
@@ -21,6 +24,7 @@ zero-shot models (same suite, same baseline): timestral-209m 0.402, toto-2.0-313
 
 | arm | rel. WQL | 95% CI | vs reference | 80% cov. |
 |---|---|---|---|---|
+| kd_209m_1m_full | 0.693 | [0.662, 0.729] | 0.995 [0.982, 1.008] | 0.78 |
 | c2_28m | 0.697 | [0.665, 0.731] | – | 0.77 |
 | kd_209m_1m | 0.713 | [0.682, 0.747] | 1.023 [1.005, 1.045] | 0.80 |
 | seasonal_naive | 1.000 | [1.000, 1.000] | – | 0.81 |
@@ -29,6 +33,8 @@ zero-shot models (same suite, same baseline): t0-gamma 0.511, chronos-2 0.614, t
 
 | contrast (paired, same windows) | ratio a/b | 95% CI | verdict |
 |---|---|---|---|
+| teacher: Timestral-209M vs 28M, full 50k steps for both: `kd_209m_1m_full` vs `c2_28m` | 0.995 | [0.982, 1.008] | no detectable difference |
+| full schedule vs early-stopped (209M labels): `kd_209m_1m_full` vs `kd_209m_1m` | 0.972 | [0.956, 0.989] | a better |
 | teacher: Timestral-209M vs 28M (same 1M windows, 512 steps): `kd_209m_1m` vs `c2_28m` | 1.023 | [1.005, 1.045] | b better |
 | 209M-taught student vs Toto-2.0-4m zero-shot: `kd_209m_1m` vs `zoo:toto-2.0-4m` | 0.990 | [0.963, 1.017] | no detectable difference |
 | 209M-taught student vs Timestral-5M zero-shot: `kd_209m_1m` vs `zoo:timestral-5m` | 1.081 | [1.056, 1.107] | b better |
@@ -38,6 +44,7 @@ zero-shot models (same suite, same baseline): t0-gamma 0.511, chronos-2 0.614, t
 
 | arm | rel. WQL | 95% CI | vs reference | 80% cov. |
 |---|---|---|---|---|
+| kd_209m_1m_full | 0.674 | [0.627, 0.721] | 0.998 [0.983, 1.016] | 0.70 |
 | c2_28m | 0.675 | [0.621, 0.730] | – | 0.69 |
 | kd_209m_1m | 0.707 | [0.660, 0.755] | 1.048 [1.028, 1.067] | 0.76 |
 | seasonal_naive | 1.000 | [1.000, 1.000] | – | 0.74 |
@@ -46,6 +53,8 @@ zero-shot models (same suite, same baseline): timestral-209m 0.614, timestral-28
 
 | contrast (paired, same windows) | ratio a/b | 95% CI | verdict |
 |---|---|---|---|
+| teacher: Timestral-209M vs 28M, full 50k steps for both: `kd_209m_1m_full` vs `c2_28m` | 0.998 | [0.983, 1.016] | no detectable difference |
+| full schedule vs early-stopped (209M labels): `kd_209m_1m_full` vs `kd_209m_1m` | 0.953 | [0.943, 0.963] | a better |
 | teacher: Timestral-209M vs 28M (same 1M windows, 512 steps): `kd_209m_1m` vs `c2_28m` | 1.048 | [1.028, 1.067] | b better |
 | 209M-taught student vs Toto-2.0-4m zero-shot: `kd_209m_1m` vs `zoo:toto-2.0-4m` | 0.998 | [0.976, 1.020] | no detectable difference |
 | 209M-taught student vs Timestral-5M zero-shot: `kd_209m_1m` vs `zoo:timestral-5m` | 1.104 | [1.067, 1.140] | b better |

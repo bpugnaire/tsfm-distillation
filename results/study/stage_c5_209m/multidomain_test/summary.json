@@ -3,6 +3,45 @@
  "baseline": "seasonal_naive",
  "rows": [
   {
+   "model": "kd_209m_1m_full",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.6933174183630348,
+   "rel_wql_ci": [
+    0.6618036442871155,
+    0.7288280453866711
+   ],
+   "rel_mase": 0.7539244709071332,
+   "rel_mase_ci": [
+    0.7193925916180341,
+    0.7886956659029684
+   ],
+   "mean_wql": 0.25036676666666663,
+   "mean_cov80": 0.78034995,
+   "mean_cov98": 0.9726893666666666,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
    "model": "c2_28m",
    "kind": "student",
    "n_params": 946368,
@@ -120,5 +159,5 @@
    "n_clusters": 425
   }
  ],
- "git_sha": "f6828743c2c4344ed4f2e27a8a5247ae12748449"
+ "git_sha": "16524b90502ede24e87d9f3ed97fcfdf11afc204"
 }

@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-19_stage_c5_209m_kd_209m_1m_full",
+ "n_params": 946368,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 58.0,
+  "max_rel_diff": 9.759197564562783e-05,
+  "p99_rel_diff": 1.333101067757525e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.915
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 905096.0,
+  "max_rel_diff": 0.16327670216560364,
+  "p99_rel_diff": 0.038002438843250275,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.269
+ }
+}

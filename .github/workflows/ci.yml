@@ -1,5 +1,11 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore: ["docs/**", "results/**", "**/*.md", "web/public/data/**"]
+  pull_request:
+concurrency:  # a newer push cancels the older run instead of queueing both
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest

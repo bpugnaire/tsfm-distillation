@@ -1,4 +1,5 @@
 {
  "c2_28m": "runs/2026-11-15_stage_c2_kd_v2_1m",
- "kd_209m_1m": "runs/2026-11-19_stage_c5_209m_kd_209m_1m"
+ "kd_209m_1m": "runs/2026-11-19_stage_c5_209m_kd_209m_1m",
+ "kd_209m_1m_full": "runs/2026-11-19_stage_c5_209m_kd_209m_1m_full"
 }

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Same checks as CI (.github/workflows/ci.yml), before every commit. Install once: `make hooks`.
+set -e
+cd "$(git rev-parse --show-toplevel)"
+uv run --quiet ruff check . || { echo "pre-commit: ruff check failed (try: uv run ruff check --fix .)"; exit 1; }
+uv run --quiet ruff format --check . > /dev/null || { echo "pre-commit: run 'uv run ruff format .' first"; exit 1; }
+# no large files in the public repo (raw forecasts once added ~1 GB): 5 MB per staged file
+big=$(git diff --cached --name-only --diff-filter=AM -z | xargs -0 -I{} sh -c 'test -f "{}" && s=$(wc -c < "{}") && [ "$s" -gt 5000000 ] && echo "{} ($((s/1000000)) MB)"' || true)
+if [ -n "$big" ]; then echo "pre-commit: files over 5 MB staged:"; echo "$big"; exit 1; fi

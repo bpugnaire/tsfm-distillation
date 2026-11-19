@@ -1,10 +1,10 @@
-.PHONY: setup lint format test test-all data cache train bench export web-data web-dev web-build figures
+.PHONY: hooks setup lint format test test-all data cache train bench export web-data web-dev web-build figures
 
 UV := uv run
 
 setup:
 	uv sync --extra teachers
-	$(UV) pre-commit install || true
+	$(MAKE) hooks
 
 lint:
 	$(UV) ruff check .
@@ -51,3 +51,7 @@ web-build:
 
 figures:
 	$(UV) python scripts/make_figures.py
+
+# make hooks: run the CI lint checks (and a 5 MB file-size guard) before every commit
+hooks:
+	git config core.hooksPath scripts/git-hooks
