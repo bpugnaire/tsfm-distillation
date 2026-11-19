@@ -173,7 +173,12 @@ def main() -> None:
     ap.add_argument("--name", required=True)
     ap.add_argument("--terms", default="short")
     ap.add_argument("--datasets", default=None)
-    ap.add_argument("--context", type=int, default=512, help="history the ONNX student reads (its trained context)")
+    ap.add_argument(
+        "--context",
+        type=int,
+        default=512,
+        help="history the ONNX student reads (its trained context)",
+    )
     a = ap.parse_args()
     metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(), RMSE(),
                NRMSE(), ND(), MeanWeightedSumQuantileLoss(quantile_levels=GIFT_LEVELS)]  # fmt: skip
