@@ -11,7 +11,13 @@ arms:
   - {name: c2_28m, type: existing, run: "stage_c2:kd_v2_1m"}
   - {name: kd_209m_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
      override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500}}}
+  # kd_209m_1m early-stopped at 32.5k steps (patience 4) and never finished the cosine decay; every other 1M-window
+  # run did all 50k steps. Same arm with early stopping off, for a fair teacher comparison.
+  - {name: kd_209m_1m_full, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
 pairs:
+  - [kd_209m_1m_full, c2_28m, "teacher: Timestral-209M vs 28M, full 50k steps for both"]
+  - [kd_209m_1m_full, kd_209m_1m, "full schedule vs early-stopped (209M labels)"]
   - [kd_209m_1m, c2_28m, "teacher: Timestral-209M vs 28M (same 1M windows, 512 steps)"]
   - [kd_209m_1m, "zoo:toto-2.0-4m", "209M-taught student vs Toto-2.0-4m zero-shot"]
   - [kd_209m_1m, "zoo:timestral-5m", "209M-taught student vs Timestral-5M zero-shot"]
