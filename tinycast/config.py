@@ -99,7 +99,7 @@ def to_dict(cfg: Any) -> dict[str, Any]:
 
 @dataclasses.dataclass
 class StudentConfig:
-    arch: str = "patch_transformer"  # or "mlp"
+    arch: str = "patch_transformer"  # or "patch_transformer_mt" (one query token per output block, ADR 0008), "mlp"
     context_length: int = 512
     horizon: int = 64
     patch_size: int = 16
@@ -110,6 +110,7 @@ class StudentConfig:
     dropout: float = 0.1
     use_asinh: bool = True
     quantile_levels: tuple[float, ...] = QUANTILE_LEVELS
+    out_patch_size: int = 16  # patch_transformer_mt: forecast steps decoded by each query token
 
 
 @dataclasses.dataclass

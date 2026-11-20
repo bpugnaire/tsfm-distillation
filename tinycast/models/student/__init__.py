@@ -119,6 +119,57 @@ class PatchTransformerNet(nn.Module):
         return self.head(self.norm(h[:, -1]))
 
 
+class MultiTokenNet(nn.Module):
+    """Patch transformer with one learned query token per output block (ADR 0008).
+
+    The single-query net squeezes the whole forecast (13 levels x 64 steps) out of one d_model vector through one linear
+    layer. Here each block of `out_patch_size` future steps has its own query token; a shared monotone head decodes each
+    token into its block. Two-stream attention as in Timestral: context tokens attend only to the context, query tokens
+    attend to the context and to each other. Fewer parameters than the single-query head (d x 13 x 16 vs d x 13 x 64).
+    """
+
+    def __init__(self, c: StudentConfig):
+        super().__init__()
+        if c.horizon % c.out_patch_size:
+            raise ValueError(
+                f"horizon {c.horizon} must be a multiple of out_patch_size {c.out_patch_size}"
+            )
+        self.c = c
+        self.n_patches = c.context_length // c.patch_size
+        self.n_queries = c.horizon // c.out_patch_size
+        self.embed = nn.Sequential(
+            nn.Linear(2 * c.patch_size, c.d_model * 2),
+            nn.GELU(),
+            nn.Linear(c.d_model * 2, c.d_model),
+        )
+        n = self.n_patches + self.n_queries
+        self.pos = nn.Parameter(torch.randn(1, n, c.d_model) * 0.02)
+        self.queries = nn.Parameter(torch.randn(1, self.n_queries, c.d_model) * 0.02)
+        block = torch.zeros(n, n, dtype=torch.bool)  # True = not allowed to attend
+        block[: self.n_patches, self.n_patches :] = (
+            True  # context does not look at the forecast tokens
+        )
+        self.register_buffer("attn_mask", block, persistent=False)
+        layer = nn.TransformerEncoderLayer(
+            c.d_model, c.n_heads, c.d_model * c.ff_mult, c.dropout, activation="gelu",
+            batch_first=True, norm_first=True,
+        )  # fmt: skip
+        self.encoder = nn.TransformerEncoder(layer, c.n_layers, enable_nested_tensor=False)
+        self.norm = nn.LayerNorm(c.d_model)
+        self.head = MonotoneQuantileHead(c.d_model, c.out_patch_size, c.quantile_levels)
+
+    def forward(self, z: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        B, p, Q = z.shape[0], self.c.patch_size, self.n_queries
+        zp = z.view(B, self.n_patches, p)
+        mp = mask.view(B, self.n_patches, p).to(z.dtype)
+        tok = self.embed(torch.cat([zp * mp, mp], dim=-1))
+        tok = torch.cat([tok, self.queries.expand(B, -1, -1)], dim=1) + self.pos
+        h = self.norm(self.encoder(tok, mask=self.attn_mask)[:, -Q:])  # (B, Q, d)
+        q = self.head(h.reshape(B * Q, -1))  # (B*Q, K, out_patch)
+        K = q.shape[1]
+        return q.view(B, Q, K, -1).permute(0, 2, 1, 3).reshape(B, K, Q * self.c.out_patch_size)
+
+
 class MLPNet(nn.Module):
     """N-HiTS-flavoured MLP ablation: flatten (values, mask) -> residual MLP -> quantile head."""
 
@@ -149,7 +200,14 @@ class Student(nn.Module):
         super().__init__()
         self.c = c
         self.scaler = RobustScaler(c.use_asinh)
-        self.net = PatchTransformerNet(c) if c.arch == "patch_transformer" else MLPNet(c)
+        nets = {
+            "patch_transformer": PatchTransformerNet,
+            "patch_transformer_mt": MultiTokenNet,
+            "mlp": MLPNet,
+        }
+        if c.arch not in nets:
+            raise ValueError(f"unknown student arch {c.arch!r}")
+        self.net = nets[c.arch](c)
 
     def prepare(self, x: torch.Tensor):
         """Left-pad/crop to context_length; returns scaled input, mask, loc, scale."""
