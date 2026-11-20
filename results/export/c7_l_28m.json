@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-20_stage_c7_size_l_28m",
+ "n_params": 2923264,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 22.0,
+  "max_rel_diff": 9.729368321131915e-05,
+  "p99_rel_diff": 1.6332155610143673e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 11.879
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 1056946.5,
+  "max_rel_diff": 0.15385344624519348,
+  "p99_rel_diff": 0.04557483270764351,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.501
+ }
+}

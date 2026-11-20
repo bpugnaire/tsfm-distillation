@@ -1,0 +1,124 @@
+{
+ "suite": "multidomain_test_ctx2048",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "kd_ctx2048_1m",
+   "kind": "student",
+   "n_params": 970944,
+   "size_mb": 3.91,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.660159333775044,
+   "rel_wql_ci": [
+    0.6258091742130666,
+    0.6995017984818664
+   ],
+   "rel_mase": 0.7420529091679898,
+   "rel_mase_ci": [
+    0.7091024603742142,
+    0.7766322636982249
+   ],
+   "mean_wql": 0.23295719999999998,
+   "mean_cov80": 0.8081869833333334,
+   "mean_cov98": 0.9785079666666667,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "c2_ctx512",
+   "kind": "student",
+   "n_params": 946368,
+   "size_mb": 3.81,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.678755733486879,
+   "rel_wql_ci": [
+    0.6439048465007176,
+    0.713931545704402
+   ],
+   "rel_mase": 0.7504520467052707,
+   "rel_mase_ci": [
+    0.7116760914279437,
+    0.7881703618018728
+   ],
+   "mean_wql": 0.25230775000000005,
+   "mean_cov80": 0.7721420666666666,
+   "mean_cov98": 0.9611027,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  },
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.42834823333333333,
+   "mean_cov80": 0.6717479333333334,
+   "mean_cov98": 0.9441402166666666,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 600,
+   "n_clusters": 425
+  }
+ ],
+ "git_sha": "e550b9d33d8f89f6075553a4525dd23a11144767-dirty"
+}

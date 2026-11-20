@@ -363,3 +363,34 @@ Teacher labelling speed at 2048 vs 512 context: Timestral-28M CPU 116 vs 372 w/s
 **Surprise / learned:** reading variates jointly gives Toto nothing here; context length is worth ~7% for Toto; 9% remains at equal
 context and equal univariate setup (size, data coverage: worst on covid_deaths, us_births/D, 10 s and 10 min data).
 **Next:** pilot of a 2048-context student (patch 64, same 32 tokens) on the C2 300k windows, proposed to the owner.
+
+## 2026-11-20 — Explainer posts: training data, and the student traced layer by layer
+**Did:** two new site posts (`web/post-data.html`, `web/post-student.html`) fed by `scripts/build_explainers.py` →
+`web/public/data/explain.json`. The script rebuilds the published student's training corpus with the training code and checks it
+window id by window id against `data/processed/corpus_train_48dd0113d4.npz`. It reads example labels from the Toto cache
+shards, and runs the C3 Toto checkpoint layer by layer on one fresh France window, checked against `Student.forward`.
+**Result:** corpus = 500,000 real windows (18,114 series, 41 datasets, 302 of 18,416 candidate series dropped by the
+contamination filter) + 500,000 synthetic (200,140 Gaussian-process, 200,201 shapes, 99,659 mixes). Labels: 245 shards,
+1.70 GB. Parameters: 946,368, of which feed-forward 56%, attention 28%, head 11% (the head and the 33-row position table
+fix the output and input range). Scale check: input × 1000 + 50,000 moves the forecast identically to within 0.002% of the
+scale. The trace reproduces `Student.forward` exactly.
+**Surprise / learned:** the data v2 sampler only uses part of each series' stride-64 grid (80 of 190 slots on the example
+traffic sensor), because of the per-dataset quota. Energy + traffic make up 64% of the real windows: the quota is per dataset,
+and those two domains have the most datasets.
+**Next:** owner review of the two pages in a browser; C7 (2.9M) result to fill the "bigger still" row (TBD).
+
+## 2026-11-20 — Stage C6 (2048-step student, 1M windows) and C7 (2.9M student, 28M vs 209M labels)
+**Did:** C6: same 1M windows as C2, Timestral-28M labels at 2048 steps, patch 64 x 32 tokens, truncation p 0.5, full 50k steps.
+C7: student l (d_model 192, 6 layers, 2.92M params) on the C2 windows with Timestral-28M and 209M labels. All on our suites and
+GIFT-Eval short-term (55 configs). (The Mac slept 12.5 h with the lid closed on battery; synthetic generation at 2112 points cost
+~5 h because GP sampling grows ~cubically with length.)
+**Result:** GIFT-Eval CRPS (ratio to Seasonal Naive) and paired vs C2 (m, 512, 28M labels, 0.616): C5 m+209M 0.612 (0.995),
+C6 2048 0.603 (0.979 [0.951, 1.009]), C7 l+28M 0.608 (0.988), l+209M 0.607 (0.986 [0.974, 0.997]); Toto-2.0-4m at 512 0.563
+(0.915), at 4096 0.527, Timestral-5M 0.494. Our suites: C6 vs C2 = shapes 1.00, multi-domain 0.97 (ns), electricity 1.06 (worse);
+C7 209M vs 28M labels with student l = 0.97 / 0.99 / 0.98 (ns), with student m = 0.99 / 1.00 / 1.00; l vs m = 0.98 on multi-domain.
+**Surprise / learned:** no single lever moves the student more than ~2%: 3x the parameters gives ~1.4%, a better teacher ~0.5%,
+4x the context ~2%. The 9% gap to Toto-4m at equal context is not size, teacher or history. Candidate: the architecture's output
+bottleneck (one summary vector decodes all 13 x 64 outputs; Toto and Timestral decode per-patch tokens), the same change the
+long-horizon note proposes. The 209M advantage grows a little with the bigger student (0.5% -> 1.5-3%), consistent with a weak
+capacity gap, not significant.
+**Next:** ADR for a multi-token decoder student (also needed for long horizons); test at 300k windows first.
