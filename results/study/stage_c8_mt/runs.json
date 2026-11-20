@@ -1,0 +1,4 @@
+{
+ "c2_single_300k": "runs/2026-11-14_stage_c2_kd_v2_300k",
+ "kd_mt_300k": "runs/2026-11-20_stage_c8_mt_kd_mt_300k"
+}

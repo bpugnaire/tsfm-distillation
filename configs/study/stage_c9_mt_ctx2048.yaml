@@ -1,0 +1,15 @@
+# Stage C9 (branch A, 2048-step part): multi-token decoder with the C6 corpus and labels (cached), vs C6's single token.
+name: stage_c9_mt_ctx2048
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c6_single_2048
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+zoo: [toto-2.0-4m, timestral-5m, timestral-28m]
+arms:
+  - {name: c6_single_2048, type: existing, run: "stage_c6_ctx2048:kd_ctx2048_1m"}
+  - {name: mt_2048_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt, context_length: 2048, patch_size: 64}, data: {random_truncate: 0.5},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [mt_2048_1m, c6_single_2048, "multi-token vs single token, 2048 steps, 1M windows"]
+  - [mt_2048_1m, "zoo:toto-2.0-4m", "multi-token 2048 student vs Toto-2.0-4m (2048 context)"]

@@ -1,0 +1,22 @@
+# Stage C9 (night 2026-11-21, branch A of the plan): the multi-token decoder (ADR 0008) at scale. Training only: every label
+# set is cached. Each arm pairs with the single-token student of the same setup. Early stopping off, full schedules.
+name: stage_c9_mt_scale
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c2_single_1m
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: c2_single_1m, type: existing, run: "stage_c2:kd_v2_1m"}
+  - {name: c7_single_l_209m, type: existing, run: "stage_c7_size:l_209m"}
+  - {name: mt_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+  - {name: mt_l_1m_209m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0, teacher: timestral-209m,
+     override: {student: {arch: patch_transformer_mt, d_model: 192, n_layers: 6, n_heads: 6},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [mt_1m, c2_single_1m, "multi-token vs single token, 1M windows, 512 steps, 28M labels"]
+  - [mt_l_1m_209m, c7_single_l_209m, "multi-token vs single token, student l, 209M labels"]
+  - [mt_l_1m_209m, mt_1m, "multi-token: student l + 209M labels vs m + 28M labels"]
+  - [mt_1m, "zoo:toto-2.0-4m", "multi-token student vs Toto-2.0-4m zero-shot"]
+  - [mt_l_1m_209m, "zoo:toto-2.0-4m", "multi-token l student vs Toto-2.0-4m zero-shot"]
