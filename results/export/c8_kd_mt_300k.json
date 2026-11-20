@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-20_stage_c8_mt_kd_mt_300k",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 42.0,
+  "max_rel_diff": 9.754554048413411e-05,
+  "p99_rel_diff": 1.3875687727704644e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 2302702.0,
+  "max_rel_diff": 0.16784997284412384,
+  "p99_rel_diff": 0.03446706756949425,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}
