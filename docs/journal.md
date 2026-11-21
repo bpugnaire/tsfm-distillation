@@ -394,3 +394,17 @@ bottleneck (one summary vector decodes all 13 x 64 outputs; Toto and Timestral d
 long-horizon note proposes. The 209M advantage grows a little with the bigger student (0.5% -> 1.5-3%), consistent with a weak
 capacity gap, not significant.
 **Next:** ADR for a multi-token decoder student (also needed for long horizons); test at 300k windows first.
+
+## 2026-11-21 — Stage C9 (night): the multi-token decoder at scale
+**Did:** multi-token students (ADR 0008) on cached labels, each paired with its single-token twin: m 512 steps 28M labels (vs C2),
+l 2.9M 512 steps 209M labels (vs C7 l_209m), m 2048 steps + truncation 28M labels (vs C6). Our suites + GIFT-Eval (55 configs).
+**Result:** GIFT-Eval CRPS (ratio to Seasonal Naive) and paired vs the twin: m 512 0.603 (0.979 [0.959, 0.997], 33/55 better),
+l 209M 0.598 (0.986 [0.973, 0.999]), m 2048 0.603 (0.999, ns). Our suites vs twin: m 512 = shapes 1.024 (worse), multi-domain
+0.985, electricity 1.045 (worse); l 209M = shapes 0.893, multi-domain 0.983, electricity 1.022 (ns); m 2048 = 1.029 / 0.993 /
+1.005. Best student so far on GIFT-Eval: multi-token l + 209M labels (0.598); at 512 steps Toto-2.0-4m is 0.563 (gap 6%, was 9%).
+The l multi-token student beats Toto-2.0-4m on all three of our suites (0.78 / 0.93 / 0.94).
+**Surprise / learned:** the pilot's consistent 2-3% gain (300k windows) shrinks at 1M windows and turns mixed on our small suites
+(worse on electricity and shapes for size m); on GIFT-Eval it holds at ~2% for 512 steps and vanishes at 2048 steps. Gains
+do not add up: context, decoder, size and teacher each give 1-2% and overlap. The largest single combination effect is the
+bigger student with the multi-token decoder and 209M labels (shapes 0.865 vs the m multi-token student).
+**Next:** decide the default student (m multi-token, 512) and the release candidate; data mix / volume is the remaining lever.

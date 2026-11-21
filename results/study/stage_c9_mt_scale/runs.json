@@ -1,0 +1,6 @@
+{
+ "c2_single_1m": "runs/2026-11-15_stage_c2_kd_v2_1m",
+ "c7_single_l_209m": "runs/2026-11-20_stage_c7_size_l_209m",
+ "mt_1m": "runs/2026-11-21_stage_c9_mt_scale_mt_1m",
+ "mt_l_1m_209m": "runs/2026-11-21_stage_c9_mt_scale_mt_l_1m_209m"
+}

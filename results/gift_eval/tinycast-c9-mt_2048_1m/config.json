@@ -1,0 +1,13 @@
+{
+ "model": "tinycast-c9-mt_2048_1m",
+ "onnx": "web/public/models/c9_mt_2048_1m.fp32.onnx",
+ "context_length": 2048,
+ "horizon": 64,
+ "terms": "short",
+ "gift_eval_commit": "0b57dd6937eb9a69a3ae771f73ab36188bb33e47",
+ "wall_seconds": 590.0,
+ "empty_context_rows": 489,
+ "empty_context_rule": "no observed history at all: forecast 0",
+ "gap_skipped_rows": 1132,
+ "gap_rule": "last 512 steps all missing: last 512 observed values"
+}

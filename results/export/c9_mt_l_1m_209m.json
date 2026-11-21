@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c9_mt_scale_mt_l_1m_209m",
+ "n_params": 2803984,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 68.0,
+  "max_rel_diff": 9.76381852524355e-05,
+  "p99_rel_diff": 1.6120510508699226e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 11.438
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 2522980.0,
+  "max_rel_diff": 0.1682913899421692,
+  "p99_rel_diff": 0.037781428545713425,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.414
+ }
+}
