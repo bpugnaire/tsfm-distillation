@@ -1,0 +1,14 @@
+# Stage C14 (night 2026-11-21): capacity gap, the other way round. Does a SMALLER teacher (Timestral-5M, 5.2M params, GIFT-Eval
+# 0.494) teach a 1M student as well as Timestral-28M (0.478) or 209M (0.465)? It labels several times faster, which matters
+# for scaling data. Same 1M windows (key 48dd0113d4), multi-token student m, 512 steps, 50k steps; reference: C9 mt_1m (28M).
+name: stage_c14_teacher5m
+base: configs/train/study_base_m.yaml
+teacher: timestral-5m
+reference_arm: kd28m_1m
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: kd28m_1m, type: existing, run: "stage_c9_mt_scale:mt_1m"}
+  - {name: kd5m_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt}, optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [kd5m_1m, kd28m_1m, "teacher Timestral-5M vs 28M (same 1M windows, multi-token student)"]
