@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c13_gt_vs_kd_mix_300k",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 36.0,
+  "max_rel_diff": 9.750464232638478e-05,
+  "p99_rel_diff": 1.2863233678217512e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 1220526.0,
+  "max_rel_diff": 0.10839737206697464,
+  "p99_rel_diff": 0.0310615636408329,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

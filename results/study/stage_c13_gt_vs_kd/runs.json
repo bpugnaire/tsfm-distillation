@@ -1,0 +1,8 @@
+{
+ "kd_300k": "runs/2026-11-20_stage_c8_mt_kd_mt_300k",
+ "kd_1m": "runs/2026-11-21_stage_c9_mt_scale_mt_1m",
+ "gt_300k": "runs/2026-11-21_stage_c13_gt_vs_kd_gt_300k",
+ "mix_300k": "runs/2026-11-21_stage_c13_gt_vs_kd_mix_300k",
+ "gt_1m": "runs/2026-11-21_stage_c13_gt_vs_kd_gt_1m",
+ "mix_1m": "runs/2026-11-21_stage_c13_gt_vs_kd_mix_1m"
+}

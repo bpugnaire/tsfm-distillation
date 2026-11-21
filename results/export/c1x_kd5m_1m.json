@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c14_teacher5m_kd5m_1m",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 11.0,
+  "max_rel_diff": 9.75013172137551e-05,
+  "p99_rel_diff": 1.2876577102360898e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 1104995.0,
+  "max_rel_diff": 0.17485688626766205,
+  "p99_rel_diff": 0.03561935946345329,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

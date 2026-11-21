@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c12_varctx_mt_2048_p16_var",
+ "n_params": 878928,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 327680.0,
+  "max_rel_diff": 9.742831025505438e-05,
+  "p99_rel_diff": 1.3664349580722046e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.928
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 5137186816.0,
+  "max_rel_diff": 0.0812206044793129,
+  "p99_rel_diff": 0.02443714439868927,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.518
+ }
+}

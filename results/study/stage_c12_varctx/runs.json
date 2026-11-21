@@ -1,0 +1,5 @@
+{
+ "c11_full_hist": "runs/2026-11-21_stage_c11_ctx_mt_2048_p16",
+ "c8_512": "runs/2026-11-20_stage_c8_mt_kd_mt_300k",
+ "mt_2048_p16_var": "runs/2026-11-21_stage_c12_varctx_mt_2048_p16_var"
+}

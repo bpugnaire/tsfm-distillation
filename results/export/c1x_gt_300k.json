@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c13_gt_vs_kd_gt_300k",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 84.0,
+  "max_rel_diff": 9.755234350450337e-05,
+  "p99_rel_diff": 1.286187057303323e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 2039700.0,
+  "max_rel_diff": 0.14479395747184753,
+  "p99_rel_diff": 0.030916694551706314,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

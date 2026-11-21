@@ -1,0 +1,4 @@
+{
+ "kd28m_1m": "runs/2026-11-21_stage_c9_mt_scale_mt_1m",
+ "kd5m_1m": "runs/2026-11-21_stage_c14_teacher5m_kd5m_1m"
+}

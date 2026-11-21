@@ -437,3 +437,22 @@ per-dataset quota shrinks, so it may need more windows to pay. Fine-resolution l
 trained on mostly full 2048-step contexts, the student sees short GIFT series as 80-90% padding. Truncation would fix the
 mismatch but breaks label consistency; the clean fix is variable-length contexts in the corpus, labelled by the teacher as cut.
 **Next:** owner decision: variable-length-context corpus (consistent labels), pipeline overlap + batch-size benchmark.
+
+## 2026-11-22 — Night: C12 (variable histories), C13 (real future vs teacher vs mix), C14 (Timestral-5M teacher)
+**Did:** C12: 2048-step multi-token student (patch 16) on a corpus where half the windows were cut to a random history length
+before Timestral-28M labelled them. C13: multi-token student m, 512 steps, trained on the real future (alpha 0), a 50/50 mix
+(0.5) and teacher labels (1, existing) at 300k and 1M windows. C14: Timestral-5M as teacher on the 1M windows. All on our
+suites and GIFT-Eval (4 parallel workers). Pipelined runs (labels on CPU during training). The batch-size benchmark ran out
+of MPS memory at its largest setting and its printed lines were lost (piped through tail): to redo.
+**Result (GIFT-Eval CRPS, ratio to Seasonal Naive):** real future 0.679 (300k) / 0.664 (1M); mix 0.644 / 0.621; teacher labels
+0.624 / 0.603. Teacher vs real future, paired: 0.919 [0.894, 0.945] at 300k, 0.908 [0.878, 0.934] at 1M, better on 50/55
+configs both times; mix vs teacher at 1M 1.031 (teacher better). Timestral-5M teacher: 0.593, vs 28M 0.984 [0.965, 1.003]
+(33/55): the best student under 1M so far. Variable histories: 0.622 vs 0.621 (no change). Our suites disagree on shapes:
+real future beats teacher labels there (KD/GT 1.10 at 300k, 1.19 at 1M) while teacher labels win on electricity (0.95, 0.96)
+and tie on the public datasets.
+**Surprise / learned:** at 300k -> 1M windows the distillation advantage on GIFT-Eval does not shrink (8.1% -> 9.2%): we are
+well below the threshold where supervised training catches up. The shapes suite favours ground truth because half the
+training data is synthetic with exact generator continuations, i.e. shapes are in-distribution for ground-truth training:
+GIFT-Eval is the honest guide. A smaller, faster teacher (5M) is at least as good for a 1M student (capacity gap).
+Consistent variable-length labels did not fix long-history use.
+**Next:** Timestral-5M labels for data scaling (faster); redo the batch-size benchmark without the OOM setting.
