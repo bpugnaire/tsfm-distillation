@@ -408,3 +408,19 @@ The l multi-token student beats Toto-2.0-4m on all three of our suites (0.78 / 0
 do not add up: context, decoder, size and teacher each give 1-2% and overlap. The largest single combination effect is the
 bigger student with the multi-token decoder and 209M labels (shapes 0.865 vs the m multi-token student).
 **Next:** decide the default student (m multi-token, 512) and the release candidate; data mix / volume is the remaining lever.
+
+## 2026-11-21 — Inference tricks, raws-labs/tinycast at equal history, data v3
+**Did:** (1) GIFT-Eval of the C9 multi-token student (m, 512) with flip symmetrisation, Reverso-style downsampling (M = 8
+cycles, beta = 4), and both (`scripts/gift_eval_student.py --flip --downsample`). (2) raws-labs/tinycast through their own
+eval loop with histories cut to 2048 and 512 raw steps (`scripts/gift_eval_raws.py`, MPS; full history reproduces the
+leaderboard within 1%). (3) Data v3: v2 + 18 GiftEvalPretrain subsets (bull, cockatoo, hog, pdb excluded as fev tasks).
+**Result:** flip: CRPS 0.603 -> 0.596 (0.989 [0.973, 1.004]), MASE unchanged. Downsampling: worse, CRPS 1.031 [1.010, 1.058],
+MASE 1.040; it fires on ~27% of series (k = 4-5 on 5-min data), big wins on bizitobs 10 s (-17%) but losses on 5-min sets
+(bizitobs_l2c/5T +54%). raws-labs/tinycast: full 0.570, 2048 raw steps 0.571, 512 raw steps 0.612 (MASE 0.819); ours at 512:
+0.603 (MASE 0.801), at 2048: 0.603. Data v3: 49,200 series (v2 18,114), 55 datasets, same 302 dropped, but only 0.30B points
+(v2 0.26B) because of the 15M-points cap per subset.
+**Surprise / learned:** at equal 512-step history our 0.87M student beats the 146k model; its whole lead is long history
+(+7% from 512 to 2048), which our students cannot use (0.603 at both). Reverso's downsampling rule is calibrated for a
+2048-step context: scaled to 512 it fires 4x more often and hurts. Flip is a small, cheap gain (~1%, borderline).
+**Next:** pilots on 300k windows: data v3 vs v2; long history at fine resolution (2048 steps, patch 16 = 128 tokens, or a
+multi-scale input).
