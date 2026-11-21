@@ -24,7 +24,7 @@ from tinycast.data.synthetic import TRAIN_SEED_MAX, synthetic_batch
 from tinycast.data.windows import window_id
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCES = ("multidomain", "multidomain_v2", "synth", "rollout", "noise", "rte")
+SOURCES = ("multidomain", "multidomain_v2", "multidomain_v3", "synth", "rollout", "noise", "rte")
 
 
 @dataclass(frozen=True)
@@ -114,6 +114,21 @@ def _multidomain_v2(spec: CorpusSpec, n: int):
     return [window_id("md2", i, 0) for i in ids], ctx, fut
 
 
+def _multidomain_v3(spec: CorpusSpec, n: int):
+    """Data v3 (2026-11-21): v2 + 18 more GiftEvalPretrain subsets, capped by time points per subset."""
+    from tinycast.data.sources import data_v2 as V
+
+    ctx, fut, ids, _, quota = V.windows_v2(
+        V.load_v2("v3"), spec.split, n, spec.seed, spec.context_length, spec.horizon
+    )
+    if len(ids) < n:
+        print(
+            f"  multidomain_v3: only {len(ids)} distinct windows available (asked {n})", flush=True
+        )
+    print(f"  multidomain_v3 windows per dataset: {quota}", flush=True)
+    return [window_id("md3", i, 0) for i in ids], ctx, fut
+
+
 def _synth(spec: CorpusSpec, n: int):
     seeds = _synth_seeds(spec.split, n, spec.seed)
     c, f = synthetic_batch(seeds, spec.context_length, spec.horizon)
@@ -189,6 +204,7 @@ def _rollout(spec: CorpusSpec, n: int, log=print):
 BUILDERS = {
     "multidomain": _multidomain,
     "multidomain_v2": _multidomain_v2,
+    "multidomain_v3": _multidomain_v3,
     "synth": _synth,
     "noise": _noise,
     "rte": _rte,

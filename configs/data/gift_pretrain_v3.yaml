@@ -1,0 +1,80 @@
+# Data v3 (owner 2026-11-21: "include a bit more data"): the 46 v2 subsets (same rules, see gift_pretrain_v2.yaml) +
+# 18 more GiftEvalPretrain subsets (~13 GB). Still excluded: retail; fev test tasks (bull, cockatoo, hog, pdb, gfc12/14/17,
+# kdd2022); pedestrian_counts; duplicates of chronos datasets we load; the very large buildings_900k / cmip6 / era5 / borg /
+# azure (size, for now). Every series is checked against GIFT-Eval + fev + our targets (series-level filter).
+# Caps per subset: max_series series, then max_points time points (random series dropped until it fits).
+repo: Salesforce/GiftEvalPretrain
+max_series: 20000
+max_points: 15000000
+subsets:
+  # web
+  wiki-rolling_nips: web
+  kaggle_web_traffic_weekly: web
+  # road sensors / transit
+  PEMS03: traffic
+  PEMS04: traffic
+  PEMS08: traffic
+  PEMS_BAY: traffic
+  LOS_LOOP: traffic
+  traffic_weekly: traffic
+  BEIJING_SUBWAY_30MIN: transit
+  SHMETRO: transit
+  HZMETRO: transit
+  uber_tlc_hourly: mobility
+  uber_tlc_daily: mobility
+  # environment / climate
+  beijing_air_quality: air
+  china_air_quality: air
+  subseasonal: climate
+  subseasonal_precip: climate
+  sunspot_with_missing: nature
+  # health
+  cdc_fluview_ilinet: health
+  cdc_fluview_who_nrevss: health
+  project_tycho: health
+  covid_mobility: health
+  # business / finance / competitions
+  godaddy: business
+  bitcoin_with_missing: finance
+  nn5_daily_with_missing: finance
+  m1_monthly: competition
+  monash_m3_monthly: competition
+  monash_m3_quarterly: competition
+  tourism_quarterly: tourism
+  cif_2016_12: competition
+  # energy (allowed since 2026-11-14; never the RTE target series)
+  solar_power: energy
+  wind_power: energy
+  lcl: energy
+  london_smart_meters_with_missing: energy
+  australian_electricity_demand: energy
+  bdg-2_panther: energy
+  bdg-2_bear: energy
+  bdg-2_fox: energy
+  bdg-2_rat: energy
+  ideal: energy
+  spain: energy
+  elecdemand: energy
+  sceaux: energy
+  borealis: energy
+  smart: energy
+  covid19_energy: energy
+  # added in v3 (2026-11-21)
+  cif_2016_6: competition
+  elf: energy
+  m1_quarterly: competition
+  m1_yearly: competition
+  monash_m3_other: competition
+  monash_m3_yearly: competition
+  nn5_weekly: finance
+  tourism_yearly: tourism
+  vehicle_trips_with_missing: mobility
+  oikolab_weather: climate
+  PEMS07: traffic
+  wind_farms_with_missing: energy
+  Q-TRAFFIC: traffic
+  extended_web_traffic_with_missing: web
+  residential_pv_power: energy
+  residential_load_power: energy
+  alibaba_cluster_trace_2018: cloud
+  largest_2017: traffic

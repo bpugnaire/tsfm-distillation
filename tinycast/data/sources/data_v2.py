@@ -57,7 +57,7 @@ def season_of(freq: str) -> int:
 
 
 def _arrow_series(
-    path: Path, name: str, rng: np.random.Generator, prefix: str = ""
+    path: Path, name: str, rng: np.random.Generator, prefix: str = "", max_series: int = MAX_SERIES
 ) -> list[Series]:
     with ipc.open_stream(path) as r:
         t = r.read_all()
@@ -78,21 +78,41 @@ def _arrow_series(
                     season_of(freq),
                 )
             )
-    if len(out) > MAX_SERIES:
-        out = [out[k] for k in sorted(rng.choice(len(out), MAX_SERIES, replace=False))]
+    if len(out) > max_series:
+        out = [out[k] for k in sorted(rng.choice(len(out), max_series, replace=False))]
     return out
 
 
-def load_gift_pretrain(cfg_path: Path | None = None) -> list[Series]:
-    cfg = yaml.safe_load(
-        (cfg_path or ROOT / "configs" / "data" / "gift_pretrain_v2.yaml").read_text()
-    )
+VERSIONS = {  # data version -> (subset config, index cache); v2 behaviour is unchanged (1,500 series per file)
+    "v2": (ROOT / "configs" / "data" / "gift_pretrain_v2.yaml", INDEX),
+    "v3": (
+        ROOT / "configs" / "data" / "gift_pretrain_v3.yaml",
+        ROOT / "data" / "processed" / "data_v3_index.json",
+    ),
+}
+
+
+def load_gift_pretrain(cfg_path: Path | None = None, version: str = "v2") -> list[Series]:
+    cfg = yaml.safe_load((cfg_path or VERSIONS[version][0]).read_text())
+    max_series, max_points = cfg.get("max_series", MAX_SERIES), cfg.get("max_points")
     rng = np.random.default_rng(0)
     series = []
     for name in cfg["subsets"]:
+        sub = []
         # a subset can span several arrow files: ids must stay unique across files (file 0 keeps its plain ids)
         for k, f in enumerate(sorted((GP_DIR / name).rglob("data-*.arrow"))):
-            series += _arrow_series(f, name, rng, prefix=f"f{k}:" if k else "")
+            sub += _arrow_series(f, name, rng, prefix=f"f{k}:" if k else "", max_series=max_series)
+        if (
+            max_points and sum(len(x.values) for x in sub) > max_points
+        ):  # drop random series until the subset fits
+            order, tot, keep = rng.permutation(len(sub)), 0, []
+            for i in order:
+                if tot + len(sub[i].values) > max_points and keep:
+                    continue
+                keep.append(i)
+                tot += len(sub[i].values)
+            sub = [sub[i] for i in sorted(keep)]
+        series += sub
     return series
 
 
@@ -121,14 +141,15 @@ def _any_in_sorted(h: np.ndarray, sorted_set: np.ndarray) -> bool:
     return bool((sorted_set[i] == h).any())
 
 
-def build_index(log=print) -> dict:
+def build_index(log=print, version: str = "v2") -> dict:
     """Load the candidate pool, drop contaminated series, cache the list of surviving series ids."""
-    if INDEX.exists():
-        return json.loads(INDEX.read_text())
+    index = VERSIONS[version][1]
+    if index.exists():
+        return json.loads(index.read_text())
     forbidden = _forbidden_hashes()
     log(f"forbidden chunk hashes: {len(forbidden):,}")
     pool = [s for name in H.DATASETS if name not in DROP_CHRONOS | H.HELD_OUT for s in H.load(name)]
-    pool += load_gift_pretrain()
+    pool += load_gift_pretrain(version=version)
     log(f"candidate series: {len(pool):,}")
     keep, dropped = [], {}
     for n, s in enumerate(pool):
@@ -148,15 +169,15 @@ def build_index(log=print) -> dict:
         "n_candidates": len(pool),
         "n_forbidden_hashes": int(len(forbidden)),
     }
-    INDEX.parent.mkdir(parents=True, exist_ok=True)
-    INDEX.write_text(json.dumps(idx))
+    index.parent.mkdir(parents=True, exist_ok=True)
+    index.write_text(json.dumps(idx))
     return idx
 
 
-def load_v2() -> list[Series]:
-    keep = set(build_index()["kept"])
+def load_v2(version: str = "v2") -> list[Series]:
+    keep = set(build_index(version=version)["kept"])
     pool = [s for name in H.DATASETS if name not in DROP_CHRONOS | H.HELD_OUT for s in H.load(name)]
-    pool += load_gift_pretrain()
+    pool += load_gift_pretrain(version=version)
     out = [s for s in pool if f"{s.dataset}/{s.series_id}" in keep]
     keys = [f"{s.dataset}/{s.series_id}" for s in out]
     if len(set(keys)) != len(keys):

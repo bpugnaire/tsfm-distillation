@@ -97,42 +97,105 @@ COLUMNS = ["MSE[mean]", "MSE[0.5]", "MAE[0.5]", "MASE[0.5]", "MAPE[0.5]", "sMAPE
            "NRMSE[mean]", "ND[0.5]", "mean_weighted_sum_quantile_loss"]  # fmt: skip
 
 
-class OnnxStudentPredictor:
-    """GluonTS-style predictor: predict(test_data.input) -> list[QuantileForecast]."""
+DS_COUNTS: dict[int, int] = {}  # downsampling factor -> series (--downsample)
 
-    def __init__(
-        self, onnx_path: str, prediction_length: int, context: int = 512, batch: int = 1024
-    ):
+
+def dominant_period(x: np.ndarray, tail: int = 16384, sig: float = 4.0) -> int | None:
+    """Dominant period by FFT over the last `tail` observed steps (gaps interpolated); None if the peak is not at least
+    `sig` x the median spectral power (Reverso's spectral test, beta = 4)."""
+    x = np.asarray(x, dtype=np.float64)[-tail:]
+    ok = np.isfinite(x)
+    if ok.sum() < 64:
+        return None
+    idx = np.arange(len(x))
+    x = np.interp(idx, idx[ok], x[ok]) - np.nanmean(x[ok])
+    p = np.abs(np.fft.rfft(x)) ** 2
+    p[0] = 0.0
+    if len(p) < 4 or np.median(p[1:]) <= 0:
+        return None
+    j = int(np.argmax(p[1:]) + 1)
+    if p[j] < sig * np.median(p[1:]):
+        return None
+    period = len(x) / j
+    return int(round(period)) if period >= 2 and period <= len(x) / 2 else None
+
+
+def block_mean(x: np.ndarray, k: int) -> np.ndarray:
+    """Average non-overlapping blocks of k steps, aligned to the end of the series (NaN-aware)."""
+    n = (len(x) // k) * k
+    with np.errstate(all="ignore"):
+        return np.nanmean(x[len(x) - n :].reshape(-1, k), axis=1)
+
+
+def upsample(q: np.ndarray, k: int, H: int) -> np.ndarray:
+    """(K, Hc) quantile paths at k-step resolution -> (K, H) at the original step, linear between block centres."""
+    centres = np.arange(q.shape[1]) * k + (k - 1) / 2
+    t = np.arange(H)
+    return np.stack([np.interp(t, centres, row) for row in q])
+
+
+class OnnxStudentPredictor:
+    """GluonTS-style predictor: predict(test_data.input) -> list[QuantileForecast].
+
+    Inference-time options (journal 2026-11-21, docs/notes/gap-analysis.md), fixed rules from the literature, not tuned:
+    * flip: average f(x) and -f(-x) with mirrored quantile levels (Reverso, raws-labs/tinycast);
+    * downsample: if the dominant period P leaves fewer than M = 8 cycles in the context T, average blocks of
+      k = floor(M * P / T) steps, forecast ceil(H / k) coarse steps and interpolate back (Reverso's rule).
+    """
+
+    def __init__(self, onnx_path: str, prediction_length: int, context: int = 512, batch: int = 1024,
+                 flip: bool = False, downsample: bool = False):  # fmt: skip
         so = ort.SessionOptions()
         so.intra_op_num_threads = 8
         self.sess = ort.InferenceSession(onnx_path, so, providers=["CPUExecutionProvider"])
         self.H, self.T, self.batch = prediction_length, context, batch
+        self.flip, self.downsample = flip, downsample
         if prediction_length > 64:
             raise ValueError(f"student horizon is 64, asked {prediction_length}")
         self.idx = [OURS.index(q) for q in GIFT_LEVELS]
         self.keys = [str(q) for q in GIFT_LEVELS] + ["mean"]
+
+    def _run(self, x: np.ndarray) -> np.ndarray:
+        q = np.concatenate(
+            [
+                self.sess.run(None, {"context": x[i : i + self.batch]})[0]
+                for i in range(0, len(x), self.batch)
+            ]
+        )
+        if self.flip:
+            qn = np.concatenate(
+                [
+                    self.sess.run(None, {"context": -x[i : i + self.batch]})[0]
+                    for i in range(0, len(x), self.batch)
+                ]
+            )
+            q = 0.5 * (q - qn[:, ::-1])  # level tau of -f(-x) is minus level 1 - tau
+        return q
 
     def predict(self, test_data_input, **kwargs):
         from gluonts.model.forecast import QuantileForecast
 
         entries = list(test_data_input)
         x = np.full((len(entries), self.T), np.nan, dtype=np.float32)
+        ks = np.ones(len(entries), dtype=int)
         for i, e in enumerate(entries):
             full = np.asarray(e["target"], dtype=np.float32)
             t = full[-self.T :]
             if not np.isfinite(t).any() and np.isfinite(full).any():
                 # the last 512 steps are all missing but older data exists (kdd_cup_2018, bitbrains gaps): read the
                 # last 512 *observed* values instead, gap removed. Counted in config.json (gap_skipped_rows).
-                obs = full[np.isfinite(full)]
-                t = obs[-self.T :]
+                full = full[np.isfinite(full)]
+                t = full[-self.T :]
                 GAP.append(1)
+            if self.downsample:
+                per = dominant_period(full)
+                k = int(8 * per // self.T) if per else 1
+                if k >= 2 and len(full) // k >= 32:
+                    t = block_mean(full, k)[-self.T :].astype(np.float32)
+                    ks[i] = k
+            DS_COUNTS[int(ks[i])] = DS_COUNTS.get(int(ks[i]), 0) + 1
             x[i, self.T - len(t) :] = t
-        q = np.concatenate(
-            [
-                self.sess.run(None, {"context": x[i : i + self.batch]})[0]
-                for i in range(0, len(x), self.batch)
-            ]
-        )[:, :, : self.H]  # (N, 13, H)
+        q = self._run(x)  # (N, 13, 64)
         # A series with no observed history at all (e.g. electricity/W MT_178: 184 NaN) has nothing to scale by:
         # forecast 0 for it, counted in config.json (empty_context_rows), never silently.
         empty = ~np.isfinite(x).any(axis=1)
@@ -142,7 +205,9 @@ class OnnxStudentPredictor:
             raise ValueError("non-finite student forecast")
         out = []
         for i, e in enumerate(entries):
-            arr = q[i, self.idx]  # (9, H)
+            k = int(ks[i])
+            qi = q[i, :, : self.H] if k == 1 else upsample(q[i, :, : -(-self.H // k)], k, self.H)
+            arr = qi[self.idx]  # (9, H)
             arr = np.concatenate(
                 [arr, arr[GIFT_LEVELS.index(0.5)][None]], axis=0
             )  # "mean" = the median
@@ -179,6 +244,8 @@ def main() -> None:
         default=512,
         help="history the ONNX student reads (its trained context)",
     )
+    ap.add_argument("--flip", action="store_true", help="average f(x) and -f(-x)")
+    ap.add_argument("--downsample", action="store_true", help="Reverso-style period downsampling")
     a = ap.parse_args()
     metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(), RMSE(),
                NRMSE(), ND(), MeanWeightedSumQuantileLoss(quantile_levels=GIFT_LEVELS)]  # fmt: skip
@@ -202,7 +269,7 @@ def main() -> None:
             ds = Dataset(name=ds_name, term=term, to_univariate=uni)
             t0 = time.time()
             res = evaluate_model(
-                OnnxStudentPredictor(a.onnx, ds.prediction_length, context=a.context), test_data=ds.test_data, metrics=metrics,
+                OnnxStudentPredictor(a.onnx, ds.prediction_length, context=a.context, flip=a.flip, downsample=a.downsample), test_data=ds.test_data, metrics=metrics,
                 batch_size=1024, axis=None, mask_invalid_label=True, allow_nan_forecast=False,
                 seasonality=get_seasonality(ds.freq),
             )  # fmt: skip
@@ -222,6 +289,7 @@ def main() -> None:
         "gift_eval_commit": "0b57dd6937eb9a69a3ae771f73ab36188bb33e47", "wall_seconds": round(time.time() - t_all, 1),
         "empty_context_rows": int(sum(EMPTY)), "empty_context_rule": "no observed history at all: forecast 0",
         "gap_skipped_rows": int(sum(GAP)), "gap_rule": "last 512 steps all missing: last 512 observed values",
+        "flip": a.flip, "downsample": a.downsample, "downsample_factors": {str(k): v for k, v in sorted(DS_COUNTS.items())},
     }, indent=1))  # fmt: skip
     print(f"{len(rows)} configs -> {out_dir / 'all_results.csv'}")
 
