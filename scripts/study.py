@@ -9,6 +9,7 @@ Comparisons between arms are PAIRED (same windows), with a cluster bootstrap ove
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +40,30 @@ def arm_config(study: dict, arm: dict) -> TrainConfig:
         base[section].update(values)
     base["student"]["quantile_levels"] = list(base["student"]["quantile_levels"])
     return from_dict(TrainConfig, base, where=f"arm {arm['name']}")
+
+
+def wait_for_data(tr_spec, va_spec, members: list[str], name: str, poll: float = 60.0) -> None:
+    """Block until the training/validation corpora and every teacher cache are complete (written by --prepare-only)."""
+    import time
+
+    from tinycast.data.cache import cache_dir
+    from tinycast.data.corpus import corpus_path
+
+    n = sum(tr_spec.counts().values())
+
+    def ready() -> bool:
+        if not (corpus_path(tr_spec).exists() and corpus_path(va_spec).exists()):
+            return False
+        for m in members:
+            man = cache_dir(m, tr_spec.key()) / "manifest.json"
+            if not man.exists() or sum(json.loads(man.read_text())["shards"].values()) < n:
+                return False
+        return True
+
+    t0 = time.time()
+    while not ready():
+        time.sleep(poll)
+    print(f"[{name}] data ready after waiting {time.time() - t0:.0f}s", flush=True)
 
 
 def run_of(ref: str) -> Path:
@@ -192,6 +217,16 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("study")
     ap.add_argument("--only-eval", action="store_true")
+    ap.add_argument(
+        "--prepare-only",
+        action="store_true",
+        help="build corpora + teacher caches for every arm, no training",
+    )
+    ap.add_argument(
+        "--wait-for-data",
+        action="store_true",
+        help="wait for a --prepare-only process instead of building data",
+    )
     a = ap.parse_args()
     study = yaml.safe_load(Path(a.study).read_text())
     study["arms"] = expand_seeds(study)
@@ -221,18 +256,27 @@ if __name__ == "__main__":
         cfg = arm_config(study, arm)
         tr_spec, va_spec = specs(cfg)
         print(f"[{arm['name']}] corpus {dict(tr_spec.mix)} (key {tr_spec.key()})", flush=True)
-        corpus = build_corpus(tr_spec)
-        build_corpus(va_spec)
+        members = []
         if cfg.loss.alpha > 0:
             from tinycast.distill.weighting import parse
 
-            for member in parse(cfg.data.teacher)[1]:  # composite teachers: cache every member
-                entry = load(ROOT / "configs" / "teachers" / f"{member}.yaml", ModelEntry)
-                cache_teacher_on_corpus(entry, tr_spec, corpus)
+            members = parse(cfg.data.teacher)[1]  # composite teachers: cache every member
+        if a.wait_for_data:  # a --prepare-only process builds the data; wait until it is complete
+            wait_for_data(tr_spec, va_spec, members, arm["name"])
+        corpus = build_corpus(tr_spec)
+        build_corpus(va_spec)
+        for member in members:
+            entry = load(ROOT / "configs" / "teachers" / f"{member}.yaml", ModelEntry)
+            cache_teacher_on_corpus(entry, tr_spec, corpus)
+        if a.prepare_only:
+            print(f"[{arm['name']}] data ready", flush=True)
+            continue
         run = train(cfg, log_every=500)
         runs[arm["name"]] = str(run.relative_to(ROOT))
         runs_file.write_text(json.dumps(runs, indent=1))
 
+    if a.prepare_only:
+        sys.exit(0)
     # ---------------------------------------------------------------- evaluate every arm on every suite
     table = {"study": study["name"], "reference_arm": study["reference_arm"], "suites": {}}
     for suite_name in study["eval_suites"]:

@@ -54,7 +54,9 @@ def specs(cfg: TrainConfig) -> tuple[CorpusSpec, CorpusSpec]:
             horizon=s.horizon,
             rollout_max_blocks=d.rollout_max_blocks,
         )
-        tr = CorpusSpec("train", mix=tuple(sorted(d.mix.items())), **common)
+        tr = CorpusSpec(
+            "train", mix=tuple(sorted(d.mix.items())), var_context=d.var_context, **common
+        )
         va = CorpusSpec("val", mix=tuple(sorted((d.val_mix or d.mix).items())), **common)
         return tr, va
     n_syn = int(round(d.n_train_windows * d.synthetic_share))

@@ -1,0 +1,18 @@
+# Stage C12 pilot (owner 2026-11-21): variable-length histories with consistent teacher labels. Same 300k windows as C11
+# (C4 corpus, 2048 steps), but half the windows keep only their last L steps (L log-uniform in [64, 2048]) BEFORE
+# Timestral-28M labels them, so the labels match what the student sees (Beyer et al. 2022). Multi-token student, patch 16
+# (128 tokens), 15k steps, batch 256 (comparable with C11). Reference: C11's mt_2048_p16 (full histories only).
+name: stage_c12_varctx
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c11_full_hist
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+arms:
+  - {name: c11_full_hist, type: existing, run: "stage_c11_ctx:mt_2048_p16"}
+  - {name: c8_512, type: existing, run: "stage_c8_mt:kd_mt_300k"}
+  - {name: mt_2048_p16_var, mix: {synth: 150000, multidomain_v2: 150000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt, context_length: 2048, patch_size: 16}, data: {var_context: 0.5},
+                optim: {patience: 1000}}}
+pairs:
+  - [mt_2048_p16_var, c11_full_hist, "variable-length histories (consistent labels) vs full histories only"]
+  - [mt_2048_p16_var, c8_512, "2048 steps with variable histories vs 512 steps"]

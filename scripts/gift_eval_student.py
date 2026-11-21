@@ -146,7 +146,7 @@ class OnnxStudentPredictor:
     def __init__(self, onnx_path: str, prediction_length: int, context: int = 512, batch: int = 1024,
                  flip: bool = False, downsample: bool = False):  # fmt: skip
         so = ort.SessionOptions()
-        so.intra_op_num_threads = 8
+        so.intra_op_num_threads = int(os.environ.get("GIFT_ORT_THREADS", "8"))
         self.sess = ort.InferenceSession(onnx_path, so, providers=["CPUExecutionProvider"])
         self.H, self.T, self.batch = prediction_length, context, batch
         self.flip, self.downsample = flip, downsample
@@ -216,7 +216,8 @@ class OnnxStudentPredictor:
         return out
 
 
-def main() -> None:
+def _eval_config(job):
+    """One GIFT-Eval config (runs in a worker process when --workers > 1); returns (row, (empty, gap, ds_counts))."""
     from gift_eval.data import Dataset
     from gluonts.ev.metrics import (
         MAE,
@@ -233,6 +234,40 @@ def main() -> None:
     from gluonts.model import evaluate_model
     from gluonts.time_feature import get_seasonality
 
+    ds_name, term, onnx, context, flip, downsample, name = job
+    EMPTY.clear()
+    GAP.clear()
+    DS_COUNTS.clear()
+    metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(), RMSE(),
+               NRMSE(), ND(), MeanWeightedSumQuantileLoss(quantile_levels=GIFT_LEVELS)]  # fmt: skip
+    props = json.loads(
+        (ROOT / "external" / "gift-eval" / "notebooks" / "dataset_properties.json").read_text()
+    )
+    if "/" in ds_name:
+        key, freq = ds_name.split("/")
+        key = PRETTY.get(key.lower(), key.lower())
+    else:
+        key = PRETTY.get(ds_name.lower(), ds_name.lower())
+        freq = props[key]["frequency"]
+    uni = Dataset(name=ds_name, term=term, to_univariate=False).target_dim != 1
+    ds = Dataset(name=ds_name, term=term, to_univariate=uni)
+    t0 = time.time()
+    res = evaluate_model(
+        OnnxStudentPredictor(onnx, ds.prediction_length, context=context, flip=flip, downsample=downsample),
+        test_data=ds.test_data, metrics=metrics, batch_size=1024, axis=None, mask_invalid_label=True,
+        allow_nan_forecast=False, seasonality=get_seasonality(ds.freq),
+    )  # fmt: skip
+    row = {"dataset": f"{key}/{freq}/{term}", "model": name}
+    row.update({f"eval_metrics/{c}": float(res[c].iloc[0]) for c in COLUMNS})
+    row.update({"domain": props[key]["domain"], "num_variates": props[key]["num_variates"]})
+    print(f"{row['dataset']:40s} H={ds.prediction_length:3d} n={len(ds.test_data):6d} "
+          f"MASE {row['eval_metrics/MASE[0.5]']:.3f} CRPS {row['eval_metrics/mean_weighted_sum_quantile_loss']:.4f} "
+          f"({time.time() - t0:.1f}s)", flush=True)  # fmt: skip
+    return row, (int(sum(EMPTY)), int(sum(GAP)), dict(DS_COUNTS))
+
+
+def main() -> None:
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--onnx", required=True)
     ap.add_argument("--name", required=True)
@@ -245,41 +280,36 @@ def main() -> None:
         help="history the ONNX student reads (its trained context)",
     )
     ap.add_argument("--flip", action="store_true", help="average f(x) and -f(-x)")
+    ap.add_argument(
+        "--workers", type=int, default=4, help="configs evaluated in parallel processes"
+    )
     ap.add_argument("--downsample", action="store_true", help="Reverso-style period downsampling")
     a = ap.parse_args()
-    metrics = [MSE(forecast_type="mean"), MSE(forecast_type=0.5), MAE(), MASE(), MAPE(), SMAPE(), MSIS(), RMSE(),
-               NRMSE(), ND(), MeanWeightedSumQuantileLoss(quantile_levels=GIFT_LEVELS)]  # fmt: skip
-    props = json.loads(
-        (ROOT / "external" / "gift-eval" / "notebooks" / "dataset_properties.json").read_text()
-    )
     out_dir = ROOT / "results" / "gift_eval" / a.name
     out_dir.mkdir(parents=True, exist_ok=True)
-    rows = []
     names = a.datasets.split(",") if a.datasets else SHORT
+    jobs = [
+        (ds_name, term, a.onnx, a.context, a.flip, a.downsample, a.name)
+        for ds_name in names
+        for term in a.terms.split(",")
+    ]
     t_all = time.time()
-    for ds_name in names:
-        for term in a.terms.split(","):
-            if "/" in ds_name:
-                key, freq = ds_name.split("/")
-                key = PRETTY.get(key.lower(), key.lower())
-            else:
-                key = PRETTY.get(ds_name.lower(), ds_name.lower())
-                freq = props[key]["frequency"]
-            uni = Dataset(name=ds_name, term=term, to_univariate=False).target_dim != 1
-            ds = Dataset(name=ds_name, term=term, to_univariate=uni)
-            t0 = time.time()
-            res = evaluate_model(
-                OnnxStudentPredictor(a.onnx, ds.prediction_length, context=a.context, flip=a.flip, downsample=a.downsample), test_data=ds.test_data, metrics=metrics,
-                batch_size=1024, axis=None, mask_invalid_label=True, allow_nan_forecast=False,
-                seasonality=get_seasonality(ds.freq),
-            )  # fmt: skip
-            row = {"dataset": f"{key}/{freq}/{term}", "model": a.name}
-            row.update({f"eval_metrics/{c}": float(res[c].iloc[0]) for c in COLUMNS})
-            row.update({"domain": props[key]["domain"], "num_variates": props[key]["num_variates"]})
-            rows.append(row)
-            print(f"{row['dataset']:40s} H={ds.prediction_length:3d} n={len(ds.test_data):6d} "
-                  f"MASE {row['eval_metrics/MASE[0.5]']:.3f} CRPS {row['eval_metrics/mean_weighted_sum_quantile_loss']:.4f} "
-                  f"({time.time() - t0:.1f}s)", flush=True)  # fmt: skip
+    if (
+        a.workers > 1
+    ):  # configs in parallel processes: GluonTS bookkeeping is single-threaded Python
+        from concurrent.futures import ProcessPoolExecutor
+
+        os.environ["GIFT_ORT_THREADS"] = str(max(1, 8 // a.workers))
+        with ProcessPoolExecutor(max_workers=a.workers) as ex:
+            results = list(ex.map(_eval_config, jobs))
+    else:
+        results = [_eval_config(j) for j in jobs]
+    rows = [r for r, _ in results]
+    for _, (empty, gap, ds_counts) in results:
+        EMPTY.append(empty)
+        GAP.append(gap)
+        for k, v in ds_counts.items():
+            DS_COUNTS[int(k)] = DS_COUNTS.get(int(k), 0) + v
     with open(out_dir / "all_results.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()

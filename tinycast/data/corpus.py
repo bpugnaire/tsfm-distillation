@@ -40,6 +40,9 @@ class CorpusSpec:
     )  # (source, count); overrides the legacy fields
     rollout_max_blocks: int = 3
     rollout_generator: str = "mistralai/Timestral-28M"
+    # Variable-length histories (2026-11-21): this share of windows keeps only its last L steps, L log-uniform in
+    # [64, context_length], the rest set to missing, BEFORE the teacher labels them (labels consistent with the input).
+    var_context: float = 0.0
 
     def counts(self) -> dict[str, int]:
         if self.mix:
@@ -51,7 +54,12 @@ class CorpusSpec:
         return {"rte": self.n_real, "synth": self.n_synth}
 
     def key(self) -> str:
-        return hashlib.sha1(json.dumps(asdict(self), sort_keys=True).encode()).hexdigest()[:10]
+        d = asdict(self)
+        if not d[
+            "var_context"
+        ]:  # fields added later stay out of the key at their default: old keys are unchanged
+            del d["var_context"]
+        return hashlib.sha1(json.dumps(d, sort_keys=True).encode()).hexdigest()[:10]
 
 
 @dataclass
@@ -217,9 +225,45 @@ MMAP_BYTES = (
 )
 
 
+def corpus_path(spec: CorpusSpec) -> Path:
+    return ROOT / "data" / "processed" / f"corpus_{spec.split}_{spec.key()}.npz"
+
+
 def build_corpus(spec: CorpusSpec, cache: bool = True, log=print) -> Corpus:
     """Build (or load) a corpus. Large ones (e.g. 1M windows x 2048 steps = 8 GB of contexts) are written straight to a
     memory-mapped file and read lazily: holding them in RAM next to the teacher cache would not fit a 16 GB Mac."""
+    if spec.var_context > 0:  # derived from the full-history corpus (same windows), then cut
+        import dataclasses
+
+        path = corpus_path(spec)
+        if cache and path.exists():
+            d = np.load(path, allow_pickle=False)
+            return Corpus(d["ids"], d["source"], d["context"], d["future"])
+        base = build_corpus(dataclasses.replace(spec, var_context=0.0), cache=cache, log=log)
+        ctx = np.array(base.context, dtype=np.float32)  # copy (the base may be memory-mapped)
+        rng = np.random.default_rng([spec.seed, 7331, spec.split == "val"])
+        T = ctx.shape[1]
+        cut = rng.random(len(ctx)) < spec.var_context
+        keep = (
+            np.exp(np.log(64) + rng.random(len(ctx)) * (np.log(T) - np.log(64))).round().astype(int)
+        )
+        for i in np.where(cut)[0]:
+            ctx[i, : T - keep[i]] = np.nan
+        log(
+            f"  variable history: {int(cut.sum())} of {len(ctx)} windows cut (median kept {int(np.median(keep[cut]))})"
+        )
+        corpus = Corpus(base.ids, base.source, ctx, base.future)
+        if cache:
+            tmp = path.with_name(path.stem + ".partial.npz")
+            np.savez(
+                tmp,
+                ids=corpus.ids,
+                source=corpus.source,
+                context=corpus.context,
+                future=corpus.future,
+            )
+            tmp.rename(path)
+        return corpus
     path = ROOT / "data" / "processed" / f"corpus_{spec.split}_{spec.key()}.npz"
     ctx_path = path.with_name(path.stem + "_context.npy")
     if cache and path.exists():
@@ -279,14 +323,18 @@ def build_corpus(spec: CorpusSpec, cache: bool = True, log=print) -> Corpus:
     corpus = Corpus(np.array(ids), np.array(src), context, np.concatenate(fut))
     if cache:
         path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_name(
+            path.stem + ".partial.npz"
+        )  # atomic: another process may be waiting for this file
         if big:
-            np.savez(path, ids=corpus.ids, source=corpus.source, future=corpus.future)
+            np.savez(tmp, ids=corpus.ids, source=corpus.source, future=corpus.future)
         else:
             np.savez(
-                path,
+                tmp,
                 ids=corpus.ids,
                 source=corpus.source,
                 context=corpus.context,
                 future=corpus.future,
             )
+        tmp.rename(path)
     return corpus
