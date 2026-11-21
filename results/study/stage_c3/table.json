@@ -110,6 +110,36 @@
       0.8966078590800587,
       0.9633738322841963
      ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "Toto-taught student vs Toto-2.0-4m zero-shot",
+     "ratio": [
+      0.868204338011284,
+      0.839612876098101,
+      0.8994048904946691
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-22m",
+     "question": "Toto-taught student vs Toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9489193718781217,
+      0.9161587479974816,
+      0.979952832205538
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-313m",
+     "question": "Toto-taught student vs its teacher, Toto-2.0-313m",
+     "ratio": [
+      1.0265079053040524,
+      1.003713238212751,
+      1.0496489093279926
+     ]
     }
    ],
    "seed_spread": {},
@@ -338,6 +368,36 @@
       1.0203910365622733,
       1.0669296480366297
      ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "Toto-taught student vs Toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9943365056041166,
+      0.9693542375801637,
+      1.0204914581233344
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-22m",
+     "question": "Toto-taught student vs Toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0518001599611775,
+      1.030082810563123,
+      1.0769336804534653
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-313m",
+     "question": "Toto-taught student vs its teacher, Toto-2.0-313m",
+     "ratio": [
+      1.0745902041174855,
+      1.0494179381939988,
+      1.102493563054913
+     ]
     }
    ],
    "seed_spread": {},
@@ -565,6 +625,36 @@
       1.0838928800852017,
       1.0518827288014052,
       1.1148015780769764
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "Toto-taught student vs Toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9235234461026353,
+      0.8940820693986347,
+      0.9513492884719055
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-22m",
+     "question": "Toto-taught student vs Toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0254688809517343,
+      1.000383190007914,
+      1.051488003630467
+     ]
+    },
+    {
+     "a": "kd_toto_1m",
+     "b": "zoo:toto-2.0-313m",
+     "question": "Toto-taught student vs its teacher, Toto-2.0-313m",
+     "ratio": [
+      1.057454117042555,
+      1.0326853463314491,
+      1.0825993944265215
      ]
     }
    ],

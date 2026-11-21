@@ -26,3 +26,5 @@ models:
   - {kind: student, name: student-preview-gt-m, checkpoint: runs/2026-11-12_preview_gt_m}
   - {kind: student_onnx, name: student-preview-gt-m-onnx-fp32, checkpoint: web/public/models/preview_gt_m.fp32.onnx}
   - {kind: student_onnx, name: student-preview-gt-m-onnx-int8, checkpoint: web/public/models/preview_gt_m.int8.onnx}
+  - {kind: student_onnx, name: student-toto-onnx-fp32, checkpoint: web/public/models/c3_kd_toto_1m.fp32.onnx}  # the website model
+  - {kind: student_onnx, name: student-toto-onnx-int8, checkpoint: web/public/models/c3_kd_toto_1m.int8.onnx}

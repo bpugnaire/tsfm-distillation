@@ -19,6 +19,9 @@ zero-shot models (same suite, same baseline): timestral-209m 0.402, toto-2.0-313
 | ensemble of 3 teachers vs Timestral-28M: `kd_ens3_1m` vs `c2_ref` | 0.999 | [0.977, 1.022] | no detectable difference |
 | ensemble student vs Toto-2.0-4m zero-shot: `kd_ens3_1m` vs `zoo:toto-2.0-4m` | 0.881 | [0.844, 0.921] | a better |
 | ensemble student vs Timestral-5M zero-shot: `kd_ens3_1m` vs `zoo:timestral-5m` | 0.930 | [0.897, 0.963] | a better |
+| Toto-taught student vs Toto-2.0-4m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-4m` | 0.868 | [0.840, 0.899] | a better |
+| Toto-taught student vs Toto-2.0-22m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-22m` | 0.949 | [0.916, 0.980] | a better |
+| Toto-taught student vs its teacher, Toto-2.0-313m: `kd_toto_1m` vs `zoo:toto-2.0-313m` | 1.027 | [1.004, 1.050] | b better |
 
 ## multidomain_test (600 windows)  — public datasets: teachers may have seen them in pretraining
 
@@ -39,6 +42,9 @@ zero-shot models (same suite, same baseline): t0-gamma 0.511, chronos-2 0.614, t
 | ensemble of 3 teachers vs Timestral-28M: `kd_ens3_1m` vs `c2_ref` | 0.986 | [0.965, 1.007] | no detectable difference |
 | ensemble student vs Toto-2.0-4m zero-shot: `kd_ens3_1m` vs `zoo:toto-2.0-4m` | 0.954 | [0.930, 0.982] | a better |
 | ensemble student vs Timestral-5M zero-shot: `kd_ens3_1m` vs `zoo:timestral-5m` | 1.042 | [1.020, 1.067] | b better |
+| Toto-taught student vs Toto-2.0-4m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-4m` | 0.994 | [0.969, 1.020] | no detectable difference |
+| Toto-taught student vs Toto-2.0-22m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-22m` | 1.052 | [1.030, 1.077] | b better |
+| Toto-taught student vs its teacher, Toto-2.0-313m: `kd_toto_1m` vs `zoo:toto-2.0-313m` | 1.075 | [1.049, 1.102] | b better |
 
 ## fresh_fr_power (312 windows)
 
@@ -59,3 +65,6 @@ zero-shot models (same suite, same baseline): timestral-209m 0.614, timestral-28
 | ensemble of 3 teachers vs Timestral-28M: `kd_ens3_1m` vs `c2_ref` | 1.029 | [1.009, 1.048] | b better |
 | ensemble student vs Toto-2.0-4m zero-shot: `kd_ens3_1m` vs `zoo:toto-2.0-4m` | 0.980 | [0.953, 1.005] | no detectable difference |
 | ensemble student vs Timestral-5M zero-shot: `kd_ens3_1m` vs `zoo:timestral-5m` | 1.084 | [1.052, 1.115] | b better |
+| Toto-taught student vs Toto-2.0-4m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-4m` | 0.924 | [0.894, 0.951] | a better |
+| Toto-taught student vs Toto-2.0-22m zero-shot: `kd_toto_1m` vs `zoo:toto-2.0-22m` | 1.025 | [1.000, 1.051] | b better |
+| Toto-taught student vs its teacher, Toto-2.0-313m: `kd_toto_1m` vs `zoo:toto-2.0-313m` | 1.057 | [1.033, 1.083] | b better |

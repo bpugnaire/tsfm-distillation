@@ -25,3 +25,7 @@ pairs:
   - [kd_ens3_1m, c2_ref, "ensemble of 3 teachers vs Timestral-28M"]
   - [kd_ens3_1m, "zoo:toto-2.0-4m", "ensemble student vs Toto-2.0-4m zero-shot"]
   - [kd_ens3_1m, "zoo:timestral-5m", "ensemble student vs Timestral-5M zero-shot"]
+  # added 2026-11-19 for the website (Toto student = the published model): evaluation only, no training
+  - [kd_toto_1m, "zoo:toto-2.0-4m", "Toto-taught student vs Toto-2.0-4m zero-shot"]
+  - [kd_toto_1m, "zoo:toto-2.0-22m", "Toto-taught student vs Toto-2.0-22m zero-shot"]
+  - [kd_toto_1m, "zoo:toto-2.0-313m", "Toto-taught student vs its teacher, Toto-2.0-313m"]

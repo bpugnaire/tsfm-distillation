@@ -1,0 +1,67 @@
+{
+ "pairs": [
+  {
+   "a": "tinycast-c3-kd_toto_1m",
+   "b": "Toto-2.0-4m@ctx512-univariate",
+   "question": "Toto student vs Toto-2.0-4m, same 512 context, univariate",
+   "n_configs": 55,
+   "ratio": [
+    1.1132978846151034,
+    1.0642817451144315,
+    1.176694039625026
+   ],
+   "a_wins": 12
+  },
+  {
+   "a": "tinycast-c3-kd_toto_1m",
+   "b": "Toto-2.0-4m",
+   "question": "Toto student vs Toto-2.0-4m as on the leaderboard (4096 context)",
+   "n_configs": 55,
+   "ratio": [
+    1.1893262982010067,
+    1.1141400400963308,
+    1.2806265361057354
+   ],
+   "a_wins": 3
+  },
+  {
+   "a": "tinycast-c3-kd_toto_1m",
+   "b": "tinycast-c2",
+   "question": "Toto student vs Timestral-taught student",
+   "n_configs": 55,
+   "ratio": [
+    1.019029350031611,
+    1.0014523460277998,
+    1.0385848532774942
+   ],
+   "a_wins": 18
+  },
+  {
+   "a": "tinycast-c2",
+   "b": "Toto-2.0-4m@ctx512-univariate",
+   "question": "Timestral-taught student vs Toto-2.0-4m, same 512 context",
+   "n_configs": 55,
+   "ratio": [
+    1.0925081643434196,
+    1.0471614363381025,
+    1.1466414010141988
+   ],
+   "a_wins": 16
+  },
+  {
+   "a": "Toto-2.0-4m@ctx512-univariate",
+   "b": "Toto-2.0-4m",
+   "question": "Toto-2.0-4m: 512 vs 4096 context",
+   "n_configs": 55,
+   "ratio": [
+    1.0682911686409864,
+    1.0360659403881887,
+    1.11012012783719
+   ],
+   "a_wins": 17
+  }
+ ],
+ "scores": {
+  "Toto-2.0-4m@ctx512-univariate": 0.5634140791035279
+ }
+}

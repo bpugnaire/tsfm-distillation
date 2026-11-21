@@ -1,0 +1,46 @@
+[
+ {
+  "suite": "fresh_fr_power",
+  "a": "student-toto-onnx-int8",
+  "b": "student-toto-onnx-fp32",
+  "question": "int8 vs fp32, same student",
+  "ratio": [
+   1.000799585862957,
+   0.9996566091178788,
+   1.001955274488715
+  ]
+ },
+ {
+  "suite": "fresh_fr_power",
+  "a": "student-toto-onnx-fp32",
+  "b": "student-preview-gt-m",
+  "question": "distilled general student (1M windows, Toto labels) vs a student trained on real futures of 12k pre-cutoff French electricity windows + 12k synthetic",
+  "ratio": [
+   0.9984596188141943,
+   0.9683308768431202,
+   1.0274603032967828
+  ]
+ },
+ {
+  "suite": "shapes",
+  "a": "student-toto-onnx-int8",
+  "b": "student-toto-onnx-fp32",
+  "question": "int8 vs fp32, same student",
+  "ratio": [
+   1.0320367468921634,
+   1.0227546074598297,
+   1.0418345448704385
+  ]
+ },
+ {
+  "suite": "shapes",
+  "a": "student-toto-onnx-fp32",
+  "b": "student-preview-gt-m",
+  "question": "distilled general student (1M windows, Toto labels) vs a student trained on real futures of 12k pre-cutoff French electricity windows + 12k synthetic",
+  "ratio": [
+   0.7993588918031745,
+   0.751602953192911,
+   0.849132626450422
+  ]
+ }
+]
