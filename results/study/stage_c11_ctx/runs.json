@@ -1,0 +1,5 @@
+{
+ "c8_mt_512": "runs/2026-11-20_stage_c8_mt_kd_mt_300k",
+ "mt_2048_p16": "runs/2026-11-21_stage_c11_ctx_mt_2048_p16",
+ "mt_2048_p64": "runs/2026-11-21_stage_c11_ctx_mt_2048_p64"
+}

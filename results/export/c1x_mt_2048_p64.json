@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c11_ctx_mt_2048_p64",
+ "n_params": 891216,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 360448.0,
+  "max_rel_diff": 9.761395631358027e-05,
+  "p99_rel_diff": 1.2301786682655802e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.719
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 4405395456.0,
+  "max_rel_diff": 0.1043998971581459,
+  "p99_rel_diff": 0.024284083396196365,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.309
+ }
+}

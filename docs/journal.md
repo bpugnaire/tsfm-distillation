@@ -424,3 +424,16 @@ MASE 1.040; it fires on ~27% of series (k = 4-5 on 5-min data), big wins on bizi
 2048-step context: scaled to 512 it fires 4x more often and hurts. Flip is a small, cheap gain (~1%, borderline).
 **Next:** pilots on 300k windows: data v3 vs v2; long history at fine resolution (2048 steps, patch 16 = 128 tokens, or a
 multi-scale input).
+
+## 2026-11-21 — Pilots C10 (data v3) and C11 (long history at fine resolution)
+**Did:** 300k-window multi-token students, Timestral-28M labels, 15k steps. C10: data v3 vs v2 (512 steps). C11: 2048 steps at
+patch 16 (128 tokens) and patch 64 (32 tokens), no truncation, vs the 512-step C8 student on 2048-step suites. GIFT-Eval for all.
+**Result:** GIFT-Eval CRPS vs C8 (0.624): v3 0.635 (1.017 [1.005, 1.030], worse); 2048/p64 0.624 (1.000); 2048/p16 0.621
+(0.996 [0.978, 1.014], MASE 0.824 vs 0.837). Our suites: v3 = shapes 1.016, multi-domain 1.000, electricity 1.030 (worse);
+2048/p16 = shapes 1.132 (worse), multi-domain 0.961, electricity 0.942 (better); 2048/p64 = 0.974 / 0.954 / 1.011.
+**Surprise / learned:** more diverse data (55 datasets, 2.7x series, same window count) did not help at 300k windows: the
+per-dataset quota shrinks, so it may need more windows to pay. Fine-resolution long history helps where long history exists
+(electricity -6%, 5-min / 15-min GIFT sets -10 to -15%) but loses on short series (weekly sets, covid_deaths, us_births +13-21%):
+trained on mostly full 2048-step contexts, the student sees short GIFT series as 80-90% padding. Truncation would fix the
+mismatch but breaks label consistency; the clean fix is variable-length contexts in the corpus, labelled by the teacher as cut.
+**Next:** owner decision: variable-length-context corpus (consistent labels), pipeline overlap + batch-size benchmark.

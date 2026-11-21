@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-21_stage_c10_v3_mt_v3_300k",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 24.0,
+  "max_rel_diff": 9.758144005900249e-05,
+  "p99_rel_diff": 1.2984951354155783e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 1028250.0,
+  "max_rel_diff": 0.17000918090343475,
+  "p99_rel_diff": 0.030418917536735535,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}
