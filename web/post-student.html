@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inside the student</title>
+  <meta name="description" content="The 0.95M-parameter patch transformer: what fixes its input and output range, where its knowledge sits, one real forecast traced layer by layer, and where to improve it." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <article class="post">
+      <p class="meta">Post 3 of 6 · about 10 minutes</p>
+      <h1>Inside the student: one forecast, step by step</h1>
+
+      <div class="tldr"><b>In short</b>
+        <ul>
+          <li>The student is a small <strong>patch transformer</strong>. It cuts 512 steps into 32 patches of 16, adds one learned query token, runs 4 transformer layers, and reads all 64 forecast steps and 13 quantiles off that token in one pass.</li>
+          <li><strong>Three numbers fix its range</strong>: the position table (33 rows) caps the input at 32 × 16 = 512 steps, and the output layer (832 = 13 × 64 outputs) fixes the horizon and the quantile levels. The amplitude has no limit: the scaler handles it.</li>
+          <li><strong>Knowledge is in the weights</strong>: 56% in the feed-forward blocks, 28% in attention. Nothing about a particular series is stored; everything comes from the 512 input values at inference time.</li>
+          <li>Measured levers: more training windows, a bigger network (−7% error from 0.22M to 0.95M), longer context on some data. Not yet tested: covariates, several series at once.</li>
+        </ul>
+      </div>
+
+      <p>Colours used on this page:</p>
+      <div class="key">
+        <div style="--c: var(--range)"><b>Sets the range</b>a size fixed at training time: input length, horizon, quantile levels</div>
+        <div style="--c: var(--knowledge)"><b>Learned knowledge</b>weights trained by distillation</div>
+        <div style="--c: var(--fixed)"><b>Fixed arithmetic</b>no weights: the same formula for every series</div>
+        <div style="--c: var(--flow)"><b>Data in flight</b>values computed for this one forecast, then discarded</div>
+      </div>
+
+      <h2>1. The whole model</h2>
+      <p>The data flows from top to bottom. Hover or tap a block to see what it does, its size, and what it decides.</p>
+      <div class="figure">
+        <svg id="m-diagram" role="img" aria-label="Architecture of the student, colour-coded by role"></svg>
+        <div class="detail" id="m-detail">Hover or tap a block.</div>
+      </div>
+
+      <h2>2. What fixes the range of inputs and outputs</h2>
+      <p>A forecaster has limits set when it is built: how far back it reads, how far ahead it predicts, and which quantiles it gives. In this model each limit is one specific tensor. Changing a limit means changing that tensor's shape, which means retraining.</p>
+      <div class="table-wrap" id="m-range"></div>
+      <p>The amplitude is not a limit. The scaler re-centres and rescales every window, so the network always sees numbers of the same size. We checked this on the trained model: multiply the input by 1,000 and add 50,000, and the forecast moves the same way, to within <span id="m-inv"></span> of the series' scale. Floating-point rounding accounts for the rest.</p>
+
+      <h2>3. Where the knowledge lives</h2>
+      <div class="figure">
+        <svg id="m-params" role="img" aria-label="Parameters by component"></svg>
+        <p class="cap" id="m-params-cap"></p>
+      </div>
+      <ul>
+        <li><span class="c-knowledge">Feed-forward blocks</span> hold most of the weights. They transform each token on its own. Interpretability work on language models finds learned patterns stored there (Geva et al., 2021); here those are patterns like cycles, trends continuing, what follows a spike.</li>
+        <li><span class="c-knowledge">Attention</span> decides which past patches each token reads. It is the routing. Step 5 below shows where the query token looks on a real series.</li>
+        <li><span class="c-knowledge">The query token</span> is 128 learned numbers that work like a question. Its starting value is the same for every series. Layer by layer, attention fills it with what the forecast needs, and it is the only token the head reads.</li>
+        <li><span class="c-range">The head</span> turns that 128-number summary into 13 × 64 values. 11% of the model is spent on this one layer, and its size grows with the horizon.</li>
+      </ul>
+      <p>There is no memory of past series. Each forecast is computed from the 512 input values and the weights, then thrown away. That is why the model works on series it has never seen, and why it cannot use anything further back than 512 steps.</p>
+
+      <h2>4. One real forecast, step by step</h2>
+      <p>The input is French national electricity demand from the fresh test set: 512 hours ending just before the target starts. The values below are the trained student's real intermediate tensors on that window, recorded layer by layer and checked against the model's normal output.</p>
+      <div class="figure" id="m-steps">
+        <div class="stepper" id="m-stepper"></div>
+        <div class="step-head"><h3 id="m-step-title"></h3><span class="shape" id="m-step-shape"></span></div>
+        <p class="step-text" id="m-step-text"></p>
+        <div class="toolbar" id="m-step-tools"></div>
+        <svg id="m-step-svg" role="img" aria-label="Intermediate values of the student on one forecast"></svg>
+        <div class="step-nav"><button type="button" id="m-prev">← Previous</button><button type="button" id="m-next">Next →</button></div>
+      </div>
+      <figure class="code" data-ref="tinycast.models.student.Student.prepare"></figure>
+      <figure class="code" data-ref="tinycast.models.student.PatchTransformerNet.forward"></figure>
+
+      <h2>5. Why this architecture</h2>
+      <ul>
+        <li><strong>Patches, not single steps.</strong> Attention compares every token with every other one, so its cost grows with the square of the token count. 33 tokens cost about 240 times less than 512. One patch of 16 hours is also a meaningful unit: part of a day. Patching comes from PatchTST (Nie et al., 2023) and is used by most forecasting foundation models.</li>
+        <li><strong>One query token, one pass.</strong> The model predicts all 64 steps at once. Many large models instead feed each prediction back in as input to get the next one. One pass is what makes a forecast take 0.75 ms (<a href="post-compression.html">post 5</a>).</li>
+        <li><strong>A mask channel.</strong> Each patch carries 16 values and 16 "observed" flags. Missing values and left padding need no special code: the model learns to ignore flagged-out steps.</li>
+        <li><strong>Pre-norm layers</strong> (LayerNorm before attention and before the feed-forward block) are the standard choice for stable training since GPT-2.</li>
+        <li><strong>Quantiles that cannot cross</strong>, by construction (step 7 above), and the <strong>scaler inside the model</strong>, so the browser sends raw values (<a href="post-compression.html">post 5</a>).</li>
+      </ul>
+      <p>To be clear about evidence: we did not compare this architecture against alternatives in this project. We did measure its size (section 6). The defaults follow what works in the published foundation models, scaled down.</p>
+
+      <h2>6. Where to improve it</h2>
+      <div class="table-wrap" id="m-axes"></div>
+      <p>For a new use, the order to try is: more training windows on inputs like yours, then a longer context if your series has long cycles, then a bigger network.</p>
+
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>Context = patch length × number of patches: choose both together. A longer context with a longer patch keeps the cost the same.</li>
+        <li>The head size is horizon × quantile levels × width. Decide the horizon before training.</li>
+        <li>Standardise each window inside the model, so amplitude is never a limit.</li>
+        <li>Give the network a mask channel instead of filling missing values.</li>
+        <li>Read the forecast from one query token. Predict all steps in one pass.</li>
+        <li>Build the quantile head so quantiles cannot cross.</li>
+      </ul>
+
+      <p class="src">Parameter counts, the trace and the scale check come from <code>scripts/build_explainers.py</code>, run on <code>runs/2026-11-16_stage_c3_kd_toto_1m</code>, the published student.</p>
+      <p class="next-post">Next: <a href="post-distillation.html">Distilling a quantile forecaster →</a></p>
+    </article>
+  </main>
+  <script type="module" src="/src/pages/explain.ts"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Evaluating a probabilistic forecaster</title>
+  <meta name="description" content="Score quantile forecasts with WQL relative to seasonal naive, compare models with paired ratios and a cluster bootstrap, and test on data the models cannot have seen." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <article class="post">
+      <p class="meta">Post 1 of 6 · about 9 minutes</p>
+      <h1>Evaluating a probabilistic forecaster without fooling yourself</h1>
+
+      <div class="tldr"><b>In short</b>
+        <ul>
+          <li>Score quantile forecasts with the <strong>weighted quantile loss</strong> (WQL), divide it per window by the WQL of <strong>seasonal naive</strong>, and average with a <strong>geometric mean</strong>.</li>
+          <li>To compare two models, compute the <strong>ratio of their scores on the same windows</strong> and bootstrap it by resampling <strong>whole series</strong>, not windows.</li>
+          <li>Test on data published <strong>after the models were released</strong>. Treat public benchmarks as secondary: the models may have trained on them.</li>
+        </ul>
+      </div>
+
+      <p>Every number on the <a href="results.html">Results</a> page goes through the four functions below. They are 60 lines of NumPy. Getting them wrong will not crash anything: you will just believe the wrong model is better.</p>
+
+      <h2>1. Score the whole distribution: pinball loss and WQL</h2>
+      <p>A probabilistic forecaster outputs quantiles: for each future step, the values that the truth should fall below 10%, 50%, 90%… of the time. The <strong>pinball loss</strong> scores one quantile against the observed value \(y\):</p>
+      $$\rho_\tau(y, q) = \max\big(\tau\,(y - q),\; (\tau - 1)\,(y - q)\big)$$
+      <p>At \(\tau = 0.9\), forecasting too low costs 9 times more than forecasting too high, so the loss is minimised exactly at the 0.9-quantile of the outcome. The loss is <em>proper</em>: no model can lower its expected score by reporting anything other than what it believes.</p>
+      <figure class="code" data-ref="tinycast.eval.metrics.pinball_loss"></figure>
+      <p>Average it over quantile levels and steps, divide by the size of the series, and you get the <strong>weighted quantile loss</strong>, the discrete version of CRPS used by GIFT-Eval and most papers:</p>
+      $$\mathrm{WQL} = \frac{1}{K}\sum_{k=1}^{K} \frac{2\sum_t \rho_{\tau_k}(y_t, q_{\tau_k,t})}{\sum_t |y_t|}$$
+      <figure class="code" data-ref="tinycast.eval.metrics.wql"></figure>
+      <div class="note warn"><b>Watch the quantile grid</b>
+        The equal-weight average over levels is a biased estimate of CRPS, and the sign depends on the grid. For a perfectly calibrated Gaussian forecast, the 9 levels 0.1–0.9 overestimate CRPS by about 9%, our 13 levels (with 0.01, 0.05, 0.95, 0.99) underestimate it by about 17% (<code>docs/decisions/0002-metrics.md</code>, checked in <code>tests/test_metrics.py</code>). Comparing models on the same grid is fine. Comparing numbers computed on different grids is not. We report on the 9 levels every model shares.</div>
+
+      <h2>2. Divide by a baseline that is hard to beat</h2>
+      <p>WQL values of different series are not comparable: a flat series is easy, a spiky one hard. Divide each window's WQL by the WQL of <strong>seasonal naive</strong> (repeat the last season) on the same window, then take the <strong>geometric mean</strong> of the ratios. A score of 0.70 reads "30% less error than repeating the last season". The geometric mean treats "twice as good" and "twice as bad" symmetrically, and one exploding series cannot dominate.</p>
+      <p>Seasonal naive is a strong baseline on electricity, so it has to be right, and tested against a hand-computed example:</p>
+      <figure class="code" data-ref="tinycast.models.baselines.SeasonalNaive._one"></figure>
+      <p>For a statistical baseline beyond seasonal naive, use <code>statsforecast</code> (<code>AutoETS</code>). Check what it actually fits: our ETS wrapper caps the season at 24 steps, so when the detected season of an hourly series is weekly (168), it falls back to a non-seasonal model. We log every such fallback in the results file. On our electricity test ETS is worse than seasonal naive.</p>
+
+      <h2>3. Compare models with paired ratios and a cluster bootstrap</h2>
+      <p>Two models scoring 0.655 [0.608, 0.702] and 0.709 [0.653, 0.764] have overlapping intervals. That does not mean they are tied. The intervals mostly measure how hard the test windows are, and that difficulty is shared by both models. Compare them on the <strong>same windows</strong>: compute the per-window ratio of their scores, then the geometric mean of the ratios. Difficulty cancels out. Those two scores are our student and Toto-2.0-4m on the fresh electricity test; their paired ratio is 0.924 [0.894, 0.951], a clear difference (<code>results/study/stage_c3/table.json</code>).</p>
+      <figure class="code" data-ref="tinycast.eval.metrics.paired_ratio_ci"></figure>
+      <p>The interval comes from a bootstrap: resample, recompute, repeat 2,000 times, read the 2.5th and 97.5th percentiles. <strong>What you resample matters.</strong> Our fresh test has 312 windows but only 13 series, and consecutive windows of one series overlap and share the same weather. Resampling windows as if they were independent gives intervals that are far too narrow. Resample whole series (a cluster bootstrap): the effective sample size is closer to 13 than to 312.</p>
+      <figure class="code" data-ref="tinycast.eval.metrics.bootstrap_ci"></figure>
+      <pre><code class="language-python">from tinycast.eval.metrics import paired_ratio_ci, wql
+
+# y: (B, H) true futures; q_a, q_b: (B, 13, H) quantile forecasts; series: (B,) series id of each window
+ratio, lo, hi = paired_ratio_ci(wql(y, q_a, LEVELS), wql(y, q_b, LEVELS), groups=series)
+better = hi &lt; 1   # a is better only if the whole interval is below 1</code></pre>
+      <p>Two more rules. Score <strong>coverage</strong> as well: the share of outcomes inside the 80% interval. On fresh electricity, our student's 80% interval contains 62% of outcomes and Toto-2.0-4m's 70%. Both are over-confident on new data, which a single WQL number hides. And remember what the interval does not cover: we trained each student once, so the interval says nothing about training randomness.</p>
+
+      <h2>4. Test on data the models cannot have seen</h2>
+      <p>Foundation models are pretrained on most public time-series data. A public benchmark may be in the training set of the model you test. Our answer: the headline test set uses French electricity demand (RTE éCO2mix, 13 series) whose forecast targets start on 2026-10-15, the day after the last model we compare was released. The cut-off lives in one config file and a test fails if any training or validation window reaches it:</p>
+      <pre><code class="language-python">def test_fresh_start_after_every_model_release():
+    for name, released in SP.model_releases.items():
+        assert SP.fresh_start &gt; released, f"fresh split starts before {name} was released"</code></pre>
+      <figure class="code" data-ref="tinycast.data.windows.candidate_origins"></figure>
+      <p>Then <strong>never select on the test set</strong>. Choose checkpoints, hyper-parameters and the model to publish on a validation split. Expect validation to disagree with the test sometimes. In our runs, validation ranked a three-teacher ensemble first; on the tests it was no better than a single teacher, and worse on electricity. Be explicit when you break this rule. We publish the Toto-taught student because every model involved is Apache-2.0, but that choice was made after seeing the test scores, and it is also the best of our four final students on fresh electricity. Its 3% lead over the Timestral-taught student there is a selected number: discount it.</p>
+
+      <h2>5. When you use a public benchmark, re-run the competitors</h2>
+      <p>We also report GIFT-Eval with its official harness (<code>gluonts</code>-based) and its leaderboard rule. Leaderboard entries come from each model's own run, with its own settings. Toto-2.0 was run with a 4,096-step context; our student reads 512. Re-running Toto-2.0-4m at 512 steps made it 6.8% worse (ratio 1.068 [1.036, 1.110], <code>results/gift_eval/pairs.json</code>). Compared at equal context, our student is still 11% worse than Toto-2.0-4m on GIFT-Eval. Without the re-run, we would have blamed the gap on distillation instead of the context length.</p>
+
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>WQL on a quantile grid shared by all models; same grid for every number you compare.</li>
+        <li>Per-window ratio to seasonal naive, geometric mean. A hand-computed unit test for the baseline.</li>
+        <li>Paired ratios between models, with a bootstrap over series (not windows).</li>
+        <li>Coverage of the 80% interval next to every score.</li>
+        <li>A test set dated after every model's release, with a test that enforces the cut-off.</li>
+        <li>Selection on validation only. Say how many training seeds you ran.</li>
+        <li>Competitors re-run with your context length when you compare on a public benchmark.</li>
+      </ul>
+
+      <p class="next-post">Next: <a href="post-data.html">From raw series to a million training windows →</a></p>
+    </article>
+  </main>
+  <script type="module" src="/src/pages/post.ts"></script>
+</body>
+</html>

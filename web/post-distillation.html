@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Distilling a quantile forecaster</title>
+  <meta name="description" content="How to distil a large probabilistic time-series model into a 1M-parameter student: the loss, the data, and what moved the score." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <article class="post">
+      <p class="meta">Post 4 of 6 · about 11 minutes</p>
+      <h1>Distilling a quantile forecaster</h1>
+
+      <div class="tldr"><b>In short</b>
+        <ul>
+          <li>Run the teacher once over your training windows and <strong>cache its quantiles</strong> (float16, parquet). Training never calls the teacher.</li>
+          <li>Train the student with the <strong>pinball loss against the teacher's quantiles</strong>, used as weighted pseudo-observations. No KL divergence, no temperature.</li>
+          <li>What moved the score: teacher labels instead of real futures (12% lower error), and <strong>more windows</strong> (13% from 30k to 300k, 11% more at 1M). The choice of teacher: ±3%.</li>
+          <li>Distil on <strong>structured</strong> inputs: real series or Gaussian-process synthetic series. White noise teaches nothing.</li>
+        </ul>
+      </div>
+
+      <p>Our student has 0.95M parameters and copies Toto-2.0-313m, a model 330 times larger. It beats Toto-2.0-4m by 8% on fresh electricity data and stays 6% behind its teacher (<a href="results.html">Results</a>). Here is the recipe, in plain PyTorch.</p>
+
+      <h2>1. Label once, train many times: the teacher cache</h2>
+      <p>Distillation here is offline. Pick your training windows (512 steps of context each), run the teacher on all of them, and store its 13 quantiles × 64 steps per window. Every training run then reads the cache. That decouples the expensive part (running a 313M model) from the part you iterate on (the student).</p>
+      <p>Cost on an Apple M1 Pro: Toto-2.0-313m labels 54 windows/s on CPU and 179 windows/s on the GPU (MPS), batch 64 (<code>results/throughput.json</code>). One million windows is about an hour and a half on the GPU. Training the student for 50,000 steps on those windows took 78 minutes on the same laptop.</p>
+      <pre><code class="language-python"># per window, in parquet: window_id, then
+#   float32 (loc, scale) + float16 of (q - loc) / scale   -> 13 x 64 x 2 bytes + 8 = 1.7 kB
+q = teacher.forecast(context, horizon=64)          # (B, 13, 64) on the project quantile grid
+loc = np.median(q.reshape(len(q), -1), axis=1)
+scale = np.abs(q - loc[:, None, None]).reshape(len(q), -1).max(axis=1)
+z = ((q - loc[:, None, None]) / scale[:, None, None]).astype(np.float16)</code></pre>
+      <p>Store each window relative to its own location and scale, as above: raw float16 overflows above 65,504, which real series such as macro-economic indicators exceed.</p>
+
+      <h2>2. The loss: pinball against the teacher's distribution</h2>
+      <p>Classic knowledge distillation (Hinton et al., 2015) matches the student's softmax to the teacher's, with a temperature and a KL divergence. A quantile forecaster has no softmax: it outputs 13 numbers per step. What it does give you is a distribution, described by its quantiles.</p>
+      <p>Treat the teacher's 13 quantiles as 13 weighted observations: the 0.5 quantile stands for the probability mass between levels 0.45 and 0.55, the 0.01 quantile for the mass below 0.03, and so on. Train every student quantile with the ordinary pinball loss against those weighted observations. The pinball loss is minimised at the quantile of whatever data you feed it, so the student's 0.9-quantile converges to the teacher's.</p>
+      $$L_{\text{kd}} = 2\sum_{k} w_k \sum_{j} v_j\, \rho_{\tau_k}\big(q^{\text{teacher}}_{j} - q^{\text{student}}_{k}\big)$$
+      <p>\(v_j\) is the probability mass of teacher level \(j\), \(w_k\) that of student level \(k\). Move \(\tau\) below: the minimum of the loss (blue dot) lands on the teacher's \(\tau\)-quantile.</p>
+      <div class="figure" id="w-kd">
+        <div class="widget-controls"><label>τ <input id="w-kd-tau" type="range" min="0.02" max="0.98" step="0.01" value="0.9" /></label><span id="w-kd-out"></span></div>
+        <svg id="w-kd-svg" role="img" aria-label="Pinball loss as a function of the student's forecast"></svg>
+        <p class="cap">Orange ticks: a teacher's 13 quantiles; their height is the probability mass each one stands for. Blue: the expected pinball loss of a student forecast \(q\) for level \(\tau\).</p>
+      </div>
+      <figure class="code" data-ref="tinycast.distill.losses.level_mass"></figure>
+      <figure class="code" data-ref="tinycast.distill.losses.kd_pinball_teacher"></figure>
+      <p>Two details matter.</p>
+      <p><strong>Mask the levels the teacher does not produce.</strong> Toto-2.0 outputs only the levels 0.1 to 0.9; we extrapolate 0.01, 0.05, 0.95 and 0.99 for evaluation. If those extrapolated values act as pseudo-observations, the student learns our extrapolation rule, not the teacher. <code>teacher_level_mask</code> keeps only the native levels.</p>
+      <p><strong>Compute the loss in the student's scaled space.</strong> The student normalises its input (median and mean absolute deviation of the context, then <code>asinh</code>). Transform the teacher's quantiles and the true future the same way before the loss. Quantiles commute with increasing transforms, so the minimum does not move, and a 50 GW series and a 3 GW one produce gradients of the same size.</p>
+      <figure class="code" data-ref="tinycast.distill.train.scaled_targets"></figure>
+
+      <h2>3. Mixing truth and teacher: α</h2>
+      $$L = (1 - \alpha)\,L_{\text{gt}} + \alpha\,L_{\text{kd}}$$
+      <figure class="code" data-ref="tinycast.distill.losses.mixed_objective"></figure>
+      <p>\(L_{\text{gt}}\) is the same pinball loss against the one future that happened. At α = 0 you train on ground truth only; that student is the baseline every distilled student must beat. At α = 1 you need no ground truth at all, so you can distil on inputs that have no future (synthetic series). The published student uses α = 1.</p>
+      <p>Measured, same 0.95M network and same 300k windows, only the target changing: teacher labels gave <strong>12% lower error</strong> on fresh electricity (ratio 0.879 [0.859, 0.898]), 15% on the shapes, 4% on public data (<code>results/study/stage_c_lite/table.json</code>, teacher Timestral-209M). The observed future is one noisy draw. The teacher's distribution is a smoother target.</p>
+
+      <h2>4. What to distil on</h2>
+      <p>With α = 1 you only need contexts. The student learns the teacher's function only where it sees inputs. So the question is not "is it real data?" but "does the teacher do something worth copying on these inputs?".</p>
+      <ul>
+        <li><strong>White noise: no.</strong> The teacher answers every noise context with the same flat forecast. A student trained on noise-labelled windows had 48% higher error on fresh electricity and 5.7× the error on the shapes than one trained on structured synthetic series (<code>results/study/stage_a/table.json</code>).</li>
+        <li><strong>Gaussian-process series (KernelSynth): yes.</strong> Random combinations of periodic, smooth and trend kernels make the teacher react to seasonality and trends. They are free, infinite, and carry no licence or leakage risk.</li>
+        <li><strong>Real series: yes</strong>, and they are where teacher labels beat ground truth. The published student uses 500k synthetic windows plus 500k windows from about 40 public datasets.</li>
+      </ul>
+      <figure class="code" data-ref="tinycast.data.synthetic.kernel_synth"></figure>
+      <div class="note"><b>A subtle one</b>
+        On purely synthetic inputs, the generator's true continuation beat the teacher's labels on the shapes (ratio 1.123 for teacher labels, <code>results/study/stage_a/table.json</code>), and tied elsewhere. The generator knows the exact future, so there is no noise for the teacher to smooth. Distil where the truth is noisy; use the truth where it is exact.</div>
+
+      <h2>5. The student</h2>
+      <p>A small patch transformer (the full walk-through, with one real forecast traced layer by layer, is in <a href="post-student.html">post 3</a>): cut the 512-step context into 32 patches of 16 steps, embed each patch (with a mask channel for missing values), add one learned query token, run 4 transformer layers of width 128, and read the forecast off the query token.</p>
+      <figure class="code" data-ref="tinycast.models.student.PatchTransformerNet.forward"></figure>
+      <p>The head predicts the median plus positive gaps (softplus) outward, so quantiles can never cross. You get a valid distribution by construction, not by post-processing.</p>
+      <figure class="code" data-ref="tinycast.models.student.MonotoneQuantileHead"></figure>
+      <p>Training: AdamW, learning rate 10⁻³ with linear warm-up and cosine decay to 10%, batch 256, gradient clipping at 1, checkpoint chosen on a validation split. Nothing exotic.</p>
+
+      <h2>6. What moved the score, and what did not</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Change (all else equal)</th><th class="num">Fresh electricity</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Teacher labels instead of real futures</td><td class="num">−12%</td><td class="src">stage_c_lite</td></tr>
+          <tr><td>30k → 300k windows</td><td class="num">−13%</td><td class="src">stage_c_lite</td></tr>
+          <tr><td>300k → 1M windows</td><td class="num">−11%</td><td class="src">stage_c2</td></tr>
+          <tr><td>Toto-2.0-313m instead of Timestral-28M as teacher (1M windows)</td><td class="num">−3%</td><td class="src">stage_c3</td></tr>
+          <tr><td>Three-teacher ensemble instead of Timestral-28M (1M windows)</td><td class="num">+3%</td><td class="src">stage_c3</td></tr>
+          <tr><td>White-noise inputs instead of KernelSynth</td><td class="num">+48%</td><td class="src">stage_a</td></tr>
+        </tbody></table></div>
+      <p>Negative is better; every row is a paired comparison whose 95% interval excludes zero change. The lesson is blunt: <strong>spend compute on labelling more windows</strong>, and pick the teacher for its licence and inference cost. At 30k windows a three-teacher ensemble beat a single teacher by 2% on public data; at 1M windows that gain was gone.</p>
+      <p>The limit: on GIFT-Eval, a broad public benchmark, the student is 11% worse than Toto-2.0-4m at equal context. Distillation copies the teacher only on inputs like the ones you distil on. The Timestral-taught student, trained on the same windows, lost most on 10-second, 10-minute and daily series.</p>
+
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>Cache the teacher's quantiles once (float16 relative to loc/scale). Check the labels for NaN and inf.</li>
+        <li>Loss: pinball of each student level against the teacher's quantiles weighted by probability mass. Mask extrapolated teacher levels.</li>
+        <li>Compute the loss after the student's own scaler.</li>
+        <li>Train the same student on ground truth only. That is your baseline.</li>
+        <li>Inputs: real series and Gaussian-process synthetic series. Never plain noise.</li>
+        <li>Scale the number of windows before tuning the teacher, the loss or the architecture.</li>
+        <li>Test outside your training domain before you claim the student is general.</li>
+      </ul>
+
+      <p class="next-post">Next: <a href="post-compression.html">From PyTorch to a 1.3 MB ONNX file →</a></p>
+    </article>
+  </main>
+  <script type="module" src="/src/pages/post.ts"></script>
+</body>
+</html>

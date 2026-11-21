@@ -3,36 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>tinycast · Draw</title>
+  <title>tinycast · a distilled forecaster</title>
+  <meta name="description" content="A 0.95M-parameter probabilistic forecaster distilled from Toto-2.0-313m, running in the browser. Results, code and what we learned." />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
   <main>
-    <section class="intro">
-      <h1>A 1M-parameter forecaster, small enough for your browser</h1>
-      <p class="lede">Draw a curve and it predicts what comes next, with its uncertainty. It learned by copying a forecasting model 29 times its size.</p>
-      <p class="stats" id="stats"></p>
-    </section>
+    <h1>A 1M-parameter forecaster, distilled from a 313M one, running in your browser</h1>
+    <p class="lede" id="lede">Loading results…</p>
+    <div class="numbers" id="numbers"></div>
 
-    <div class="card plain">
+    <h2>Draw a series, get a forecast</h2>
+    <p class="prose">Draw from left to right. The student forecasts the next 64 steps on every move of the pen. Move the pointer back over your drawing to forecast from an earlier point. Pick a shape to see the true continuation and the teacher's forecast.</p>
+    <div class="figure">
       <div class="toolbar">
-        <select id="preset" aria-label="Load a shape"><option value="">Pick a shape…</option></select>
-        <button id="random">Random shape</button>
-        <button id="clear">Clear</button>
-        <button id="undo">Undo</button>
-        <span style="flex:1"></span>
-        <button class="chip" id="cmp-teacher" aria-pressed="false" disabled><span class="dot" style="background:var(--teacher)"></span>Show the teacher</button>
+        <select id="preset" aria-label="Load a shape"><option value="">Load a shape…</option></select>
+        <button id="clear" type="button">Clear</button>
+        <button id="undo" type="button">Undo</button>
+        <span class="grow"></span>
+        <button id="teacher" type="button" aria-pressed="false" disabled>Show teacher</button>
       </div>
-      <div class="pad-wrap" style="margin-top:10px">
-        <svg id="pad" style="touch-action:none; cursor:crosshair; display:block; border-radius:8px"></svg>
-        <div class="pad-hint" id="hint">Draw left to right. Hover your drawing to forecast from an earlier point.</div>
-      </div>
+      <div class="pad-wrap"><svg id="pad" role="img" aria-label="Drawing area with the forecast"></svg></div>
       <div class="legend" id="legend"></div>
+      <p class="readout" id="readout"></p>
     </div>
 
-    <p class="next-links"><a class="cta" href="play.html">Play: can you beat it?</a>
-      <a href="results.html">How it compares with models of its size →</a></p>
+    <h2>Accuracy against size</h2>
+    <p class="prose" id="pareto-lede"></p>
+    <div class="figure">
+      <svg id="pareto" role="img" aria-label="Error against number of parameters"></svg>
+      <p class="cap" id="pareto-cap"></p>
+    </div>
+
+    <h2>Where it works, where it fails</h2>
+    <p class="prose">The two shapes it forecasts best and the two it forecasts worst, out of 20. Forecasts below are computed live by the model in this page.</p>
+    <div class="figure"><div class="multiples" id="multiples"></div>
+      <p class="cap">Score: forecast error divided by the error of seasonal naive (repeat the last season), averaged over 10 random draws of each shape. Below 1 beats seasonal naive. Low-noise series that repeat exactly are the hardest case to win: seasonal naive copies the last period almost perfectly.</p></div>
+
+    <h2>Read more</h2>
+    <ul class="prose">
+      <li><a href="results.html">Results</a>: every comparison we ran, with confidence intervals, including where the student loses.</li>
+      <li><a href="posts.html">Posts</a>: how to evaluate a probabilistic forecaster, distil one, compress it, and run it in a browser, with the code.</li>
+    </ul>
   </main>
-  <script type="module" src="/src/pages/draw.ts"></script>
+  <script type="module" src="/src/pages/home.ts"></script>
 </body>
 </html>

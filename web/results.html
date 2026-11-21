@@ -3,33 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>tinycast · Results</title>
+  <title>tinycast · results</title>
+  <meta name="description" content="Every comparison of the tinycast distillation study, with paired 95% confidence intervals." />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
   <main>
-    <section class="intro">
-      <h1>How it compares</h1>
-      <p class="lede">Each score is the forecast error divided by the error of a naive forecast that repeats the last season. Lower is better: 0.5 means half the naive error.</p>
-    </section>
+    <h1>Results</h1>
+    <p class="lede" id="lede"></p>
 
-    <h2>Against models of its size</h2>
-    <p class="section-lede" id="small-lede"></p>
-    <div class="small-multiples" id="small"></div>
+    <div class="note"><b>How to read the numbers</b>
+      <span id="howto"></span></div>
 
-    <h2>Fine-tuned on your own data</h2>
-    <p class="section-lede">The student fine-tuned on the history of the series it will forecast, from the distilled weights or from random weights. Dotted lines: other models, used as they are. Measured with the previous version of the student (300k training windows).</p>
-    <div class="toolbar" id="ft-tabs" style="margin-bottom:8px"></div>
-    <svg id="ft"></svg>
-    <p class="small muted" id="ft-note"></p>
+    <h2>Leaderboard</h2>
+    <div class="tabs" id="tabs"></div>
+    <p class="prose small" id="suite-note"></p>
+    <div class="figure"><svg id="board" role="img" aria-label="Scores of every model"></svg></div>
+    <div class="table-wrap" id="table"></div>
+    <p class="src" id="board-src"></p>
 
-    <details class="more">
-      <summary>All models, with exact scores</summary>
-      <div class="toolbar" style="margin:12px 0 8px" id="tabs"></div>
-      <div class="table-wrap" id="board"></div>
-    </details>
+    <h2>What the student is worth</h2>
+    <div class="findings" data-group="worth"></div>
+
+    <h2>What made distillation work</h2>
+    <p class="prose">Controlled comparisons: two students that differ in one thing, scored on the same windows. Earlier stages used Timestral teachers; each card says which.</p>
+    <div class="findings" data-group="recipe"></div>
+
+    <h2>Shipping and adapting it</h2>
+    <div class="findings" data-group="ship"></div>
+
+    <h2>Method and limits</h2>
+    <ul class="prose" id="method"></ul>
   </main>
-  <div class="tooltip" id="tip"></div>
   <script type="module" src="/src/pages/results.ts"></script>
 </body>
 </html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From raw series to a million training windows</title>
+  <meta name="description" content="Where the student's training data comes from, how each series is cut into windows, how splits stay leak-free, and how the teacher's labels sit on disk." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <article class="post">
+      <p class="meta">Post 2 of 6 · about 8 minutes</p>
+      <h1>From raw series to a million training windows</h1>
+
+      <div class="tldr"><b>In short</b>
+        <ul>
+          <li>A training example is a <strong>window</strong>: 512 past values the student reads, and 64 future steps the loss scores. The 64 steps carry the teacher's 13 quantiles.</li>
+          <li>The published student trained on <strong>1,000,000 windows</strong>: half cut from real public series, half generated from random seeds. None comes from French electricity.</li>
+          <li>Each series is split <strong>by position</strong>: the first 70% for training, the next 15% for validation, the last 15% for test. A window belongs to the split that holds its whole target.</li>
+          <li>Window origins sit on a grid with a stride of 64, so <strong>no two targets share a step</strong>. Every dataset gets the same quota.</li>
+          <li>The teacher's labels sit in <strong>parquet shards next to a manifest</strong>, joined to the windows by a hashed id.</li>
+        </ul>
+      </div>
+
+      <div class="numbers" id="d-numbers"></div>
+
+      <p>Colours used on this page:</p>
+      <div class="key">
+        <div style="--c: var(--ink-2)"><b>Context</b>the 512 past steps the student reads</div>
+        <div style="--c: var(--ink)"><b>Target</b>the 64 future steps the loss looks at</div>
+        <div style="--c: var(--teacher)"><b>Teacher labels</b>Toto-2.0-313m's quantiles for the target</div>
+        <div style="--c: var(--s-train)"><b>Train</b>· <span style="color:var(--s-val);font-weight:600">validation</span> · <span style="color:var(--s-test);font-weight:600">test</span>: where a window's target is allowed to fall</div>
+      </div>
+
+      <h2>1. One training example</h2>
+      <p>The student never sees a whole series. It sees fixed-size windows: <span class="c-flow">512 steps of context</span> and a <span class="c-flow">64-step target</span>. For distillation, the target also carries <span class="c-teacher">the teacher's quantiles</span>, computed once and cached. With α = 1, the loss uses only those labels. The real future in the window is kept for validation and for ground-truth baselines.</p>
+      <div class="figure">
+        <div class="tabs" id="d-ex-tabs"></div>
+        <svg id="d-anatomy" role="img" aria-label="One training window: context, target and the teacher's quantiles"></svg>
+        <div class="legend"><span><i style="border-color:var(--ink-2)"></i>context (input)</span><span><i style="border-color:var(--ink)"></i>real future</span><span><i class="band" style="background:color-mix(in srgb, var(--teacher) 35%, transparent)"></i>teacher's 10–90% and 30–70% ranges</span><span><i style="border-color:var(--teacher)"></i>teacher's median</span></div>
+        <p class="cap" id="d-ex-cap"></p>
+      </div>
+      <p>The student also standardises every window by itself (<a href="post-student.html">post 3</a>), so a series in megawatts and one in passenger counts train side by side. Missing values stay <code>NaN</code>. The model gets a mask for them.</p>
+
+      <h2>2. What the million windows are made of</h2>
+      <div class="figure">
+        <svg id="d-mix" role="img" aria-label="Composition of the training corpus by domain and generator"></svg>
+        <p class="cap">Top: 500,000 windows cut from <span id="d-nseries"></span> real series in <span id="d-nds"></span> public datasets, coloured by domain. Bottom: 500,000 synthetic windows, by generator.</p>
+      </div>
+      <p><strong>Real series</strong> come from two openly licensed collections: Chronos's training datasets and Salesforce's GiftEvalPretrain (<code>configs/data/gift_pretrain_v2.yaml</code>). They cover traffic sensors, smart meters, wind farms, air quality, weather, web traffic and epidemiology. Every dataset gets <strong>the same quota</strong>. A dataset with fewer windows than its share hands the leftover to the others. Without a quota, the few datasets with thousands of long series would make up most of the corpus.</p>
+      <div class="figure">
+        <svg id="d-datasets" role="img" aria-label="Windows per dataset"></svg>
+        <p class="cap">Windows per dataset. Most datasets hit the same cap (dashed line). The ones below it had fewer windows than their share. Energy and traffic still dominate because they have the most datasets, not the most series.</p>
+      </div>
+      <figure class="code" data-ref="tinycast.data.sources.data_v2.windows_v2"></figure>
+
+      <h2>3. Cutting one series into windows</h2>
+      <p>Here is one real series from the corpus, an hourly road-traffic sensor (<span id="d-ser-name"></span>). Public datasets end on different dates, so a single calendar cut-off is impossible. Each series is split <strong>by position</strong> instead: <span class="c-train">train</span> for the first 70%, <span class="c-val">validation</span> for the next 15%, <span class="c-test">test</span> for the last 15%.</p>
+      <div class="figure">
+        <svg id="d-series" role="img" aria-label="One series with its position splits and the window origins drawn from it"></svg>
+        <p class="cap" id="d-series-cap"></p>
+      </div>
+      <p>The rule that prevents leaks is about <strong>targets</strong>: a window belongs to a split only if its whole 64-step target lies inside that split. The context may reach back into earlier parts, because that is just the past. Origins sit on a grid with a <strong>stride equal to the horizon</strong> (64), shifted by a random offset per series. Two training targets therefore never share a step, while their contexts overlap by 448 of 512 steps:</p>
+      <div class="figure">
+        <svg id="d-zoom" role="img" aria-label="Three consecutive grid slots: overlapping contexts, tiled targets"></svg>
+        <p class="cap">Three consecutive grid slots of this series. Each row is one window: grey is its context, blue its target. The targets tile the series. Slot 3 is on the grid but was not drawn into the corpus: with a fixed quota per dataset, only part of each grid is used.</p>
+      </div>
+      <p>A window must have at least 90% of its target observed and 32 observed steps of history. Contexts shorter than 512 steps are left-padded with <code>NaN</code>. The id of a window is a hash of where it came from, so it is the same on every machine and in every run:</p>
+      <figure class="code" data-ref="tinycast.data.windows.window_id"></figure>
+
+      <h2>4. Synthetic series: free, unlimited, leak-free</h2>
+      <p>The other half of the corpus is generated. Each window is a pure function of one integer seed, so nothing is stored: the corpus regenerates its series from the seed list. The seed ranges cannot collide: <span class="c-train">training seeds</span> in [0, 500,000), <span class="c-val">validation seeds</span> in [500,000, 1,000,000), and the gallery and test shapes from 1,000,000 up. A unit test checks the boundary between training and test seeds (<code>tests/test_leakage.py</code>).</p>
+      <ul id="d-kinds"></ul>
+      <figure class="code" data-ref="tinycast.data.synthetic.synthetic_series"></figure>
+      <p>The synthetic tabs in section 1 show one window of each kind, with the teacher's labels.</p>
+
+      <h2>5. Keeping the test sets out</h2>
+      <p>Public data has one risk: the same series can appear in a training collection and in a benchmark. Before training, every candidate series is checked. The first 70% of the series is cut into 32-step chunks. Each chunk is z-normalised and hashed, and the hash is looked up in a set built from GIFT-Eval, fev, our electricity series and the held-out pedestrian counts. <strong>One matching chunk drops the whole series.</strong></p>
+      <p id="d-contam"></p>
+      <p>The headline test, French electricity from RTE, is held out completely. It is never in the distillation corpus. Its split is calendar-based, and its test period starts after every model we compare was released:</p>
+      <div class="figure">
+        <svg id="d-rte" role="img" aria-label="French national electricity demand with the calendar splits"></svg>
+        <p class="cap" id="d-rte-cap"></p>
+      </div>
+
+      <h2>6. How it sits on disk</h2>
+      <p>Two artefacts, joined by window id:</p>
+      <pre class="tree" id="d-tree"></pre>
+      <p>The <strong>corpus key</strong> is a hash of the recipe: sources, counts, seed, context length and horizon. Change any of them and you get a new key, a new corpus file and a new cache folder, never a silent mix. The manifest records which teacher, package version and git commit made the labels. Training refuses to start if a single window id is missing from the cache.</p>
+      <p>Each window's labels are one binary blob of <span id="d-blob-bytes"></span>:</p>
+      <div class="figure">
+        <svg id="d-blob" role="img" aria-label="Byte layout of one cached label"></svg>
+        <p class="cap">Storing raw float16 overflows above 65,504 (a bitcoin price, a macro series). Storing each window relative to its own centre and spread keeps float16's size with precision relative to the window's own range.</p>
+      </div>
+      <figure class="code" data-ref="tinycast.data.cache._encode"></figure>
+      <details><summary>The manifest of this cache (shard list truncated)</summary><pre class="tree" id="d-manifest"></pre></details>
+
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>Define a window as (context, target). Assign it to a split by its <em>target</em> only.</li>
+        <li>Split each series by position when the datasets end on different dates; use a calendar cut-off for your headline test.</li>
+        <li>Put origins on a stride-equal-to-horizon grid. Give every dataset the same quota.</li>
+        <li>Hash every chunk of every training series against your test sets and drop matching series whole.</li>
+        <li>Generate synthetic series from seeds, with disjoint seed ranges per split.</li>
+        <li>Give windows stable ids (a hash of source, series, origin). Key corpora and caches by a hash of the recipe.</li>
+        <li>Cache labels per window relative to its own location and scale, in shards with a manifest.</li>
+      </ul>
+
+      <p class="src">Every number on this page is computed by <code>scripts/build_explainers.py</code>. It rebuilds the published student's corpus with the training code, checks it window by window against the stored one, and reads the teacher's labels from the cache shards.</p>
+      <p class="next-post">Next: <a href="post-student.html">Inside the student: one forecast, step by step →</a></p>
+    </article>
+  </main>
+  <script type="module" src="/src/pages/explain.ts"></script>
+</body>
+</html>

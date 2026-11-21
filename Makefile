@@ -39,9 +39,10 @@ bench:
 export:
 	$(UV) python scripts/export.py --run $(R)
 
-web-data:
-	python3 web/learn-src/build.py
+web-data:  # paired comparisons first (scripts/gift_eval_pairs.py needs external/gift-eval)
+	$(UV) python scripts/site_pairs.py
 	$(UV) python scripts/build_web_data.py
+	$(UV) python scripts/build_explainers.py  # data + student explainer posts (needs data/ and the C3 run, ~70 s)
 
 web-dev:
 	cd web && npm run dev

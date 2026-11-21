@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Running the model in a browser tab</title>
+  <meta name="description" content="onnxruntime-web with Vite: load an ONNX forecaster, feed it missing values, time it honestly, and drive it from a drawing canvas." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <article class="post">
+      <p class="meta">Post 6 of 6 · about 5 minutes</p>
+      <h1>Running the model in a browser tab</h1>
+
+      <div class="tldr"><b>In short</b>
+        <ul>
+          <li><code>npm install onnxruntime-web</code>, import <code>onnxruntime-web/wasm</code>; Vite bundles the WebAssembly binary for you.</li>
+          <li>Send a <code>Float32Array</code> with <code>NaN</code> for missing values; the scaler inside the graph handles them.</li>
+          <li>Time only <code>session.run</code>, after a warm-up call, and report the median.</li>
+          <li>Never queue inferences: run one at a time, and only on the latest input.</li>
+        </ul>
+      </div>
+
+      <h2>1. The whole runtime is 40 lines</h2>
+      <p>Because the scaler is inside the ONNX graph (<a href="post-compression.html">post 5</a>), the browser has nothing to re-implement. This is the complete file the <a href="index.html">demo</a> uses:</p>
+      <figure class="code" data-ref="web/src/lib/ort.ts"></figure>
+      <p>Points worth copying:</p>
+      <ul>
+        <li><strong>Import the WASM build</strong> (<code>onnxruntime-web/wasm</code>), not the default entry, when you do not need WebGPU. Vite resolves the <code>.wasm</code> file through <code>import.meta.url</code>, so there is no CDN and no manual copy step.</li>
+        <li><strong>Threads need cross-origin isolation.</strong> Multi-threaded WASM requires the COOP and COEP HTTP headers. GitHub Pages does not send them, so we set <code>numThreads = 1</code> unless <code>self.crossOriginIsolated</code> is true. A one-millisecond model does not need more.</li>
+        <li><strong>Pad on the left with <code>NaN</code>.</strong> The model reads exactly 512 values. Shorter inputs are left-padded with <code>NaN</code>, and gaps in the drawing stay <code>NaN</code>. The graph's mask channel ignores them.</li>
+        <li><strong>The output is flat.</strong> <code>quantiles.data</code> is a <code>Float32Array</code> of shape (1, 13, 64) in row-major order: slice it per quantile level.</li>
+      </ul>
+
+      <h2>2. Measure latency honestly</h2>
+      <p>The first <code>session.run</code> compiles kernels and is much slower than the rest. Run it once on dummy data inside <code>load()</code> and never time it. Then time <code>session.run</code> alone with <code>performance.now()</code>: no drawing, no array copies. Keep the last 50 timings and show the median, not the mean: garbage collection and tab throttling produce rare, huge outliers. The demo's readout does exactly that, on your machine, live.</p>
+      <p>For reference, on an Apple M1 Pro the same file runs in 0.75 ms per forecast in ONNX Runtime for Python, one thread (<code>results/shapes/student-toto-onnx-fp32.json</code>). The browser number depends on your machine and browser; compare it with the live readout in the demo.</p>
+
+      <h2>3. Drive it from a canvas without lag</h2>
+      <p>The demo forecasts on every pointer move. Pointer events arrive faster than any model, so naive code queues hundreds of inferences and the forecast trails the pen. The fix is a dirty flag and one inference in flight:</p>
+      <pre><code class="language-typescript">let busy = false, dirty = false;
+const request = () =&gt; { dirty = true; requestAnimationFrame(() =&gt; void pump()); };
+
+async function pump(): Promise&lt;void&gt; {
+  if (busy || !dirty) return;      // one inference at a time
+  dirty = false;
+  busy = true;
+  try { forecast = await model.forecast(values.slice(0, origin + 1)); }
+  finally { busy = false; }
+  render();
+  if (dirty) requestAnimationFrame(() =&gt; void pump());   // input changed meanwhile: run once more, on the latest
+}</code></pre>
+      <p>Two details of the drawing itself. Pointer events skip time steps when the pen moves fast, so fill every step between two events by linear interpolation. And treat the pen tip as "now": erase everything to its right when the user draws backwards, otherwise old strokes leak into the context.</p>
+      <pre><code class="language-typescript">if (prev) {                                   // fill the steps between two pointer events
+  const [i0, v0] = prev;
+  for (let k = Math.min(i0, i); k &lt;= Math.max(i0, i); k++)
+    values[k] = i === i0 ? v : v0 + ((v - v0) * (k - i0)) / (i - i0);
+} else values[i] = v;
+for (let k = i + 1; k &lt; values.length; k++) values[k] = NaN;   // the pen tip is the present</code></pre>
+
+      <h2>4. Draw the uncertainty, not just the line</h2>
+      <p>The fan chart is three <code>d3.area()</code> bands between symmetric pairs of quantiles (1–99%, 10–90%, 30–70%), from light to dark, with the median on top. Label what the bands are: "98%, 80% and 40% intervals" tells the reader how to use them; "likely range" does not.</p>
+      <pre><code class="language-typescript">import { area } from "d3-shape";
+for (const [lo, hi, opacity] of [[1, 99, 0.14], [10, 90, 0.26], [30, 70, 0.42]])
+  svg.append("path")
+    .attr("d", area&lt;number&gt;().x((_, i) =&gt; x(origin + 1 + i)).y0((d) =&gt; y(d)).y1((_, i) =&gt; y(q[level(hi)][i]))(q[level(lo)]))
+    .attr("fill", studentColour).attr("opacity", opacity);</code></pre>
+      <p>Import only the D3 modules you use (<code>d3-scale</code>, <code>d3-shape</code>, <code>d3-selection</code>), not the <code>d3</code> bundle.</p>
+
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>Preprocessing inside the ONNX graph; the browser sends raw values with <code>NaN</code> for gaps.</li>
+        <li><code>onnxruntime-web/wasm</code> bundled by Vite; one thread unless the page is cross-origin isolated.</li>
+        <li>Warm-up run at load; time <code>session.run</code> only; show the median.</li>
+        <li>One inference in flight, re-run only on the latest input.</li>
+        <li>Fan chart with labelled intervals.</li>
+      </ul>
+
+      <p class="next-post">Back to the <a href="index.html">demo</a> or the <a href="results.html">results</a>.</p>
+    </article>
+  </main>
+  <script type="module" src="/src/pages/post.ts"></script>
+</body>
+</html>

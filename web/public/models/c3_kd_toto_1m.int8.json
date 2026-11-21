@@ -1,0 +1,1 @@
+{"run": "2026-11-16_stage_c3_kd_toto_1m", "n_params": 946368, "student_config": {"arch": "patch_transformer", "context_length": 512, "horizon": 64, "patch_size": 16, "d_model": 128, "n_layers": 4, "n_heads": 4, "ff_mult": 4, "dropout": 0.1, "use_asinh": true, "quantile_levels": [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]}}

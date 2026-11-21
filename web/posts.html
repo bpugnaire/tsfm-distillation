@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tinycast · posts</title>
+  <meta name="description" content="Six short posts: evaluating, distilling, compressing and shipping a probabilistic forecaster, with the code." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Posts</h1>
+    <p class="lede">What we did to build the student, written so you can do it yourself: the library, the function, the code, and the mistakes we made. Read them in order or pick one.</p>
+    <ul class="post-list">
+      <li><a href="post-evaluation.html">1 · Evaluating a probabilistic forecaster without fooling yourself</a>
+        <p>Pinball loss and WQL, scores relative to seasonal naive, paired comparisons with a cluster bootstrap, and a test set the models cannot have seen.</p></li>
+      <li><a href="post-data.html">2 · From raw series to a million training windows</a>
+        <p>Where the training data comes from, how each series is cut into windows, how the splits stay leak-free, and how the teacher's labels sit on disk.</p></li>
+      <li><a href="post-student.html">3 · Inside the student: one forecast, step by step</a>
+        <p>What fixes the model's input and output range, where its knowledge sits, one real forecast traced layer by layer, and where to improve it.</p></li>
+      <li><a href="post-distillation.html">4 · Distilling a quantile forecaster</a>
+        <p>Why the classic KL recipe does not apply, the loss that replaces it, which inputs to distil on, and what actually moved the score.</p></li>
+      <li><a href="post-compression.html">5 · From PyTorch to a 1.3 MB ONNX file</a>
+        <p>Putting the scaler inside the graph, the export calls that fail and how to fix them, parity tests, and int8 quantisation that keeps accuracy.</p></li>
+      <li><a href="post-browser.html">6 · Running the model in a browser tab</a>
+        <p>onnxruntime-web with Vite, input tensors with missing values, honest latency measurement, and the drawing canvas.</p></li>
+    </ul>
+  </main>
+  <script type="module" src="/src/pages/post.ts"></script>
+</body>
+</html>

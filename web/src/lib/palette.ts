@@ -47,18 +47,4 @@ export const ink = {
     "dark": "#383835"
   }
 } as const;
-export const modelRoles: Record<string, keyof typeof roles> = {
-  "student": "student",
-  "toto-2.0-313m": "teacher",
-  "toto-2.0-1b": "teacher",
-  "t0": "teacher",
-  "toto-2.0-4m": "comparator",
-  "toto-2.0-22m": "comparator",
-  "chronos-2": "comparator",
-  "chronos-bolt": "comparator",
-  "ttm": "comparator",
-  "timestral": "comparator",
-  "seasonal_naive": "baseline",
-  "ets": "baseline"
-};
 export const bands: [number, number, number][] = [[0.01, 0.99, 0.15], [0.1, 0.9, 0.28], [0.3, 0.7, 0.45]];
