@@ -153,14 +153,25 @@ def train(
 
             build_ensemble_cache(members, teacher_corpus_key or tr_spec.key(), log=log)
             members, kind = [ensemble_cache_name(members)], "single"
+        big = isinstance(tr.context, np.memmap)  # labels of a memory-mapped corpus stay on disk too
+        if big and kind != "single":
+            raise ValueError("weighted teachers on a memory-mapped corpus are not supported")
         for name in members:
-            q_m, man = read_cache(name, teacher_corpus_key or tr_spec.key(), tr.ids)
+            if big:
+                from tinycast.data.cache import read_cache_mmap
+
+                q_m, man = read_cache_mmap(name, teacher_corpus_key or tr_spec.key(), tr.ids)
+            else:
+                q_m, man = read_cache(name, teacher_corpus_key or tr_spec.key(), tr.ids)
             qs.append(q_m)
             mans.append(man)
         t_levels = tuple(mans[0]["levels"])
         if any(tuple(m["levels"]) != t_levels for m in mans):
             raise ValueError("teachers were cached on different level grids")
-        teacher_q, diag = combine(kind, qs, tr.future, t_levels, tau)
+        if big:  # single teacher: no stacking copy
+            teacher_q, diag = qs[0], {}
+        else:
+            teacher_q, diag = combine(kind, qs, tr.future, t_levels, tau)
         native = set.intersection(*(set(m["native_levels"]) for m in mans))
         if diag:
             log(f"teacher combination {kind}: {diag}")
@@ -197,7 +208,8 @@ def train(
     )  # large corpora stay on disk; batches are gathered from the file
     ctx_all = None if mmapped else torch.as_tensor(tr.context)
     fut_all = torch.as_tensor(tr.future)
-    tq_all = torch.as_tensor(teacher_q) if teacher_q is not None else None
+    tq_mm = isinstance(teacher_q, np.memmap)
+    tq_all = torch.as_tensor(teacher_q) if teacher_q is not None and not tq_mm else None
     rng = np.random.default_rng(cfg.seed)
     o = cfg.optim
     history, best, bad_evals = [], float("inf"), 0
@@ -235,8 +247,9 @@ def train(
             ys = scaled_targets(model, y, loc, scale)
             l_gt = L.pinball_gt(zq, ys, levels, mask=~torch.isnan(y), horizon_w=hw)
             l_kd = None
-            if tq_all is not None:
-                qt = scaled_targets(model, tq_all[idx].to(device), loc, scale)
+            if tq_all is not None or tq_mm:
+                tq = torch.from_numpy(np.asarray(teacher_q[idx.numpy()])) if tq_mm else tq_all[idx]
+                qt = scaled_targets(model, tq.to(device), loc, scale)
                 if cfg.loss.kd == "pinball_teacher":
                     l_kd = L.kd_pinball_teacher(zq, qt, levels, t_levels, hw, t_mask)
                 elif cfg.loss.kd == "quantile_huber":

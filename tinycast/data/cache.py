@@ -237,18 +237,54 @@ def read_cache(
 
 
 def check_cache(teacher: str, corpus_key: str, expected_n: int) -> dict:
-    q, man = read_cache(teacher, corpus_key)
-    report = {
-        "n": len(q),
-        "expected": expected_n,
-        "nan": int(
+    """Integrity check, shard by shard (a 3M-window cache is ~10 GB as float32: never load it whole)."""
+    d = cache_dir(teacher, corpus_key)
+    man = json.loads((d / "manifest.json").read_text())
+    K, H = len(man["levels"]), man["horizon"]
+    n = nan = 0
+    nonmono = 0.0
+    for name in sorted(man["shards"]):
+        q = _decode(pq.read_table(d / name)["q"].to_pylist(), K, H)
+        n += len(q)
+        nan += int(
             (~np.isfinite(q)).sum()
-        ),  # NaN *and* inf (v1 only checked NaN and missed overflows)
-        "non_monotone_frac": float((np.diff(q, axis=1) < -1e-3).mean()),
+        )  # NaN *and* inf (v1 only checked NaN and missed overflows)
+        nonmono += float((np.diff(q, axis=1) < -1e-3).sum())
+    report = {
+        "n": n,
+        "expected": expected_n,
+        "nan": nan,
+        "non_monotone_frac": nonmono / max(1, n * (K - 1) * H),
     }
     if report["n"] != expected_n or report["nan"]:
         raise ValueError(f"cache integrity failed: {report}")
     return report
+
+
+def read_cache_mmap(teacher: str, corpus_key: str, ids: np.ndarray) -> tuple[np.ndarray, dict]:
+    """Teacher quantiles aligned to `ids`, as a read-only float32 memmap built once next to the cache (decoded shard
+    by shard). For corpora whose labels do not fit in RAM; same values as read_cache."""
+    d = cache_dir(teacher, corpus_key)
+    man = json.loads((d / "manifest.json").read_text())
+    K, H = len(man["levels"]), man["horizon"]
+    out = d / f"aligned_{ids_fingerprint(ids)}.npy"
+    if not out.exists():
+        tmp = out.with_suffix(".partial.npy")
+        mm = np.lib.format.open_memmap(tmp, mode="w+", dtype=np.float32, shape=(len(ids), K, H))
+        pos = {w: i for i, w in enumerate(ids)}
+        seen = 0
+        for name in sorted(man["shards"]):
+            t = pq.read_table(d / name)
+            wid = t["window_id"].to_numpy(zero_copy_only=False)
+            rows = np.array([pos[w] for w in wid])
+            mm[rows] = _decode(t["q"].to_pylist(), K, H).astype(np.float32)
+            seen += len(wid)
+        if seen != len(ids):
+            raise KeyError(f"{len(ids) - seen} windows missing from cache {d}")
+        mm.flush()
+        del mm
+        tmp.rename(out)
+    return np.load(out, mmap_mode="r"), man
 
 
 def cache_teacher_on_corpus(entry, spec, corpus, log: Callable[[str], None] = print) -> Path:
