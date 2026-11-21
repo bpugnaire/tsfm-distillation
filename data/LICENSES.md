@@ -11,6 +11,7 @@
 | GIFT-Eval test data + harness | https://huggingface.co/datasets/Salesforce/GiftEval, https://github.com/SalesforceAIResearch/gift-eval (commit 0b57dd6) | Apache-2.0 (dataset card + LICENSE.txt) | evaluation only (public benchmark, flagged) | 2026-11-16 |
 | Chronos-Bolt tiny / mini | https://huggingface.co/amazon/chronos-bolt-tiny, amazon/chronos-bolt-mini | Apache-2.0 | comparator only | 2026-11-16 |
 | IBM Granite TTM-r2 | https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2 | Apache-2.0 | comparator only | 2026-11-16 |
+| raws-labs/tinycast (146k params; not this project) | https://huggingface.co/raws-labs/tinycast (rev 9635a27), https://github.com/raws-labs/tinycast (commit 628c0be) | Apache-2.0 | comparator only (GIFT-Eval) | 2026-11-21 |
 
 ## Note on distillation from Timestral (2026-11-13)
 The Timestral licence does not mention distillation or training on its outputs. Its revenue restriction "applies to the Model and any
