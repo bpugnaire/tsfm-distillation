@@ -1,0 +1,19 @@
+# Stage C11 pilot 2 (owner 2026-11-21): can the student use long history if it reads it at fine resolution?
+# Multi-token students on the C4 pilot corpus (300k windows, 2048 steps, Timestral-28M labels at 2048: cached), no history
+# truncation (labels stay consistent with the input), 15k steps. Patch 16 x 128 tokens vs patch 64 x 32 tokens; reference:
+# C8's 512-step multi-token student, scored on the same 2048-step suites (it reads the last 512 steps).
+name: stage_c11_ctx
+base: configs/train/study_base_m.yaml
+teacher: timestral-28m
+reference_arm: c8_mt_512
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+arms:
+  - {name: c8_mt_512, type: existing, run: "stage_c8_mt:kd_mt_300k"}
+  - {name: mt_2048_p16, mix: {synth: 150000, multidomain_v2: 150000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt, context_length: 2048, patch_size: 16}, optim: {patience: 1000}}}
+  - {name: mt_2048_p64, mix: {synth: 150000, multidomain_v2: 150000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt, context_length: 2048, patch_size: 64}, optim: {patience: 1000}}}
+pairs:
+  - [mt_2048_p16, c8_mt_512, "2048 steps at patch 16 vs 512 steps"]
+  - [mt_2048_p64, c8_mt_512, "2048 steps at patch 64 vs 512 steps"]
+  - [mt_2048_p16, mt_2048_p64, "patch 16 vs 64 at 2048 steps"]
