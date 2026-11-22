@@ -141,6 +141,10 @@ class DataConfig:
     random_truncate: float = 0.0
     # Share of TRAINING windows stored with a shorter history (cut before teacher labelling: consistent labels).
     var_context: float = 0.0
+    # Corpus sources trained on the real future instead of teacher labels (e.g. [synth]: the generator's continuation is the
+    # exact truth there). Implemented by replacing those windows' teacher quantiles with the future repeated on every level:
+    # the teacher pinball loss then equals the ground-truth pinball loss for them (losses.kd_pinball_teacher).
+    gt_sources: list[str] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass

@@ -1,0 +1,17 @@
+# Stage C16 pilot (owner 2026-11-22): per-source target. Synthetic windows are trained on their real future (the generator's
+# exact continuation, where ground truth won: C13 shapes), real windows on Timestral-5M labels (where distillation won).
+# Same 1M windows, teacher, student (multi-token m, 512) and 50k steps as C14's kd5m_1m (pure distillation) and C13's gt_1m.
+name: stage_c16_hybrid
+base: configs/train/study_base_m.yaml
+teacher: timestral-5m
+reference_arm: kd5m_1m
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: kd5m_1m, type: existing, run: "stage_c14_teacher5m:kd5m_1m"}
+  - {name: gt_1m, type: existing, run: "stage_c13_gt_vs_kd:gt_1m"}
+  - {name: hyb5m_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt}, data: {gt_sources: [synth]},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [hyb5m_1m, kd5m_1m, "hybrid (real future on synthetic, teacher on real) vs pure teacher labels"]
+  - [hyb5m_1m, gt_1m, "hybrid vs pure real future"]

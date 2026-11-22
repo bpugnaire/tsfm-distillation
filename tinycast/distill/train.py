@@ -208,6 +208,17 @@ def train(
     )  # large corpora stay on disk; batches are gathered from the file
     ctx_all = None if mmapped else torch.as_tensor(tr.context)
     fut_all = torch.as_tensor(tr.future)
+    if (
+        teacher_q is not None and cfg.data.gt_sources
+    ):  # hybrid target: real future for these sources
+        if isinstance(teacher_q, np.memmap):
+            raise ValueError("gt_sources is not supported with memory-mapped labels yet")
+        rows = np.isin(tr.source, cfg.data.gt_sources) & np.isfinite(tr.future).all(axis=1)
+        teacher_q = np.array(teacher_q, dtype=np.float32, copy=False)
+        teacher_q[rows] = np.asarray(tr.future, dtype=np.float32)[rows][:, None, :]
+        log(
+            f"gt_sources {cfg.data.gt_sources}: {int(rows.sum())} windows trained on the real future"
+        )
     tq_mm = isinstance(teacher_q, np.memmap)
     tq_all = torch.as_tensor(teacher_q) if teacher_q is not None and not tq_mm else None
     rng = np.random.default_rng(cfg.seed)
