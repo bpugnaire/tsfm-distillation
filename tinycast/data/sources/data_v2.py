@@ -89,6 +89,10 @@ VERSIONS = {  # data version -> (subset config, index cache); v2 behaviour is un
         ROOT / "configs" / "data" / "gift_pretrain_v3.yaml",
         ROOT / "data" / "processed" / "data_v3_index.json",
     ),
+    "v4": (
+        ROOT / "configs" / "data" / "gift_pretrain_v4.yaml",
+        ROOT / "data" / "processed" / "data_v4_index.json",
+    ),
 }
 
 
