@@ -61,6 +61,24 @@ def test_gallery_seeds_disjoint_from_training_seeds():
     assert all(s.meta["seed"] >= SP.gallery_seed_offset for s in S.gallery())
 
 
+def test_large_synthetic_corpora_avoid_gallery_seeds():
+    """Above 500k synthetic windows, extra seeds come from a separate high range: still disjoint from gallery seeds,
+    disjoint between train and val, and small corpora keep their old seeds."""
+    import numpy as np
+
+    from tinycast.data.corpus import _synth_seeds
+
+    tr, va = _synth_seeds("train", 1_500_000, 0), _synth_seeds("val", 600_000, 0)
+    gal = {s.meta["seed"] for s in S.gallery()}
+    assert (
+        len(set(tr)) == len(tr)
+        and not (set(tr) & gal)
+        and not (set(va) & gal)
+        and not (set(tr) & set(va))
+    )
+    assert np.array_equal(_synth_seeds("train", 1000, 0), _synth_seeds("train", 1000, 0))
+
+
 def test_real_data_splits_if_present():
     from tinycast.data.sources import rte_eco2mix
 

@@ -60,8 +60,21 @@ def wait_for_data(tr_spec, va_spec, members: list[str], name: str, poll: float =
                 return False
         return True
 
+    import os
+
     t0 = time.time()
+    prep = int(os.environ.get("PIPELINE_PREP_PID", "0"))
     while not ready():
+        if (
+            prep
+        ):  # the preparer died without producing the data: fail now instead of waiting forever
+            try:
+                os.kill(prep, 0)
+            except ProcessLookupError as err:
+                if not ready():
+                    raise RuntimeError(
+                        f"[{name}] the --prepare-only process ({prep}) exited before the data was ready"
+                    ) from err
         time.sleep(poll)
     print(f"[{name}] data ready after waiting {time.time() - t0:.0f}s", flush=True)
 

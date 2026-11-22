@@ -70,10 +70,24 @@ class Corpus:
     future: np.ndarray  # (N, H) float32 (NaN where no ground truth exists, e.g. rollouts)
 
 
+EXTRA_SEED_BASE = {
+    "train": 100_000_000,
+    "val": 200_000_000,
+}  # far above the gallery (1,000,000 + a few)
+
+
 def _synth_seeds(split: str, n: int, seed: int) -> np.ndarray:
+    """Distinct synthetic seeds. Up to 500k per split: drawn from the split's half of [0, TRAIN_SEED_MAX) exactly as before
+    (existing corpora keep their seeds). Beyond that (e.g. 1.5M synthetic windows): the whole half, then consecutive seeds
+    from a separate range far above the gallery's, so training seeds still never touch gallery/test seeds."""
     half = TRAIN_SEED_MAX // 2  # train and val use disjoint seed ranges
     base = 0 if split == "train" else half
-    return base + np.random.default_rng([seed, 17]).choice(half, size=n, replace=False)
+    rng = np.random.default_rng([seed, 17])
+    if n <= half:
+        return base + rng.choice(half, size=n, replace=False)
+    first = base + rng.choice(half, size=half, replace=False)
+    extra = EXTRA_SEED_BASE[split] + np.arange(n - half)
+    return np.concatenate([first, extra])
 
 
 def _rte(spec: CorpusSpec, n: int):

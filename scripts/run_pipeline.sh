@@ -6,6 +6,7 @@ set -u
 cd "$(dirname "$0")/.."
 (for cfg in "$@"; do uv run python -W ignore scripts/study.py "$cfg" --prepare-only > "runs/$(basename "$cfg" .yaml).prepare.log" 2>&1; done) &
 prep=$!
+export PIPELINE_PREP_PID=$prep  # the trainer fails fast if the preparer dies (see wait_for_data)
 for cfg in "$@"; do
   name=$(basename "$cfg" .yaml)
   echo "$(date '+%F %T') start $name (pipelined)" >> runs/queue.log
