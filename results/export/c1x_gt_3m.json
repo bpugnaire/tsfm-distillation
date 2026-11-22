@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-22_stage_c15_3m_gt_3m",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 1968.0,
+  "max_rel_diff": 9.756675717653707e-05,
+  "p99_rel_diff": 1.6304384189425036e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 35877488.0,
+  "max_rel_diff": 0.5818166732788086,
+  "p99_rel_diff": 0.05175870656967163,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

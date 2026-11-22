@@ -456,3 +456,18 @@ training data is synthetic with exact generator continuations, i.e. shapes are i
 GIFT-Eval is the honest guide. A smaller, faster teacher (5M) is at least as good for a 1M student (capacity gap).
 Consistent variable-length labels did not fix long-history use.
 **Next:** Timestral-5M labels for data scaling (faster); redo the batch-size benchmark without the OOM setting.
+
+## 2026-11-22 — Stage C15: 3M windows, real future vs Timestral-5M labels
+**Did:** 3M windows (1.5M synthetic incl. 1M seeds from the new high range + 1.5M data v2), multi-token student m, 512 steps,
+150k steps (~13 passes), memory-mapped corpus and labels, pipelined (5M-teacher labels during the real-future training).
+(First launch lost the night: the synthetic seed space held only 500k training seeds, the preparer crashed and the trainer
+waited forever; both fixed, relaunched at 10:30, done 19:57.)
+**Result:** GIFT-Eval CRPS, data-scaling curve: real future 0.679 (300k), 0.664 (1M), 0.671 (3M); teacher labels 0.624 (300k,
+28M), 0.603 (1M, 28M), 0.593 (1M, 5M), **0.582 (3M, 5M)**. Teacher vs real future at 3M: 0.868 [0.819, 0.916] (46/55).
+3M vs 1M: teacher labels 0.983 [0.963, 1.000]; real future 1.011 (no gain). Our suites (3M, teacher labels): beats Toto-2.0-4m
+on all three (0.93 shapes, 0.94 public, 0.92 electricity) and its own teacher Timestral-5M on shapes (0.979); electricity
+-7% vs 1M. Real future still wins on shapes (KD/GT 1.23).
+**Surprise / learned:** the opposite of the scaling-law expectation for our regime: real-future training stops improving
+after 1M windows, while distillation keeps improving, so the gap widens (8% at 300k, 9% at 1M, 13% at 3M). The student
+beats its teacher on synthetic shapes (in-distribution data).
+**Next:** best student under 1M is now kd5m_3m (0.582): GIFT-Eval with flip, site update; more data with the 5M teacher.

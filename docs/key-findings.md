@@ -50,11 +50,22 @@ teacher labels help when the truth is noisy and the teacher knows more than our 
 and the test comes from the same source. This is also why our shapes suite flatters ground-truth training and why
 GIFT-Eval is the guide for decisions.
 
-## 3. The distillation advantage did not shrink with more data
+## 3. More data makes distillation pull further ahead, not less
 
-Theory (Busbridge et al. 2025) predicts supervised training catches up once the student has seen enough data. From 300k to
-1M windows, the gap on GIFT-Eval went from 8.1% to 9.2%: a 1M forecaster at our data scale is far from that threshold.
-3M windows are running (C15, 2026-11-22).
+Theory (Busbridge et al. 2025) predicts supervised training catches up once the student has seen enough data. Here the
+opposite happened (C13, C15):
+
+| windows | real future | teacher labels | teacher / real future |
+|---|---|---|---|
+| 300k | 0.679 | 0.624 (28M) | 0.919 |
+| 1M | 0.664 | 0.603 (28M), 0.593 (5M) | 0.908 |
+| 3M | 0.671 | **0.582** (5M) | **0.868** [0.819, 0.916] |
+
+Real-future training stops improving after 1M windows; distillation keeps improving. **Intuition.** With the real future,
+more windows mostly add more noisy single draws; a 1M-parameter model saturates on what it can extract from them. Teacher
+labels are already denoised distributions, so each extra window adds a clean, informative example, and the student keeps
+moving towards the teacher (at 3M it even beats Timestral-5M on our shapes test). We are far below the data scale where the
+theory's crossover would happen (raws-labs and Reverso train on ~150M windows of real futures).
 
 ## 4. At equal history, our 0.87M student beats a 146k model that beats it on the leaderboard
 
