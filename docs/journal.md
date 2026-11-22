@@ -483,3 +483,14 @@ raws-labs/tinycast at its 2048-step history (ours/theirs 1.022 [0.977, 1.068]) a
 (0.875) and TTM-R2 (point forecasts, 0.620). Flip averaging on the 3M student: 0.998 [0.988, 1.009], nothing (it gave
 ~1% on the 1M student). **Surprise / learned:** the free inference trick vanishes once the student has more data, as if
 the student had learned the sign symmetry itself. **Next:** C16 hybrid result, then C17 (10M windows) overnight.
+
+## 2026-11-23 — C16: per-source hybrid target (real future on synthetic, teacher on real)
+**Did:** `data.gt_sources: [synth]` (teacher quantiles of synthetic windows replaced by their true future, which makes the
+teacher pinball equal the ground-truth pinball; checked to 7 digits), same 1M windows / student / 50k steps as C14 kd5m_1m.
+**Result:** vs pure teacher labels: shapes 0.779 [0.724, 0.832], multidomain_test 1.022 [1.008, 1.035], fresh_fr_power
+1.004 [0.986, 1.023], GIFT-Eval 1.025 [1.011, 1.040] (`results/study/stage_c16_hybrid/table.md`, `runs/c17_decision.txt`).
+**Surprise / learned:** the shapes win of real-future training transfers completely, but it costs 2–2.5% on held-out real
+data: the teacher's view of synthetic series is useful for real data, the generator's own draw is not. The pre-registered
+rule (hybrid only if its GIFT interval is below 1) kept C17 on pure distillation. **Also:** C17 first launch failed in 1
+minute (data v4 missing from `VERSIONS`; an edit script without an existence check). Fixed and relaunched 2026-11-23 00:0x.
+**Next:** C17 (10M windows) results in the morning; GIFT-Eval medium/long with the rolled-out 3M student.

@@ -50,6 +50,14 @@ teacher labels help when the truth is noisy and the teacher knows more than our 
 and the test comes from the same source. This is also why our shapes suite flatters ground-truth training and why
 GIFT-Eval is the guide for decisions.
 
+**Tested (C16): use the real future only on synthetic windows, teacher labels on real ones.** Same 1M windows and student.
+Against pure teacher labels: shapes −22% [0.724, 0.832] (the real-future gain, fully kept), fresh electricity a tie
+(1.004 [0.986, 1.023]), held-out public data +2.2% [1.008, 1.035], GIFT-Eval **+2.5% [1.011, 1.040] worse**. So the hybrid
+buys our in-house shapes score and pays for it on everything else. The teacher's forecasts of synthetic series carry
+something useful for real data that the generator's own continuation does not: the generator's future is itself one random
+draw of a Gaussian process (not "the truth" except on the hand-built shape families), while the teacher answers with a
+calibrated spread and a real-data prior. Evidence: `results/study/stage_c16_hybrid`, `results/gift_eval/tinycast-hyb5m_1m`.
+
 ## 3. More data makes distillation pull further ahead, not less
 
 Theory (Busbridge et al. 2025) predicts supervised training catches up once the student has seen enough data. Here the
