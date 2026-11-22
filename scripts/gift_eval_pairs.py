@@ -20,6 +20,11 @@ GE = ROOT / "results" / "gift_eval"
 LB = ROOT / "external" / "gift-eval" / "results"
 CRPS = "eval_metrics/mean_weighted_sum_quantile_loss"
 PAIRS = [  # (a, b, question); names are result folders under results/gift_eval/ or the leaderboard
+    ("tinycast-kd5m_3m", "Toto-2.0-4m@ctx512-univariate", "site student (3M windows, Timestral-5M) vs Toto-2.0-4m, same 512 context"),
+    ("tinycast-kd5m_3m", "Toto-2.0-4m", "site student vs Toto-2.0-4m as on the leaderboard (4096 context)"),
+    ("tinycast-kd5m_3m", "Timestral-5M", "site student vs its teacher Timestral-5M as on the leaderboard"),
+    ("tinycast-kd5m_3m", "tinycast-gt_3m", "teacher labels vs real future, 3M windows"),
+    ("tinycast-kd5m_3m+flip", "tinycast-kd5m_3m", "site student: sign-flip averaging vs plain"),
     ("tinycast-c3-kd_toto_1m", "Toto-2.0-4m@ctx512-univariate", "Toto student vs Toto-2.0-4m, same 512 context, univariate"),
     ("tinycast-c3-kd_toto_1m", "Toto-2.0-4m", "Toto student vs Toto-2.0-4m as on the leaderboard (4096 context)"),
     ("tinycast-c3-kd_toto_1m", "tinycast-c2", "Toto student vs Timestral-taught student"),

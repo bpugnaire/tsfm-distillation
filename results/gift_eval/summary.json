@@ -1370,6 +1370,16 @@
    "CRPS_rank": 131
   },
   {
+   "model": "tinycast-kd5m_3m+flip",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.7798183746623392,
+   "CRPS": 0.5813791610141333,
+   "CRPS_rank": 132
+  },
+  {
    "model": "Metamorph1.0-4.5M",
    "org": "SRI International",
    "leakage": "No",
@@ -1377,7 +1387,17 @@
    "params": NaN,
    "MASE": 0.7596438821279339,
    "CRPS": 0.581825308643816,
-   "CRPS_rank": 132
+   "CRPS_rank": 133
+  },
+  {
+   "model": "tinycast-kd5m_3m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.7789289998786463,
+   "CRPS": 0.5824327536838686,
+   "CRPS_rank": 134
   },
   {
    "model": "TimeTron-v2-33M",
@@ -1387,7 +1407,7 @@
    "params": NaN,
    "MASE": 0.7918099948618861,
    "CRPS": 0.58719816420752,
-   "CRPS_rank": 133
+   "CRPS_rank": 135
   },
   {
    "model": "Chronos_large",
@@ -1397,7 +1417,7 @@
    "params": NaN,
    "MASE": 0.761371164072841,
    "CRPS": 0.5915479551492642,
-   "CRPS_rank": 134
+   "CRPS_rank": 136
   },
   {
    "model": "sundial_base_128m",
@@ -1407,7 +1427,17 @@
    "params": NaN,
    "MASE": 0.7324295293657802,
    "CRPS": 0.5924299802347124,
-   "CRPS_rank": 135
+   "CRPS_rank": 137
+  },
+  {
+   "model": "tinycast-kd5m_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.7919582656537307,
+   "CRPS": 0.5925776058791672,
+   "CRPS_rank": 138
   },
   {
    "model": "Chronos_base",
@@ -1417,7 +1447,17 @@
    "params": NaN,
    "MASE": 0.7678214440147073,
    "CRPS": 0.5955373984329235,
-   "CRPS_rank": 136
+   "CRPS_rank": 139
+  },
+  {
+   "model": "tinycast-c9-mt_1m+flip",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.7991940504482986,
+   "CRPS": 0.595960835255866,
+   "CRPS_rank": 140
   },
   {
    "model": "Moirai_large",
@@ -1427,7 +1467,17 @@
    "params": NaN,
    "MASE": 0.806633388625207,
    "CRPS": 0.596614035251025,
-   "CRPS_rank": 137
+   "CRPS_rank": 141
+  },
+  {
+   "model": "tinycast-c9-mt_l_1m_209m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.7997879332161489,
+   "CRPS": 0.5983601502771891,
+   "CRPS_rank": 142
   },
   {
    "model": "Moirai_base",
@@ -1437,7 +1487,37 @@
    "params": NaN,
    "MASE": 0.8175987429513873,
    "CRPS": 0.6009443208690981,
-   "CRPS_rank": 138
+   "CRPS_rank": 143
+  },
+  {
+   "model": "tinycast-c9-mt_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8014014101789928,
+   "CRPS": 0.6025088736105095,
+   "CRPS_rank": 144
+  },
+  {
+   "model": "tinycast-c9-mt_2048_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8108622676553282,
+   "CRPS": 0.6025667881262253,
+   "CRPS_rank": 145
+  },
+  {
+   "model": "tinycast-c6-ctx2048-1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.808947767237617,
+   "CRPS": 0.6029074972320984,
+   "CRPS_rank": 146
   },
   {
    "model": "Chronos_small",
@@ -1447,7 +1527,37 @@
    "params": NaN,
    "MASE": 0.7795548544335232,
    "CRPS": 0.606693603458977,
-   "CRPS_rank": 139
+   "CRPS_rank": 147
+  },
+  {
+   "model": "tinycast-c7-l_209m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8089766151069634,
+   "CRPS": 0.6068276930066999,
+   "CRPS_rank": 148
+  },
+  {
+   "model": "tinycast-c7-l_28m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8168129271120252,
+   "CRPS": 0.6079526788492556,
+   "CRPS_rank": 149
+  },
+  {
+   "model": "tinycast-c5-209m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8186758976763429,
+   "CRPS": 0.6121704993561095,
+   "CRPS_rank": 150
   },
   {
    "model": "YingLong_6m",
@@ -1457,7 +1567,7 @@
    "params": NaN,
    "MASE": 0.8191511924672492,
    "CRPS": 0.6122565550873462,
-   "CRPS_rank": 140
+   "CRPS_rank": 151
   },
   {
    "model": "tinycast-c2",
@@ -1467,7 +1577,7 @@
    "params": NaN,
    "MASE": 0.8219538764689537,
    "CRPS": 0.6155344813266336,
-   "CRPS_rank": 141
+   "CRPS_rank": 152
   },
   {
    "model": "Migas-1.0",
@@ -1477,7 +1587,27 @@
    "params": NaN,
    "MASE": 0.6665677736135942,
    "CRPS": 0.6199566446733129,
-   "CRPS_rank": 142
+   "CRPS_rank": 153
+  },
+  {
+   "model": "tinycast-c9-mt_1m+flip+ds",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8340796529750627,
+   "CRPS": 0.6201504992586028,
+   "CRPS_rank": 154
+  },
+  {
+   "model": "tinycast-mix_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8225097711726064,
+   "CRPS": 0.6211262931580726,
+   "CRPS_rank": 155
   },
   {
    "model": "ValBestSingle-cmtt",
@@ -1487,7 +1617,47 @@
    "params": NaN,
    "MASE": 0.6771649571882709,
    "CRPS": 0.621425330919314,
-   "CRPS_rank": 143
+   "CRPS_rank": 156
+  },
+  {
+   "model": "tinycast-c9-mt_1m+ds",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8332935078849197,
+   "CRPS": 0.6214581667278364,
+   "CRPS_rank": 157
+  },
+  {
+   "model": "tinycast-mt_2048_p16",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8239948742697146,
+   "CRPS": 0.621475627944684,
+   "CRPS_rank": 158
+  },
+  {
+   "model": "tinycast-c4-ctx2048-trunc",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8305100015823217,
+   "CRPS": 0.6220071274744411,
+   "CRPS_rank": 159
+  },
+  {
+   "model": "tinycast-mt_2048_p16_var",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8278299454594716,
+   "CRPS": 0.6220967339094294,
+   "CRPS_rank": 160
   },
   {
    "model": "FLAIR",
@@ -1497,7 +1667,27 @@
    "params": NaN,
    "MASE": 0.8322422270424898,
    "CRPS": 0.623232023207958,
-   "CRPS_rank": 144
+   "CRPS_rank": 161
+  },
+  {
+   "model": "tinycast-mt_2048_p64",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8325765764114721,
+   "CRPS": 0.6236649873302673,
+   "CRPS_rank": 162
+  },
+  {
+   "model": "tinycast-c8-mt-300k",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8367458149316511,
+   "CRPS": 0.6239754782702182,
+   "CRPS_rank": 163
   },
   {
    "model": "tinycast-c3-kd_ens3_1m",
@@ -1507,7 +1697,7 @@
    "params": NaN,
    "MASE": 0.8285739736388339,
    "CRPS": 0.6268247537097752,
-   "CRPS_rank": 145
+   "CRPS_rank": 164
   },
   {
    "model": "tinycast-c3-kd_toto_1m",
@@ -1517,7 +1707,7 @@
    "params": NaN,
    "MASE": 0.8297885944725183,
    "CRPS": 0.6272477024283242,
-   "CRPS_rank": 146
+   "CRPS_rank": 165
   },
   {
    "model": "PatchTST",
@@ -1527,7 +1717,27 @@
    "params": NaN,
    "MASE": 0.8326738167195255,
    "CRPS": 0.6283270010107336,
-   "CRPS_rank": 147
+   "CRPS_rank": 166
+  },
+  {
+   "model": "tinycast-c4-ctx2048",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.831550772461904,
+   "CRPS": 0.6288268903454617,
+   "CRPS_rank": 167
+  },
+  {
+   "model": "tinycast-mt_v3_300k",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.836308325799797,
+   "CRPS": 0.6346564614405477,
+   "CRPS_rank": 168
   },
   {
    "model": "TimesFM",
@@ -1537,7 +1747,17 @@
    "params": NaN,
    "MASE": 0.8228131426172967,
    "CRPS": 0.6347188201903912,
-   "CRPS_rank": 148
+   "CRPS_rank": 169
+  },
+  {
+   "model": "tinycast-c2-300k-ctx512",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8527793056819252,
+   "CRPS": 0.6379909965307575,
+   "CRPS_rank": 170
   },
   {
    "model": "tinycast-c3-kd_t0_1m",
@@ -1547,7 +1767,17 @@
    "params": NaN,
    "MASE": 0.8562186055078308,
    "CRPS": 0.6402099091747867,
-   "CRPS_rank": 149
+   "CRPS_rank": 171
+  },
+  {
+   "model": "tinycast-mix_300k",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8559900651440615,
+   "CRPS": 0.6440006591799673,
+   "CRPS_rank": 172
   },
   {
    "model": "Reverso",
@@ -1557,7 +1787,7 @@
    "params": NaN,
    "MASE": 0.6995439337496708,
    "CRPS": 0.650791381825969,
-   "CRPS_rank": 150
+   "CRPS_rank": 173
   },
   {
    "model": "TFT",
@@ -1567,7 +1797,17 @@
    "params": NaN,
    "MASE": 0.8835123766149493,
    "CRPS": 0.6511902205802675,
-   "CRPS_rank": 151
+   "CRPS_rank": 174
+  },
+  {
+   "model": "tinycast-gt_1m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8659217239183016,
+   "CRPS": 0.6638749585069198,
+   "CRPS_rank": 175
   },
   {
    "model": "Lingjiang",
@@ -1577,7 +1817,7 @@
    "params": NaN,
    "MASE": 0.9543787768885983,
    "CRPS": 0.6642597603719385,
-   "CRPS_rank": 152
+   "CRPS_rank": 176
   },
   {
    "model": "Moirai_small",
@@ -1587,7 +1827,7 @@
    "params": NaN,
    "MASE": 0.8879840736810806,
    "CRPS": 0.6658504600998629,
-   "CRPS_rank": 153
+   "CRPS_rank": 177
   },
   {
    "model": "Reverso-Small",
@@ -1597,7 +1837,7 @@
    "params": NaN,
    "MASE": 0.7156109099829426,
    "CRPS": 0.6682340130910365,
-   "CRPS_rank": 154
+   "CRPS_rank": 178
   },
   {
    "model": "DLinear-t",
@@ -1607,7 +1847,17 @@
    "params": NaN,
    "MASE": 0.8636559666281439,
    "CRPS": 0.6689273135400142,
-   "CRPS_rank": 155
+   "CRPS_rank": 179
+  },
+  {
+   "model": "tinycast-gt_3m",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8790805066460625,
+   "CRPS": 0.671027528431901,
+   "CRPS_rank": 180
   },
   {
    "model": "iTransformer",
@@ -1617,7 +1867,17 @@
    "params": NaN,
    "MASE": 0.8892681405773504,
    "CRPS": 0.6716196240036643,
-   "CRPS_rank": 156
+   "CRPS_rank": 181
+  },
+  {
+   "model": "tinycast-gt_300k",
+   "org": "this project",
+   "leakage": "see note",
+   "type": null,
+   "params": NaN,
+   "MASE": 0.8908086924086326,
+   "CRPS": 0.678883588026445,
+   "CRPS_rank": 182
   },
   {
    "model": "FFM",
@@ -1627,7 +1887,7 @@
    "params": NaN,
    "MASE": 0.923576547689876,
    "CRPS": 0.6839742142201662,
-   "CRPS_rank": 157
+   "CRPS_rank": 183
   },
   {
    "model": "Reverso-Nano",
@@ -1637,7 +1897,7 @@
    "params": NaN,
    "MASE": 0.7525711780591182,
    "CRPS": 0.7087361025327182,
-   "CRPS_rank": 158
+   "CRPS_rank": 184
   },
   {
    "model": "Super-Linear",
@@ -1647,7 +1907,7 @@
    "params": NaN,
    "MASE": 0.8502295201229189,
    "CRPS": 0.793398163924396,
-   "CRPS_rank": 159
+   "CRPS_rank": 185
   },
   {
    "model": "Auto_Arima",
@@ -1657,7 +1917,7 @@
    "params": NaN,
    "MASE": 0.9347324171156448,
    "CRPS": 0.8078795816884224,
-   "CRPS_rank": 160
+   "CRPS_rank": 186
   },
   {
    "model": "N-BEATS",
@@ -1667,7 +1927,7 @@
    "params": NaN,
    "MASE": 0.8625300579438975,
    "CRPS": 0.8227984876939313,
-   "CRPS_rank": 161
+   "CRPS_rank": 187
   },
   {
    "model": "VisionTS",
@@ -1677,7 +1937,7 @@
    "params": NaN,
    "MASE": 0.8715509564019739,
    "CRPS": 0.825484155938255,
-   "CRPS_rank": 162
+   "CRPS_rank": 188
   },
   {
    "model": "DLinear",
@@ -1687,7 +1947,7 @@
    "params": NaN,
    "MASE": 1.015570849621848,
    "CRPS": 0.8727962794943187,
-   "CRPS_rank": 163
+   "CRPS_rank": 189
   },
   {
    "model": "DeepAR",
@@ -1697,7 +1957,7 @@
    "params": NaN,
    "MASE": 1.2002655080353948,
    "CRPS": 0.8736725181205658,
-   "CRPS_rank": 164
+   "CRPS_rank": 190
   },
   {
    "model": "TIDE",
@@ -1707,7 +1967,7 @@
    "params": NaN,
    "MASE": 1.1398711556773333,
    "CRPS": 0.8743823798212633,
-   "CRPS_rank": 165
+   "CRPS_rank": 191
   },
   {
    "model": "Auto_Theta",
@@ -1717,7 +1977,7 @@
    "params": NaN,
    "MASE": 0.9551772322284189,
    "CRPS": 0.8971768298890479,
-   "CRPS_rank": 166
+   "CRPS_rank": 192
   },
   {
    "model": "TTM-R1-Pretrained",
@@ -1727,7 +1987,7 @@
    "params": NaN,
    "MASE": 0.9936056389434986,
    "CRPS": 0.9040054230458878,
-   "CRPS_rank": 167
+   "CRPS_rank": 193
   },
   {
    "model": "TTM-R2-Pretrained",
@@ -1737,7 +1997,7 @@
    "params": 810000.0,
    "MASE": 1.004836805381401,
    "CRPS": 0.9388348115231201,
-   "CRPS_rank": 168
+   "CRPS_rank": 194
   },
   {
    "model": "Lag-Llama",
@@ -1747,7 +2007,7 @@
    "params": NaN,
    "MASE": 1.2624385445054338,
    "CRPS": 0.9634057942339791,
-   "CRPS_rank": 169
+   "CRPS_rank": 195
   },
   {
    "model": "Seasonal_Naive",
@@ -1757,7 +2017,7 @@
    "params": NaN,
    "MASE": 1.0,
    "CRPS": 1.0,
-   "CRPS_rank": 170
+   "CRPS_rank": 196
   },
   {
    "model": "Naive",
@@ -1767,7 +2027,7 @@
    "params": NaN,
    "MASE": 1.1425182697241645,
    "CRPS": 1.201752715186074,
-   "CRPS_rank": 171
+   "CRPS_rank": 197
   },
   {
    "model": "VISIT-1.0",
@@ -1777,7 +2037,7 @@
    "params": NaN,
    "MASE": 1.142518269710601,
    "CRPS": 1.2017527160643093,
-   "CRPS_rank": 172
+   "CRPS_rank": 198
   },
   {
    "model": "Auto_ETS",
@@ -1787,7 +2047,7 @@
    "params": NaN,
    "MASE": 0.9837443474036679,
    "CRPS": 1.481078907615344,
-   "CRPS_rank": 173
+   "CRPS_rank": 199
   },
   {
    "model": "Crossformer",
@@ -1797,7 +2057,7 @@
    "params": NaN,
    "MASE": 3.575237724363516,
    "CRPS": 4.40657384451057,
-   "CRPS_rank": 174
+   "CRPS_rank": 200
   }
  ]
 }

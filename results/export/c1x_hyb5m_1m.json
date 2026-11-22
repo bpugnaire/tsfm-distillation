@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-22_stage_c16_hybrid_hyb5m_1m",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 16.0,
+  "max_rel_diff": 9.763006528373808e-05,
+  "p99_rel_diff": 1.4579162552763592e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 773416.0,
+  "max_rel_diff": 0.1858092099428177,
+  "p99_rel_diff": 0.033536143600940704,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

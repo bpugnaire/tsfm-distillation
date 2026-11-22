@@ -1,0 +1,172 @@
+{
+ "n_configs": 55,
+ "rows": [
+  {
+   "model": "tinycast-kd5m_3m",
+   "label": "Our student",
+   "note": "512-step history",
+   "n_params": 866640,
+   "crps_rel": 0.5824327536838686,
+   "ours_over_theirs": null,
+   "ours_better_on": null
+  },
+  {
+   "model": "TinyCast",
+   "label": "raws-labs/tinycast",
+   "note": "2048-step history",
+   "n_params": 146505,
+   "crps_rel": 0.5699206418619479,
+   "ours_over_theirs": [
+    1.0219541299312185,
+    0.9772679766220737,
+    1.0680751319183295
+   ],
+   "ours_better_on": 27
+  },
+  {
+   "model": "raws-tinycast@hist512",
+   "label": "raws-labs/tinycast, 512 history",
+   "note": "cut to 512 steps like ours (our run)",
+   "n_params": 146505,
+   "crps_rel": 0.6119262387208805,
+   "ours_over_theirs": [
+    0.9518022219497198,
+    0.9180353933741455,
+    0.9867066596816906
+   ],
+   "ours_better_on": 37
+  },
+  {
+   "model": "TTM-R2-Pretrained",
+   "label": "TTM-R2",
+   "note": "point forecasts only",
+   "n_params": 805280,
+   "crps_rel": 0.9388348115231201,
+   "ours_over_theirs": [
+    0.6203783099382073,
+    0.580649749163871,
+    0.6608411244971021
+   ],
+   "ours_better_on": 54
+  },
+  {
+   "model": "Toto-2.0-4m",
+   "label": "Toto-2.0-4m",
+   "note": "4096-step history",
+   "n_params": 4144448,
+   "crps_rel": 0.5273974882898905,
+   "ours_over_theirs": [
+    1.1043525360206634,
+    1.0503466096829288,
+    1.1684369141011213
+   ],
+   "ours_better_on": 12
+  },
+  {
+   "model": "Toto-2.0-4m@ctx512-univariate",
+   "label": "Toto-2.0-4m, 512 history",
+   "note": "512 steps like ours (our run)",
+   "n_params": 4144448,
+   "crps_rel": 0.563414079103528,
+   "ours_over_theirs": [
+    1.0337561223365275,
+    1.0017771417932755,
+    1.0705907232670253
+   ],
+   "ours_better_on": 24
+  },
+  {
+   "model": "Timestral-5M",
+   "label": "Timestral-5M (our teacher)",
+   "note": "",
+   "n_params": 5208960,
+   "crps_rel": 0.4935265538103033,
+   "ours_over_theirs": [
+    1.1801447139716383,
+    1.1194626231008176,
+    1.250895556409808
+   ],
+   "ours_better_on": 4
+  },
+  {
+   "model": "TimeH2O-v1-tiny",
+   "label": "TimeH2O-v1-tiny",
+   "note": "",
+   "n_params": 5825636,
+   "crps_rel": 0.49038985536275725,
+   "ours_over_theirs": [
+    1.1876933164798529,
+    1.12695279103581,
+    1.2586441400107204
+   ],
+   "ours_better_on": 3
+  },
+  {
+   "model": "FlowState-9.1M",
+   "label": "FlowState",
+   "note": "",
+   "n_params": 9069312,
+   "crps_rel": 0.5187736846977137,
+   "ours_over_theirs": [
+    1.1227106749318803,
+    1.0728470066256321,
+    1.1777533174549997
+   ],
+   "ours_better_on": 13
+  },
+  {
+   "model": "Moirai_small",
+   "label": "Moirai-small",
+   "note": "",
+   "n_params": 13827528,
+   "crps_rel": 0.6658504600998629,
+   "ours_over_theirs": [
+    0.8747200589100992,
+    0.8253786204760014,
+    0.9226627006765856
+   ],
+   "ours_better_on": 44
+  }
+ ],
+ "sizes": {
+  "tinycast-kd5m_3m": {
+   "n_params": 866640,
+   "source": "results/export/c1x_kd5m_3m.json"
+  },
+  "raws-labs/tinycast": {
+   "n_params": 146505,
+   "source": "https://huggingface.co/api/models/raws-labs/tinycast",
+   "fetched": "2026-11-22"
+  },
+  "ibm-granite/granite-timeseries-ttm-r2": {
+   "n_params": 805280,
+   "source": "https://huggingface.co/api/models/ibm-granite/granite-timeseries-ttm-r2",
+   "fetched": "2026-11-22"
+  },
+  "Datadog/Toto-2.0-4m": {
+   "n_params": 4144448,
+   "source": "https://huggingface.co/api/models/Datadog/Toto-2.0-4m",
+   "fetched": "2026-11-22"
+  },
+  "mistralai/Timestral-5M": {
+   "n_params": 5208960,
+   "source": "https://huggingface.co/api/models/mistralai/Timestral-5M",
+   "fetched": "2026-11-22"
+  },
+  "h2oai/timeh2o-v1-tiny": {
+   "n_params": 5825636,
+   "source": "https://huggingface.co/api/models/h2oai/timeh2o-v1-tiny",
+   "fetched": "2026-11-22"
+  },
+  "ibm-research/flowstate": {
+   "n_params": 9069312,
+   "source": "https://huggingface.co/api/models/ibm-research/flowstate",
+   "fetched": "2026-11-22"
+  },
+  "Salesforce/moirai-1.1-R-small": {
+   "n_params": 13827528,
+   "source": "https://huggingface.co/api/models/Salesforce/moirai-1.1-R-small",
+   "fetched": "2026-11-22"
+  }
+ }
+}

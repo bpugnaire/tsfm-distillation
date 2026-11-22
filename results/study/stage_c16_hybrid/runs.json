@@ -1,0 +1,5 @@
+{
+ "kd5m_1m": "runs/2026-11-21_stage_c14_teacher5m_kd5m_1m",
+ "gt_1m": "runs/2026-11-21_stage_c13_gt_vs_kd_gt_1m",
+ "hyb5m_1m": "runs/2026-11-22_stage_c16_hybrid_hyb5m_1m"
+}

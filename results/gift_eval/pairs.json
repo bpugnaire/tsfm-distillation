@@ -1,6 +1,66 @@
 {
  "pairs": [
   {
+   "a": "tinycast-kd5m_3m",
+   "b": "Toto-2.0-4m@ctx512-univariate",
+   "question": "site student (3M windows, Timestral-5M) vs Toto-2.0-4m, same 512 context",
+   "n_configs": 55,
+   "ratio": [
+    1.0337561223365275,
+    1.0017771417932755,
+    1.0705907232670253
+   ],
+   "a_wins": 24
+  },
+  {
+   "a": "tinycast-kd5m_3m",
+   "b": "Toto-2.0-4m",
+   "question": "site student vs Toto-2.0-4m as on the leaderboard (4096 context)",
+   "n_configs": 55,
+   "ratio": [
+    1.1043525360206634,
+    1.0503466096829288,
+    1.1684369141011213
+   ],
+   "a_wins": 12
+  },
+  {
+   "a": "tinycast-kd5m_3m",
+   "b": "Timestral-5M",
+   "question": "site student vs its teacher Timestral-5M as on the leaderboard",
+   "n_configs": 55,
+   "ratio": [
+    1.1801447139716383,
+    1.1194626231008176,
+    1.250895556409808
+   ],
+   "a_wins": 4
+  },
+  {
+   "a": "tinycast-kd5m_3m",
+   "b": "tinycast-gt_3m",
+   "question": "teacher labels vs real future, 3M windows",
+   "n_configs": 55,
+   "ratio": [
+    0.8679714750972046,
+    0.8168273577351046,
+    0.915944345746843
+   ],
+   "a_wins": 46
+  },
+  {
+   "a": "tinycast-kd5m_3m+flip",
+   "b": "tinycast-kd5m_3m",
+   "question": "site student: sign-flip averaging vs plain",
+   "n_configs": 55,
+   "ratio": [
+    0.9981910483861504,
+    0.9880501498097587,
+    1.0092802984528337
+   ],
+   "a_wins": 31
+  },
+  {
    "a": "tinycast-c3-kd_toto_1m",
    "b": "Toto-2.0-4m@ctx512-univariate",
    "question": "Toto student vs Toto-2.0-4m, same 512 context, univariate",
