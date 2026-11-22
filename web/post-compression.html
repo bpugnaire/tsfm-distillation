@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>From PyTorch to a 1.3 MB ONNX file</title>
+  <title>From PyTorch to a 1.2 MB ONNX file</title>
   <meta name="description" content="Export a forecaster to ONNX with its normalisation inside, test parity correctly, and quantise to int8 without losing accuracy." />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
@@ -11,14 +11,14 @@
   <main>
     <article class="post">
       <p class="meta">Post 5 of 6 · about 7 minutes</p>
-      <h1>From PyTorch to a 1.3 MB ONNX file</h1>
+      <h1>From PyTorch to a 1.2 MB ONNX file</h1>
 
       <div class="tldr"><b>In short</b>
         <ul>
           <li>Put the <strong>normalisation inside the exported graph</strong>: the runtime sends raw values and gets raw quantiles back. No second implementation to keep in sync.</li>
           <li>Export with <code>torch.onnx.export(..., dynamo=False)</code> and the <strong>MHA fast path disabled</strong>; rewrite ops that have no ONNX translation.</li>
           <li>Test parity with a tolerance <strong>relative to the series' scale</strong>, on nasty inputs (scales from 0.001 to 50,000, gaps, short series).</li>
-          <li><code>onnxruntime.quantization.quantize_dynamic</code>, per-channel, first layer kept in float32: 3.9 MB → 1.3 MB. Then <strong>re-run the benchmark</strong>: it cost 0% on electricity, 3% on the shapes.</li>
+          <li><code>onnxruntime.quantization.quantize_dynamic</code>, per-channel, first layer kept in float32: 3.6 MB → 1.2 MB. Then <strong>re-run the benchmark</strong>: it cost 0% on electricity, 1.5% on the shapes.</li>
         </ul>
       </div>
 
@@ -41,7 +41,7 @@
         <li><strong>Easy inputs prove nothing.</strong> Test the paths the scaler takes: tiny and huge scales, offsets, missing gaps, left-padded short series.</li>
       </ul>
       <figure class="code" data-ref="tinycast.export.onnx.parity_report"></figure>
-      <p>Our export script fails if the fp32 maximum relative error exceeds 10⁻⁴. For the published student, the 99th-percentile relative error is 1.4 × 10⁻⁶ in fp32 and 4.2% in int8, over 1,000 stress windows (<code>results/export/c3_kd_toto_1m.json</code>).</p>
+      <p>Our export script fails if the fp32 maximum relative error exceeds 10⁻⁴. For the published student, the 99th-percentile relative error is 1.4 × 10⁻⁶ in fp32 and 5.0% in int8, over 1,000 stress windows (<code>results/export/c1x_kd5m_3m.json</code>).</p>
 
       <h2>4. int8: smaller, and almost as accurate</h2>
       <p>Dynamic quantisation stores weights as 8-bit integers with a scale factor, and quantises activations on the fly. It needs no calibration data and one function call in <code>onnxruntime</code>:</p>
@@ -56,7 +56,7 @@
         </tbody></table></div>
       <p>The first layer sees the scaled input directly; its errors propagate through everything after it. Per-channel scales stop one large weight from coarsening the rounding of a whole matrix. We also tried keeping the output head in fp32: no effect, because the dynamic quantiser does not quantise the <code>Gemm</code> node the head exports to. Check which nodes are actually quantised before you reason about them.</p>
       <div class="note"><b>Parity error is not accuracy loss</b>
-        A 4% p99 output difference sounds bad. Re-scored on the benchmarks, the int8 student is indistinguishable from fp32 on fresh electricity (ratio 1.001 [1.000, 1.002]) and 3.2% worse on the shapes (1.032 [1.023, 1.042], <code>results/site_pairs.json</code>). Always re-run the metric you care about.</div>
+        A 5% p99 output difference sounds bad. Re-scored on the benchmarks, the int8 student is indistinguishable from fp32 on fresh electricity (ratio 0.997 [0.996, 0.999]) and 1.5% worse on the shapes (1.015 [1.007, 1.022], <code>results/site_pairs.json</code>). Always re-run the metric you care about.</div>
 
       <h2>5. What it buys</h2>
       <div class="table-wrap"><table>
@@ -65,10 +65,10 @@
           <tr><td>Toto-2.0-313m (teacher), PyTorch</td><td class="num">313M</td><td class="num">275</td></tr>
           <tr><td>Toto-2.0-22m, PyTorch</td><td class="num">22M</td><td class="num">31</td></tr>
           <tr><td>Toto-2.0-4m, PyTorch</td><td class="num">4.1M</td><td class="num">10.7</td></tr>
-          <tr class="ours"><td>our student, ONNX Runtime, fp32</td><td class="num">0.95M</td><td class="num">0.75</td></tr>
-          <tr class="ours"><td>our student, ONNX Runtime, int8</td><td class="num">0.95M</td><td class="num">0.68</td></tr>
+          <tr class="ours"><td>our student, ONNX Runtime, fp32</td><td class="num">0.87M</td><td class="num">0.89</td></tr>
+          <tr class="ours"><td>our student, ONNX Runtime, int8</td><td class="num">0.87M</td><td class="num">0.92</td></tr>
         </tbody></table></div>
-      <p>CPU, one thread, batch 1, median of 50 runs, Apple M1 Pro (<code>results/shapes/summary.json</code>, <code>results/shapes/student-toto-onnx-*.json</code>). The runtimes differ, so this table mixes model size with runtime efficiency; it answers "what would I deploy", not "which architecture is faster".</p>
+      <p>CPU, one thread, batch 1, median of 50 runs, Apple M1 Pro (<code>results/shapes/summary.json</code>, <code>results/shapes/student-site-onnx-*.json</code>). The runtimes differ, so this table mixes model size with runtime efficiency; it answers "what would I deploy", not "which architecture is faster".</p>
 
       <h2>Checklist</h2>
       <ul class="checklist">

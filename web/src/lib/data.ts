@@ -7,7 +7,8 @@ export interface Manifest {
   cpu_ms_onnx_t1_b1: { fp32: number; int8: number }; context: number; horizon: number;
   teacher: { name: string; label: string; n_params: number }; source: string[];
 }
-export interface Shape { name: string; label: string; description: string; context: (number | null)[]; future: number[]; teacher_median: number[]; student_rel_wql: number }
+export interface SmallRow { model: string; label: string; note: string; n_params: number; crps_rel: number; ours_over_theirs: [number, number, number] | null; ours_better_on: number | null }
+export interface Shape { name: string; label: string; description: string; context: (number | null)[]; future: number[]; teacher_median: number[]; student_rel_wql: number; future_long?: number[] }
 export interface Shapes { shapes: Shape[]; source: string }
 export interface Row { model: string; label: string; role: Role; rel_wql: number; ci: [number, number]; cov80: number; n_params: number; ms: number | null }
 export interface Suite { rows: Row[]; n_windows: number; n_series: number; source: string[] }
@@ -16,10 +17,16 @@ export interface Contrast { suite: string; name: string; ratio: Ratio; source: s
 export interface Finding { group: "worth" | "recipe" | "ship"; title: string; versus: string; text: string; takeaway: string; contrasts: Contrast[] }
 export interface Results {
   suites: Record<string, Suite>;
-  gift: { n_configs: number; rank: number; n_models: number; rows: GiftRow[]; source: string[] };
+  gift: { n_configs: number; rank: number; n_models: number; rows: GiftRow[]; small: { n_configs: number; rows: SmallRow[] }; source: string[] };
   findings: Finding[];
   splits: { train_end: string; fresh_start: string; releases: Record<string, string> };
+  size_score: SizeScore;
 }
+export interface SzScore { score: number; ci: [number, number] | null; cov80?: number; source: string }
+export interface SzStudent { run: string; label: string; n_params: number; size: string; multi_token: boolean; context: number; windows: number;
+  teacher: string; distilled: boolean; published: boolean; scores: Record<string, SzScore> }
+export interface SzZoo { model: string; label: string; n_params: number; teacher: boolean; gift_leakage?: boolean; scores: Record<string, SzScore> }
+export interface SizeScore { students: SzStudent[]; zoo: SzZoo[] }
 export interface Snippet { file: string; line: number; code: string; lang: "python" | "typescript" }
 
 const base = import.meta.env.BASE_URL;

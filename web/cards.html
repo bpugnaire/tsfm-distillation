@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forecasting study cards</title>
+  <meta name="description" content="27 study cards on the hard parts of probabilistic forecasting and post-training time-series foundation models, each backed by a number measured in this project." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Study cards</h1>
+    <p class="lede">The hard parts of evaluating, distilling and shipping a forecasting foundation model, one question per card. Read the question, answer it in your head, then flip the card. The back gives the short answer, what we measured on it in this project, and where to go deeper.</p>
+    <div class="toolbar">
+      <div class="tabs" id="c-topics" style="margin:0"></div>
+      <span class="grow"></span>
+      <label class="small"><input type="checkbox" id="c-hide" /> hide cards I know</label>
+      <button type="button" id="c-shuffle">Shuffle</button>
+      <button type="button" id="c-flipall">Flip all</button>
+    </div>
+    <p class="small muted" id="c-progress"></p>
+    <div class="cards" id="c-grid"></div>
+  </main>
+  <script type="module" src="/src/pages/cards.ts"></script>
+</body>
+</html>

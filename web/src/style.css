@@ -210,3 +210,19 @@ pre.tree { font: 13px/1.6 var(--mono); background: var(--code-bg); border: 1px s
 pre.tree .dim { color: var(--muted); }
 svg .hit { cursor: pointer; }
 svg .hit:hover rect, svg .hit.on rect { stroke: var(--ink); stroke-width: 1.5; }
+
+/* ---------- study cards ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-top: 12px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.card.flipped { border-color: color-mix(in srgb, var(--student) 45%, var(--border)); }
+.card.known { opacity: .72; }
+.card-top { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.card-known { color: var(--good); font-weight: 600; }
+.card-q { font-weight: 600; font-size: 16px; line-height: 1.4; margin: 0; }
+.card-back { font-size: 14.5px; line-height: 1.5; border-top: 1px solid var(--grid); padding-top: 8px; }
+.card-back p { margin: 0 0 8px; }
+.card-here { background: var(--wash); border-radius: 8px; padding: 8px 10px; }
+.card-here b { display: block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--student); }
+.card-actions { display: flex; gap: 8px; margin-top: auto; }
+.card-actions button { font-size: 13px; padding: 4px 10px; }
+#pad { user-select: none; -webkit-user-select: none; }

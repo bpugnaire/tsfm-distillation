@@ -11,6 +11,7 @@ export default defineConfig({
         home: page("index.html"),
         results: page("results.html"),
         posts: page("posts.html"),
+        cards: page("cards.html"),
         evaluation: page("post-evaluation.html"),
         data: page("post-data.html"),
         student: page("post-student.html"),

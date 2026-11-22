@@ -31,6 +31,20 @@ export class Student {
     return { q: LEVELS.map((_, k) => Array.from(d.subarray(k * H, (k + 1) * H))), ms };
   }
 
+  /** Several contexts in one run (batch dimension). Returns per row 13 x 64 quantiles, plus ms for the whole run. */
+  async forecastBatch(contexts: number[][]): Promise<{ q: number[][][]; ms: number }> {
+    const n = contexts.length, x = new Float32Array(n * CONTEXT).fill(NaN);
+    contexts.forEach((ctx, r) => {
+      const c = ctx.slice(-CONTEXT);
+      x.set(c.map((v) => (Number.isFinite(v) ? v : NaN)), r * CONTEXT + CONTEXT - c.length);
+    });
+    const t0 = performance.now();
+    const out = await this.sess.run({ context: new ort.Tensor("float32", x, [n, CONTEXT]) });
+    const ms = performance.now() - t0;
+    const d = out.quantiles.data as Float32Array, K = LEVELS.length, H = d.length / (n * K);
+    return { q: contexts.map((_, r) => LEVELS.map((_, k) => Array.from(d.subarray((r * K + k) * H, (r * K + k + 1) * H)))), ms };
+  }
+
   get threads(): number {
     return ort.env.wasm.numThreads ?? 1;
   }

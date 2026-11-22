@@ -2,6 +2,7 @@ const PAGES = [
   ["index.html", "Demo"],
   ["results.html", "Results"],
   ["posts.html", "Posts"],
+  ["cards.html", "Study cards"],
 ] as const;
 const REPO = "https://github.com/bpugnaire/tsfm-distillation";
 

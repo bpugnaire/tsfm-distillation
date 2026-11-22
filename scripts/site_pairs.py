@@ -18,6 +18,8 @@ from tinycast.eval.metrics import paired_ratio_ci
 
 SUITES = ("fresh_fr_power", "shapes")
 PAIRS = [  # (a, b, question)
+    ("student-site-onnx-int8", "student-site-onnx-fp32", "int8 vs fp32, site student (C15 kd5m_3m)"),
+    ("student-site-onnx-fp32", "student-preview-gt-m", "site student (distilled, general) vs electricity-history student"),
     ("student-toto-onnx-int8", "student-toto-onnx-fp32", "int8 vs fp32, same student"),
     ("student-toto-onnx-fp32", "student-preview-gt-m",
      "distilled general student (1M windows, Toto labels) vs a student trained on real futures of 12k "

@@ -22,11 +22,11 @@
         </ul>
       </div>
 
-      <p>Our student has 0.95M parameters and copies Toto-2.0-313m, a model 330 times larger. It beats Toto-2.0-4m by 8% on fresh electricity data and stays 6% behind its teacher (<a href="results.html">Results</a>). Here is the recipe, in plain PyTorch.</p>
+      <p>Our student has 0.87M parameters and copies Timestral-5M, a model 6 times larger, on 3 million training windows. It beats Toto-2.0-4m by 8% on fresh electricity data and lands within 2% of its teacher there (<a href="results.html">Results</a>). Earlier students on this page copied bigger teachers (Timestral-209M, Toto-2.0-313m); the smaller teacher turned out to teach better. Here is the recipe, in plain PyTorch.</p>
 
       <h2>1. Label once, train many times: the teacher cache</h2>
-      <p>Distillation here is offline. Pick your training windows (512 steps of context each), run the teacher on all of them, and store its 13 quantiles × 64 steps per window. Every training run then reads the cache. That decouples the expensive part (running a 313M model) from the part you iterate on (the student).</p>
-      <p>Cost on an Apple M1 Pro: Toto-2.0-313m labels 54 windows/s on CPU and 179 windows/s on the GPU (MPS), batch 64 (<code>results/throughput.json</code>). One million windows is about an hour and a half on the GPU. Training the student for 50,000 steps on those windows took 78 minutes on the same laptop.</p>
+      <p>Distillation here is offline. Pick your training windows (512 steps of context each), run the teacher on all of them, and store its 13 quantiles × 64 steps per window. Every training run then reads the cache. That decouples the expensive part (running the teacher) from the part you iterate on (the student).</p>
+      <p>Cost on an Apple M1 Pro: Toto-2.0-313m labels 54 windows/s on CPU and 179 windows/s on the GPU (MPS), batch 64 (<code>results/throughput.json</code>). One million windows is about an hour and a half on the GPU. Timestral-5M is much cheaper: 868 windows/s on CPU, so the 3M windows of the published student took about an hour (<code>runs/stage_c15_3m.prepare.log</code>). Training it for 150,000 steps took 6.2 hours on the same laptop.</p>
       <pre><code class="language-python"># per window, in parquet: window_id, then
 #   float32 (loc, scale) + float16 of (q - loc) / scale   -> 13 x 64 x 2 bytes + 8 = 1.7 kB
 q = teacher.forecast(context, horizon=64)          # (B, 13, 64) on the project quantile grid

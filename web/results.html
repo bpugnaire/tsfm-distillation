@@ -22,6 +22,16 @@
     <div class="table-wrap" id="table"></div>
     <p class="src" id="board-src"></p>
 
+    <h2>Size against accuracy: every student we trained</h2>
+    <p class="prose">Each dot is one model. Further right means more parameters; higher means lower error. The line links the models that no smaller model beats, the best accuracy available at each size. Our students range from 0.2M to 2.9M parameters. Most are 0.87M or 0.95M, so the vertical spread around 0.9M is the effect of the training recipe: teacher, real future or teacher labels, number of windows, decoder, context length.</p>
+    <div class="tabs" id="sz-tabs"></div>
+    <div class="figure">
+      <svg id="sz" role="img" aria-label="Score against number of parameters for every model"></svg>
+      <div class="legend" id="sz-legend"></div>
+      <p class="cap" id="sz-cap"></p>
+    </div>
+    <div class="table-wrap" id="sz-table"></div>
+
     <h2>What the student is worth</h2>
     <div class="findings" data-group="worth"></div>
 

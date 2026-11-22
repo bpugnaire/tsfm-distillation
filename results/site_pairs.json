@@ -1,6 +1,28 @@
 [
  {
   "suite": "fresh_fr_power",
+  "a": "student-site-onnx-int8",
+  "b": "student-site-onnx-fp32",
+  "question": "int8 vs fp32, site student (C15 kd5m_3m)",
+  "ratio": [
+   0.9973694013130724,
+   0.9959200846001615,
+   0.9988833903620022
+  ]
+ },
+ {
+  "suite": "fresh_fr_power",
+  "a": "student-site-onnx-fp32",
+  "b": "student-preview-gt-m",
+  "question": "site student (distilled, general) vs electricity-history student",
+  "ratio": [
+   0.9926627301556245,
+   0.9593292553658491,
+   1.0250284288331295
+  ]
+ },
+ {
+  "suite": "fresh_fr_power",
   "a": "student-toto-onnx-int8",
   "b": "student-toto-onnx-fp32",
   "question": "int8 vs fp32, same student",
@@ -19,6 +41,28 @@
    0.9984596188141943,
    0.9683308768431202,
    1.0274603032967828
+  ]
+ },
+ {
+  "suite": "shapes",
+  "a": "student-site-onnx-int8",
+  "b": "student-site-onnx-fp32",
+  "question": "int8 vs fp32, site student (C15 kd5m_3m)",
+  "ratio": [
+   1.0148386058402057,
+   1.0068938595307932,
+   1.02247755950075
+  ]
+ },
+ {
+  "suite": "shapes",
+  "a": "student-site-onnx-fp32",
+  "b": "student-preview-gt-m",
+  "question": "site student (distilled, general) vs electricity-history student",
+  "ratio": [
+   0.8531002153198111,
+   0.8053827376672097,
+   0.9045562198707594
   ]
  },
  {

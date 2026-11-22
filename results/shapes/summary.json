@@ -229,6 +229,45 @@
    "n_clusters": 200
   },
   {
+   "model": "student-site-onnx-fp32",
+   "kind": "student_onnx",
+   "n_params": 866640,
+   "size_mb": 3.62,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.4812863401256903,
+   "rel_wql_ci": [
+    0.43626218669013256,
+    0.5332056749616412
+   ],
+   "rel_mase": 0.5464682533327757,
+   "rel_mase_ci": [
+    0.48952693645265943,
+    0.6131274897566926
+   ],
+   "mean_wql": 0.0778191,
+   "mean_cov80": 0.82851545,
+   "mean_cov98": 0.9946881500000001,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": 0.8915624930523336,
+   "latency_ms_t8_b32": 14.609166493755765,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
    "model": "t0-gamma",
    "kind": "t0",
    "n_params": 255614272,
@@ -264,6 +303,45 @@
    "tails_extrapolated": false,
    "latency_ms_t1_b1": 102.15677099768072,
    "latency_ms_t8_b32": 421.1023125681095,
+   "n_windows": 200,
+   "n_clusters": 200
+  },
+  {
+   "model": "student-site-onnx-int8",
+   "kind": "student_onnx",
+   "n_params": 866640,
+   "size_mb": 1.21,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.4884279584230906,
+   "rel_wql_ci": [
+    0.44301847815707746,
+    0.5403401906280361
+   ],
+   "rel_mase": 0.5543653978942515,
+   "rel_mase_ci": [
+    0.4961803006751202,
+    0.6221016392282396
+   ],
+   "mean_wql": 0.07795905,
+   "mean_cov80": 0.8250001499999999,
+   "mean_cov98": 0.9944538,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": 0.9151460108114406,
+   "latency_ms_t8_b32": 11.94520850549452,
    "n_windows": 200,
    "n_clusters": 200
   },
@@ -739,5 +817,5 @@
    "n_clusters": 200
   }
  ],
- "git_sha": "11dcda6f6f1da625de6589f17a0aeab385cf2cdc-dirty"
+ "git_sha": "1e329b9e9e76ea16d444f64c83bab7eb51d53e76-dirty"
 }

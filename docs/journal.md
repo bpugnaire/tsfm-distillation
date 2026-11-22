@@ -471,3 +471,15 @@ on all three (0.93 shapes, 0.94 public, 0.92 electricity) and its own teacher Ti
 after 1M windows, while distillation keeps improving, so the gap widens (8% at 300k, 9% at 1M, 13% at 3M). The student
 beats its teacher on synthetic shapes (in-distribution data).
 **Next:** best student under 1M is now kd5m_3m (0.582): GIFT-Eval with flip, site update; more data with the 5M teacher.
+
+## 2026-11-22 — Site: 3M student by default, long forecasts in Draw, small-model comparison
+**Did:** Site model switched to the C15 3M-window student (`c1x_kd5m_3m`, Timestral-5M labels; benchmarks
+`results/{shapes,fresh_fr_power}/student-site-onnx-*.json`). Draw now forecasts to the edge of the pad by rolling the
+student out in 64-step blocks with sampled paths (browser port of `tinycast/models/rollout.py`, paths mode; 128 paths, 12
+while the pen moves). New `scripts/small_models.py` → `results/gift_eval/small_models.json`: our student against every
+model under 15M on the 55 GIFT-Eval short-term configs, parameter counts from Hugging Face. **Result:** ours 0.582; ties
+raws-labs/tinycast at its 2048-step history (ours/theirs 1.022 [0.977, 1.068]) and beats it at 512 steps (0.952
+[0.918, 0.987]); 3% behind Toto-2.0-4m at 512 steps, 18–19% behind Timestral-5M and TimeH2O-v1-tiny; beats Moirai-small
+(0.875) and TTM-R2 (point forecasts, 0.620). Flip averaging on the 3M student: 0.998 [0.988, 1.009], nothing (it gave
+~1% on the 1M student). **Surprise / learned:** the free inference trick vanishes once the student has more data, as if
+the student had learned the sign symmetry itself. **Next:** C16 hybrid result, then C17 (10M windows) overnight.

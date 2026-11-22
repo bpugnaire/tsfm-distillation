@@ -30,16 +30,18 @@ WEB = ROOT / "web"
 DATA = WEB / "public" / "data"
 SUITES = ("fresh_fr_power", "shapes", "multidomain_test")
 
-# The student on the site (owner decision 2026-11-19): taught by Toto-2.0-313m, so every model involved is Apache-2.0.
-STUDENT = {
-    "stage": "stage_c3",
-    "arm": "kd_toto_1m",
-    "onnx": "c3_kd_toto_1m",
-    "onnx_runs": "student-toto-onnx",  # results/<suite>/student-toto-onnx-{fp32,int8}.json (scripts/benchmark.py)
-    "teacher": "toto-2.0-313m",
-    "gift": "tinycast-c3-kd_toto_1m",
+# The student on the site. 2026-11-19: Toto-taught C3 student (all Apache-2.0); 2026-11-22 (owner): the C15 3M-window student.
+STUDENT = {  # site model since 2026-11-22 (owner): best student under 1M on GIFT-Eval (C15, 3M windows, Timestral-5M labels)
+    "stage": "stage_c15_3m",
+    "arm": "kd5m_3m",
+    "onnx": "c1x_kd5m_3m",
+    "onnx_runs": "student-site-onnx",  # results/<suite>/student-site-onnx-{fp32,int8}.json (scripts/benchmark.py)
+    "teacher": "timestral-5m",
+    "gift": "tinycast-kd5m_3m",
 }
 # Same network trained on the real futures only (300k windows, Stage C-lite): the floor every distilled student must beat.
+GE_SMALL = ROOT / "results" / "gift_eval" / "small_models.json"  # scripts/small_models.py
+LONG_H = 256  # Draw pad: rolled-out horizon
 GT_STUDENT = {"stage": "stage_c_lite", "arm": "gt_mix_m_300k"}
 
 LABELS = {
@@ -133,6 +135,16 @@ def shapes() -> dict:
     if tch["ids"] != suite["ids"] or st["ids"] != suite["ids"]:
         raise ValueError("teacher, student and suite windows differ")
     med = QUANTILE_LEVELS.index(0.5)
+    # Longer true futures for the Draw pad's rolled-out forecast: the same seed-0 shape generated with a 256-step horizon.
+    # Only kept where it extends the 64-step draw exactly (same context, same first 64 steps); 9 of 20 shapes place their
+    # events relative to the total length, so for them the truth stops at 64 steps.
+    from tinycast.data.shapes import gallery
+
+    long = {}
+    for a, b in zip(gallery(512, 64), gallery(512, LONG_H), strict=True):
+        same = np.allclose(a.context, b.context, equal_nan=True)
+        if same and np.allclose(a.future, b.future[:64], equal_nan=True):
+            long[a.name] = [sig(float(v)) for v in b.future]
     w = np.array([np.nan if v is None else v for v in st["per_series"]["wql"]])
     b = np.array([np.nan if v is None else v for v in base["per_series"]["wql"]])
     out = []
@@ -154,6 +166,7 @@ def shapes() -> dict:
                     sig(v) for v in np.array(tch["forecasts_f16"][k], dtype=float)[med]
                 ],
                 "student_rel_wql": sig(float(np.exp(np.log(r).mean())), 3),
+                **({"future_long": long[name]} if name in long else {}),
             }
         )
     return {"shapes": out, "source": rel(d / f"{STUDENT['arm']}.json")}
@@ -252,7 +265,8 @@ def gift() -> dict:
         "rank": rank,
         "n_models": len(board) + 1,
         "rows": rows,
-        "source": [rel(p), rel(pp)],
+        "small": {k: v for k, v in read(GE_SMALL).items() if k != "sizes"},
+        "source": [rel(p), rel(pp), rel(GE_SMALL)],
     }
 
 
@@ -292,22 +306,22 @@ def findings() -> list[dict]:
     """(group, title, versus, text, takeaway, contrasts). Titles are claims; the numbers come from the files."""
     S, T = STUDENT["stage"], STUDENT["arm"]
     F = [
-        ("worth", "Better than Toto-2.0-4m, with 4× fewer parameters", "vs Toto-2.0-4m (4.1M), used as released",
-         "Our 0.95M student against the smallest official Toto. Clear win on fresh electricity and the shapes; a tie on public data the Toto models may have seen in pretraining.",
+        ("worth", "Better than Toto-2.0-4m on our test sets, with 5× fewer parameters", "vs Toto-2.0-4m (4.1M), used as released",
+         "Our 0.87M student against the smallest official Toto: 6–8% lower error on fresh electricity, the shapes and held-out public data.",
          "A small model trained on a big model's forecasts can beat a model of similar size trained from scratch by its authors.",
          _study_pair(S, T, "zoo:toto-2.0-4m")),
-        ("worth", "Within 3–8% of the teacher it copies, at 330× fewer parameters", "vs its teacher, Toto-2.0-313m",
-         "The student never beats its teacher (it is trained to imitate it), but it keeps most of its accuracy.",
-         "Expect the student to land a few percent behind the teacher, not above it.",
-         _study_pair(S, T, "zoo:toto-2.0-313m")),
-        ("worth", "On GIFT-Eval it loses to Toto-2.0-4m", "vs Toto-2.0-4m at the same 512-step context",
-         "On 55 short-term GIFT-Eval configs our student is 11% worse than Toto-2.0-4m, even when Toto reads the same 512 steps. It wins on only 12 configs. The same-data student taught by Timestral lost most on 10-second, 10-minute and daily series, which our training windows barely cover.",
+        ("worth", "Level with the teacher it copies on our test sets", "vs its teacher, Timestral-5M (6× larger)",
+         "Within 3% of Timestral-5M on electricity and public data, 2% better on the shapes, where half our training data comes from the same generators. On GIFT-Eval the teacher stays 18% ahead.",
+         "A student can match its teacher on data like its training windows; check far from them before claiming more.",
+         _study_pair(S, T, "zoo:timestral-5m")),
+        ("worth", "On GIFT-Eval it is still 3% behind Toto-2.0-4m", "vs Toto-2.0-4m at the same 512-step context",
+         "On 55 short-term GIFT-Eval configs our student is 3% worse than Toto-2.0-4m reading the same 512 steps, and wins 24 of them. Earlier 1M-window students were 9–11% behind: most of the gap closed with more training windows and a smaller teacher.",
          "Distillation transfers the teacher's skill only on inputs like those you distil on. Test on data outside your training domain before claiming generality.",
          _gift_pair(STUDENT["gift"], "Toto-2.0-4m@ctx512-univariate")),
         ("worth", "A student trained on the domain's own history ties it on that domain", "distilled general student vs a same-size student trained on 12k French electricity windows",
-         "On electricity, a student trained only on real electricity history (plus synthetic series) scores the same. On the shapes the distilled student has 20% lower error: it is the general one.",
+         "On electricity, a student trained only on real electricity history (plus synthetic series) scores the same. On the shapes the distilled student has 15% lower error: it is the general one.",
          "If you only forecast one domain and have its history, train on it first. Distil when you need one model for many domains.",
-         _site_pair("student-toto-onnx-fp32", "student-preview-gt-m")),
+         _site_pair("student-site-onnx-fp32", "student-preview-gt-m")),
         ("recipe", "Teacher forecasts are better labels than the real future", "teacher labels vs real futures, same network, same 300k windows",
          "Only the training target changes: the teacher's 13 quantiles (Timestral-209M) instead of the one future that happened. The teacher's distribution is a less noisy target than a single draw.",
          "With real inputs, train on the teacher's quantiles (α = 1), not on the observed values.",
@@ -323,7 +337,7 @@ def findings() -> list[dict]:
         ("recipe", "At 1M windows, the choice of teacher barely matters", "Toto-2.0-313m labels vs Timestral-28M labels, same 1M windows",
          "Between −3% and +3% depending on the test set. An ensemble of three teachers was no better either, although it won by 2% at 30k windows.",
          "Pick the teacher with the cleanest licence and the cheapest inference; scale the data instead.",
-         _study_pair(S, T, "c2_ref")),
+         _study_pair("stage_c3", "kd_toto_1m", "c2_ref")),
         ("recipe", "Random noise as input teaches nothing", "white-noise inputs vs KernelSynth inputs, both labelled by the teacher",
          "On noise, the teacher answers every input with the same flat forecast, so the student learns one flat forecast. Gaussian-process series (KernelSynth) make the teacher react to trend and seasonality.",
          "Data-free distillation works only with structured synthetic inputs.",
@@ -333,9 +347,9 @@ def findings() -> list[dict]:
          "Distil where the truth is noisy (real data); use the generator's truth where it is exact.",
          _study_pair("stage_a", "kd_synth", "gt_synth")),
         ("ship", "int8 is free on electricity, costs 3% on shapes", "int8 ONNX vs fp32 ONNX, same student",
-         "Dynamic int8 with per-channel weights, patch embedding kept in fp32: 3.9 MB → 1.3 MB.",
+         "Dynamic int8 with per-channel weights, patch embedding kept in fp32: 3.6 MB → 1.2 MB.",
          "Quantise, then re-run the benchmark: the parity error does not tell you the accuracy cost.",
-         _site_pair("student-toto-onnx-int8", "student-toto-onnx-fp32")),
+         _site_pair("student-site-onnx-int8", "student-site-onnx-fp32")),
         ("ship", "Little history? Fine-tune from the distilled weights", "fine-tune on 1 week of history: from distilled weights vs random weights (3 seeds)",
          "Measured with an earlier student (300k windows, Timestral-209M labels). On electricity, one week of data from random weights gives a model worse than seasonal naive.",
          "Start every small-data fine-tune from the distilled checkpoint.",
@@ -392,6 +406,9 @@ def results() -> dict:
         "gift": gift(),
         "findings": findings(),
         "finetune": finetune_curves(),
+        "size_score": json.loads(
+            (ROOT / "results" / "size_vs_score.json").read_text()
+        ),  # scripts/size_vs_score.py
         "splits": {
             "train_end": str(sp.train_end.date()),
             "fresh_start": str(sp.fresh_start.date()),

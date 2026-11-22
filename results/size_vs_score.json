@@ -1,0 +1,1728 @@
+{
+ "source": "scripts/size_vs_score.py",
+ "students": [
+  {
+   "run": "2026-11-13_stage_c_lite_gt_mix_m_300k",
+   "label": "m \u00b7 300k windows \u00b7 ground truth only",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "ground truth only",
+   "distilled": false,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.5401959251038149,
+     "ci": [
+      0.4850885205804187,
+      0.6052909161188565
+     ],
+     "cov80": 0.8976567,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7291356993442915,
+     "ci": [
+      0.6705830399444567,
+      0.7903163496158059
+     ],
+     "cov80": 0.8014287666666666,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.9039754885420538,
+     "ci": [
+      0.865404585536282,
+      0.9412768082555306
+     ],
+     "cov80": 0.7754408974358974,
+     "source": "results/study/stage_c_lite/table.json"
+    }
+   }
+  },
+  {
+   "run": "2026-11-13_stage_c_lite_kd_mix_s_300k",
+   "label": "s \u00b7 300k windows \u00b7 Timestral-209M",
+   "n_params": 218816,
+   "size": "s",
+   "multi_token": false,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "Timestral-209M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4991694059179524,
+     "ci": [
+      0.450020899462515,
+      0.5554114131078347
+     ],
+     "cov80": 0.8762502500000001,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7258505466419747,
+     "ci": [
+      0.6804414354179213,
+      0.7754327780906703
+     ],
+     "cov80": 0.7976348,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.8533462060311537,
+     "ci": [
+      0.8181595604819063,
+      0.8874674672206382
+     ],
+     "cov80": 0.7543070512820512,
+     "source": "results/study/stage_c_lite/table.json"
+    }
+   }
+  },
+  {
+   "run": "2026-11-13_stage_c_lite_kd_mix_m_300k",
+   "label": "m \u00b7 300k windows \u00b7 Timestral-209M",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "Timestral-209M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.46013395764619497,
+     "ci": [
+      0.41526595419187073,
+      0.5087251312330001
+     ],
+     "cov80": 0.8333594,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7029393295419539,
+     "ci": [
+      0.661264264334507,
+      0.7487214965275965
+     ],
+     "cov80": 0.7883691333333334,
+     "source": "results/study/stage_c_lite/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7945696140081893,
+     "ci": [
+      0.7496798998417815,
+      0.8395231122417579
+     ],
+     "cov80": 0.7626201282051281,
+     "source": "results/study/stage_e/table.json"
+    }
+   }
+  },
+  {
+   "run": "2026-11-14_stage_c2_kd_v2_300k",
+   "label": "m \u00b7 300k windows \u00b7 Timestral-28M",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4865904868951813,
+     "ci": [
+      0.4409578138362646,
+      0.5387577315235128
+     ],
+     "cov80": 0.8391408999999999,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7420799802048202,
+     "ci": [
+      0.705450585648278,
+      0.7835562317883312
+     ],
+     "cov80": 0.7662721833333334,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7552610713996577,
+     "ci": [
+      0.710477382699225,
+      0.7989032397784864
+     ],
+     "cov80": 0.629807532051282,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "gift": {
+     "score": 0.6379909965307575,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c2-300k-ctx512"
+    }
+   }
+  },
+  {
+   "run": "2026-11-15_stage_c2_kd_v2_1m",
+   "label": "m \u00b7 1M windows \u00b7 Timestral-28M",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.45783439646578317,
+     "ci": [
+      0.4170477836534286,
+      0.503312866521074
+     ],
+     "cov80": 0.83195335,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6970978914606906,
+     "ci": [
+      0.6653521534029084,
+      0.7313393188474503
+     ],
+     "cov80": 0.7721420666666666,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6748753934934724,
+     "ci": [
+      0.6211951608459744,
+      0.7295203433281395
+     ],
+     "cov80": 0.6934096474358975,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "gift": {
+     "score": 0.6155344813266336,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c2"
+    }
+   }
+  },
+  {
+   "run": "2026-11-16_stage_c3_kd_toto_1m",
+   "label": "m \u00b7 1M windows \u00b7 Toto-2.0-313m",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Toto-2.0-313m",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.45096755172972625,
+     "ci": [
+      0.4136783868414518,
+      0.4932137333348137
+     ],
+     "cov80": 0.7464062,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7165349015382199,
+     "ci": [
+      0.6826045873793696,
+      0.7546976788573471
+     ],
+     "cov80": 0.6753289333333333,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6545361154857213,
+     "ci": [
+      0.6077726842645073,
+      0.7017147150596478
+     ],
+     "cov80": 0.6209936217948717,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "gift": {
+     "score": 0.6272477024283242,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c3-kd_toto_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-16_stage_c3_kd_t0_1m",
+   "label": "m \u00b7 1M windows \u00b7 t0-gamma",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "t0-gamma",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.512076374975709,
+     "ci": [
+      0.4663118806532062,
+      0.5659794778591484
+     ],
+     "cov80": 0.85664075,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6974789488215928,
+     "ci": [
+      0.6618026827451287,
+      0.7381661582196426
+     ],
+     "cov80": 0.7797133833333334,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7106850792311069,
+     "ci": [
+      0.6649049586482155,
+      0.7558853307978131
+     ],
+     "cov80": 0.7309197435897435,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "gift": {
+     "score": 0.6402099091747867,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c3-kd_t0_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-16_stage_c3_kd_ens3_1m_2",
+   "label": "m \u00b7 1M windows \u00b7 3-teacher ensemble",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "3-teacher ensemble",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4574550495736779,
+     "ci": [
+      0.41576477194920103,
+      0.5035244643622764
+     ],
+     "cov80": 0.75914065,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6876570702283414,
+     "ci": [
+      0.6537721368039189,
+      0.726240126536965
+     ],
+     "cov80": 0.6716121333333332,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6943337991076176,
+     "ci": [
+      0.6487125987534994,
+      0.7392698576770987
+     ],
+     "cov80": 0.612980673076923,
+     "source": "results/study/stage_c3/table.json"
+    },
+    "gift": {
+     "score": 0.6268247537097752,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c3-kd_ens3_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-19_stage_c5_209m_kd_209m_1m_full",
+   "label": "m \u00b7 1M windows \u00b7 Timestral-209M",
+   "n_params": 946368,
+   "size": "m",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-209M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4530756728249631,
+     "ci": [
+      0.4083517815553519,
+      0.5027956223644953
+     ],
+     "cov80": 0.8274216,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6933174183630348,
+     "ci": [
+      0.6618036442871155,
+      0.7288280453866711
+     ],
+     "cov80": 0.78034995,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6738099510628265,
+     "ci": [
+      0.627211243918645,
+      0.7210334347681722
+     ],
+     "cov80": 0.6973157051282052,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "gift": {
+     "score": 0.6121704993561095,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c5-209m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-20_stage_c6_ctx2048_kd_ctx2048_1m",
+   "label": "m \u00b7 1M windows \u00b7 Timestral-28M \u00b7 2048 steps",
+   "n_params": 970944,
+   "size": "m",
+   "multi_token": false,
+   "context": 2048,
+   "windows": 1000000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "gift": {
+     "score": 0.6029074972320984,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c6-ctx2048-1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-20_stage_c7_size_l_28m",
+   "label": "l \u00b7 1M windows \u00b7 Timestral-28M",
+   "n_params": 2923264,
+   "size": "l",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.46732370986423266,
+     "ci": [
+      0.4282265534854269,
+      0.5119132758068615
+     ],
+     "cov80": 0.7617192,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.684187279017039,
+     "ci": [
+      0.6518338548898535,
+      0.7187909764867346
+     ],
+     "cov80": 0.7782091666666667,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6609281702680122,
+     "ci": [
+      0.6134367316650085,
+      0.7090480830124041
+     ],
+     "cov80": 0.6320115705128205,
+     "source": "results/study/stage_c7_size/table.json"
+    },
+    "gift": {
+     "score": 0.6079526788492556,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c7-l_28m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-20_stage_c7_size_l_209m",
+   "label": "l \u00b7 1M windows \u00b7 Timestral-209M",
+   "n_params": 2923264,
+   "size": "l",
+   "multi_token": false,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-209M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.45456230467982456,
+     "ci": [
+      0.41084073104391994,
+      0.5035915852186795
+     ],
+     "cov80": 0.7585159,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6798070463593968,
+     "ci": [
+      0.6473026106496278,
+      0.7152802405341614
+     ],
+     "cov80": 0.7840563666666666,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6505947561512144,
+     "ci": [
+      0.6042692779672061,
+      0.6969214480138681
+     ],
+     "cov80": 0.6968652884615384,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "gift": {
+     "score": 0.6068276930066999,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c7-l_209m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-20_stage_c8_mt_kd_mt_300k",
+   "label": "m multi-token \u00b7 300k windows \u00b7 Timestral-28M",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4754525967271859,
+     "ci": [
+      0.42939272299093073,
+      0.5260233935236184
+     ],
+     "cov80": 0.82593845,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7186774479816029,
+     "ci": [
+      0.68327513082296,
+      0.7547420816868966
+     ],
+     "cov80": 0.7850196666666667,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7326844470891498,
+     "ci": [
+      0.684966799420395,
+      0.7796339771978651
+     ],
+     "cov80": 0.6999697756410257,
+     "source": "results/study/stage_c8_mt/table.json"
+    },
+    "gift": {
+     "score": 0.6239754782702182,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c8-mt-300k"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c9_mt_scale_mt_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 Timestral-28M",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4689001693225013,
+     "ci": [
+      0.42898580306502804,
+      0.5149332108347686
+     ],
+     "cov80": 0.8411716,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6868410086885207,
+     "ci": [
+      0.6533200543490465,
+      0.722595444982082
+     ],
+     "cov80": 0.7906799499999999,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.705056129282782,
+     "ci": [
+      0.6624408985619902,
+      0.7470898358896391
+     ],
+     "cov80": 0.6528945833333333,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "gift": {
+     "score": 0.6025088736105095,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c9-mt_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c9_mt_scale_mt_l_1m_209m",
+   "label": "l multi-token \u00b7 1M windows \u00b7 Timestral-209M",
+   "n_params": 2803984,
+   "size": "l",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-209M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4057765202096732,
+     "ci": [
+      0.36827832966391366,
+      0.4471797888654066
+     ],
+     "cov80": 0.8547655500000001,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6685684122331285,
+     "ci": [
+      0.6334512381314404,
+      0.7068582816120025
+     ],
+     "cov80": 0.7894796833333334,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6649597802619832,
+     "ci": [
+      0.6192515086630151,
+      0.7091512363558842
+     ],
+     "cov80": 0.631209967948718,
+     "source": "results/study/stage_c9_mt_scale/table.json"
+    },
+    "gift": {
+     "score": 0.5983601502771891,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c9-mt_l_1m_209m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c9_mt_ctx2048_mt_2048_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 Timestral-28M \u00b7 2048 steps",
+   "n_params": 891216,
+   "size": "m",
+   "multi_token": true,
+   "context": 2048,
+   "windows": 1000000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "gift": {
+     "score": 0.6025667881262253,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-c9-mt_2048_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c10_v3_mt_v3_300k",
+   "label": "m multi-token \u00b7 300k windows \u00b7 Timestral-28M \u00b7 data v3",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4832947048311684,
+     "ci": [
+      0.43541945093960693,
+      0.5399160819003265
+     ],
+     "cov80": 0.82007795,
+     "source": "results/study/stage_c10_v3/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7186694790441567,
+     "ci": [
+      0.6842428478444758,
+      0.7543426552633766
+     ],
+     "cov80": 0.78496635,
+     "source": "results/study/stage_c10_v3/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7544241837652987,
+     "ci": [
+      0.7111601474000757,
+      0.797919440851888
+     ],
+     "cov80": 0.725811314102564,
+     "source": "results/study/stage_c10_v3/table.json"
+    },
+    "gift": {
+     "score": 0.6346564614405477,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mt_v3_300k"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c11_ctx_mt_2048_p16",
+   "label": "m multi-token \u00b7 300k windows \u00b7 Timestral-28M \u00b7 2048 steps \u00b7 patch 16",
+   "n_params": 878928,
+   "size": "m",
+   "multi_token": true,
+   "context": 2048,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "gift": {
+     "score": 0.621475627944684,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mt_2048_p16"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c11_ctx_mt_2048_p64",
+   "label": "m multi-token \u00b7 300k windows \u00b7 Timestral-28M \u00b7 2048 steps",
+   "n_params": 891216,
+   "size": "m",
+   "multi_token": true,
+   "context": 2048,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "gift": {
+     "score": 0.6236649873302673,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mt_2048_p64"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c12_varctx_mt_2048_p16_var",
+   "label": "m multi-token \u00b7 300k windows \u00b7 Timestral-28M \u00b7 2048 steps \u00b7 patch 16 \u00b7 variable histories",
+   "n_params": 878928,
+   "size": "m",
+   "multi_token": true,
+   "context": 2048,
+   "windows": 300000,
+   "teacher": "Timestral-28M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "gift": {
+     "score": 0.6220967339094294,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mt_2048_p16_var"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c13_gt_vs_kd_gt_300k",
+   "label": "m multi-token \u00b7 300k windows \u00b7 ground truth only",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "ground truth only",
+   "distilled": false,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4338183818503558,
+     "ci": [
+      0.3862535002557316,
+      0.4892500286271516
+     ],
+     "cov80": 0.8106253,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7242369066220392,
+     "ci": [
+      0.6769429745005534,
+      0.7788507506824817
+     ],
+     "cov80": 0.7621921333333334,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.772402177030896,
+     "ci": [
+      0.7269731558058417,
+      0.8168795143969984
+     ],
+     "cov80": 0.7521033333333335,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "gift": {
+     "score": 0.678883588026445,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-gt_300k"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c13_gt_vs_kd_mix_300k",
+   "label": "m multi-token \u00b7 300k windows \u00b7 0.5 \u00d7 Timestral-28M + real future",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 300000,
+   "teacher": "0.5 \u00d7 Timestral-28M + real future",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.4437657472794844,
+     "ci": [
+      0.39629930270595454,
+      0.4986876543765046
+     ],
+     "cov80": 0.8339064500000001,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7180347661871163,
+     "ci": [
+      0.6826272870658422,
+      0.7563670702069457
+     ],
+     "cov80": 0.7664635666666667,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.763806765167839,
+     "ci": [
+      0.7195045855253771,
+      0.8058328550776896
+     ],
+     "cov80": 0.6952621153846155,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "gift": {
+     "score": 0.6440006591799673,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mix_300k"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c13_gt_vs_kd_gt_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 ground truth only",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "ground truth only",
+   "distilled": false,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.395627727929789,
+     "ci": [
+      0.3503685216650955,
+      0.4478772794174312
+     ],
+     "cov80": 0.80461005,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6981511401119166,
+     "ci": [
+      0.6595447496608072,
+      0.7429900360758319
+     ],
+     "cov80": 0.7561784500000001,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7355540995051286,
+     "ci": [
+      0.6897358940784114,
+      0.7814638476115199
+     ],
+     "cov80": 0.6592550641025641,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "gift": {
+     "score": 0.6638749585069198,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-gt_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c13_gt_vs_kd_mix_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 0.5 \u00d7 Timestral-28M + real future",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "0.5 \u00d7 Timestral-28M + real future",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.40419494158196556,
+     "ci": [
+      0.361913580491834,
+      0.45212839472251176
+     ],
+     "cov80": 0.8388282499999999,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6778314272375618,
+     "ci": [
+      0.6435708880871012,
+      0.7174557657270288
+     ],
+     "cov80": 0.7723015666666667,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7011720302955775,
+     "ci": [
+      0.6532614788346763,
+      0.7496012599292754
+     ],
+     "cov80": 0.662159391025641,
+     "source": "results/study/stage_c13_gt_vs_kd/table.json"
+    },
+    "gift": {
+     "score": 0.6211262931580726,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-mix_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-21_stage_c14_teacher5m_kd5m_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 Timestral-5M",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "Timestral-5M",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.5004709945214376,
+     "ci": [
+      0.45277898605734185,
+      0.5562492149489351
+     ],
+     "cov80": 0.8354691,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.686256425045543,
+     "ci": [
+      0.6544301261073482,
+      0.7230370366749511
+     ],
+     "cov80": 0.8005058833333334,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7023163877809275,
+     "ci": [
+      0.6620028189633538,
+      0.7436997308097847
+     ],
+     "cov80": 0.6590547435897436,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "gift": {
+     "score": 0.5925776058791672,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-kd5m_1m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-22_stage_c15_3m_gt_3m",
+   "label": "m multi-token \u00b7 3M windows \u00b7 ground truth only",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 3000000,
+   "teacher": "ground truth only",
+   "distilled": false,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.39203758156910523,
+     "ci": [
+      0.3505248915515203,
+      0.4385543599118815
+     ],
+     "cov80": 0.8253125,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.69139177131397,
+     "ci": [
+      0.6528540122143568,
+      0.7364196160990639
+     ],
+     "cov80": 0.76123875,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7371213358517843,
+     "ci": [
+      0.6937226087616412,
+      0.7780233511569727
+     ],
+     "cov80": 0.7165967307692308,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "gift": {
+     "score": 0.671027528431901,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-gt_3m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-22_stage_c15_3m_kd5m_3m",
+   "label": "m multi-token \u00b7 3M windows \u00b7 Timestral-5M",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 3000000,
+   "teacher": "Timestral-5M",
+   "distilled": true,
+   "published": true,
+   "scores": {
+    "shapes": {
+     "score": 0.4812847626574221,
+     "ci": [
+      0.4362621509444803,
+      0.5332056312561675
+     ],
+     "cov80": 0.82851545,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.6764872652894155,
+     "ci": [
+      0.6437958890176754,
+      0.7123603361463873
+     ],
+     "cov80": 0.8026929833333334,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.6507359888576763,
+     "ci": [
+      0.6033455331380537,
+      0.6971461219267495
+     ],
+     "cov80": 0.6670672115384615,
+     "source": "results/study/stage_c15_3m/table.json"
+    },
+    "gift": {
+     "score": 0.5824327536838686,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-kd5m_3m"
+    }
+   }
+  },
+  {
+   "run": "2026-11-22_stage_c16_hybrid_hyb5m_1m",
+   "label": "m multi-token \u00b7 1M windows \u00b7 real future on synth, Timestral-5M on the rest",
+   "n_params": 866640,
+   "size": "m",
+   "multi_token": true,
+   "context": 512,
+   "windows": 1000000,
+   "teacher": "real future on synth, Timestral-5M on the rest",
+   "distilled": true,
+   "published": false,
+   "scores": {
+    "shapes": {
+     "score": 0.3896658424411838,
+     "ci": [
+      0.34660807135670996,
+      0.4384244543055142
+     ],
+     "cov80": 0.8118749500000001,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "multidomain_test": {
+     "score": 0.7014015401974933,
+     "ci": [
+      0.6694143378331505,
+      0.7377121976295072
+     ],
+     "cov80": 0.7968770166666667,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "fresh_fr_power": {
+     "score": 0.7052931504523553,
+     "ci": [
+      0.659737274547311,
+      0.748524402632735
+     ],
+     "cov80": 0.6838442628205127,
+     "source": "results/study/stage_c16_hybrid/table.json"
+    },
+    "gift": {
+     "score": 0.6070994722056303,
+     "ci": null,
+     "n_configs": 55,
+     "source": "results/gift_eval/tinycast-hyb5m_1m"
+    }
+   }
+  }
+ ],
+ "zoo": [
+  {
+   "model": "timestral-209m",
+   "label": "Timestral-209M",
+   "n_params": 209312256,
+   "teacher": true,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6138338612752539,
+     "ci": [
+      0.5706432247785677,
+      0.6587722433221915
+     ],
+     "cov80": 0.7095854487179487,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.4022977149312591,
+     "ci": [
+      0.3661675995754396,
+      0.44303207021247215
+     ],
+     "cov80": 0.8332029499999999,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6277564677547688,
+     "ci": [
+      0.5980441200778494,
+      0.6622431158077786
+     ],
+     "cov80": 0.8191838666666666,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.4652429765364315,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "timestral-28m",
+   "label": "Timestral-28M",
+   "n_params": 27821184,
+   "teacher": true,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6146725955151264,
+     "ci": [
+      0.5734054967187244,
+      0.6574536986095859
+     ],
+     "cov80": 0.7026743910256409,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.446763497788975,
+     "ci": [
+      0.4094515337583436,
+      0.4885133896908922
+     ],
+     "cov80": 0.8068748500000001,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6377628777143037,
+     "ci": [
+      0.6081162495374917,
+      0.6719962034465359
+     ],
+     "cov80": 0.8095474666666667,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.47805591340584686,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "toto-2.0-313m",
+   "label": "Toto-2.0-313m",
+   "n_params": 312684608,
+   "teacher": true,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6189735374205185,
+     "ci": [
+      0.5783503490158043,
+      0.6610922569986066
+     ],
+     "cov80": 0.6967645192307693,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.4393220445741715,
+     "ci": [
+      0.4053175122944783,
+      0.47624132895979954
+     ],
+     "cov80": 0.8184375,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6667982816078982,
+     "ci": [
+      0.6343065199474456,
+      0.7028386132555556
+     ],
+     "cov80": 0.8088783,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.49312969265546447,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "chronos-2",
+   "label": "Chronos-2",
+   "n_params": 119477664,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6240109843334757,
+     "ci": [
+      0.5828847600782145,
+      0.6678061079647784
+     ],
+     "cov80": 0.7070813141025641,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.5039186822363325,
+     "ci": [
+      0.4685080935715394,
+      0.5425159657039957
+     ],
+     "cov80": 0.7341406,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6143900144923443,
+     "ci": [
+      0.5817346745227319,
+      0.648980792872497
+     ],
+     "cov80": 0.7731108166666667,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.4961606074790837,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "toto-2.0-22m",
+   "label": "Toto-2.0-22m",
+   "n_params": 21915584,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6382798421715621,
+     "ci": [
+      0.5951997446946192,
+      0.6818322088154818
+     ],
+     "cov80": 0.6564503846153846,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.4752432768204126,
+     "ci": [
+      0.43941619023901296,
+      0.5138336342029056
+     ],
+     "cov80": 0.7923441,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6812462374646032,
+     "ci": [
+      0.6504195811801028,
+      0.714143537605656
+     ],
+     "cov80": 0.80110795,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.5083923976727412,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "timestral-5m",
+   "label": "Timestral-5M",
+   "n_params": 5208960,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6405926377642024,
+     "ci": [
+      0.5969814944111899,
+      0.6880133800450482
+     ],
+     "cov80": 0.664613173076923,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.49184658721699404,
+     "ci": [
+      0.4457930920426655,
+      0.5456025005190859
+     ],
+     "cov80": 0.80664065,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6598122579991632,
+     "ci": [
+      0.630711782821703,
+      0.6941979912212608
+     ],
+     "cov80": 0.8190067166666667,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.4935265538103032,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   }
+  },
+  {
+   "model": "chronos-2-small",
+   "label": "Chronos-2-small",
+   "n_params": 27934624,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6422596514098944,
+     "ci": [
+      0.6003899818527941,
+      0.6877126734548527
+     ],
+     "cov80": 0.671123814102564,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.4941730166328879,
+     "ci": [
+      0.4557785405506189,
+      0.5375718278929378
+     ],
+     "cov80": 0.75164045,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6419157491441998,
+     "ci": [
+      0.6111875316929276,
+      0.6732054685344127
+     ],
+     "cov80": 0.77489155,
+     "source": "results/multidomain_test/summary.json"
+    }
+   }
+  },
+  {
+   "model": "chronos-bolt-mini",
+   "label": "Chronos-Bolt-mini",
+   "n_params": 21236096,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6513864302279497,
+     "ci": [
+      0.6076870528024032,
+      0.6967044069304298
+     ],
+     "cov80": 0.7021735256410256,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.6512977065518273,
+     "ci": [
+      0.5933030179850557,
+      0.7195342898271262
+     ],
+     "cov80": 0.8352349499999999,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.6368012451377048,
+     "ci": [
+      0.5973881400687853,
+      0.680892791504564
+     ],
+     "cov80": 0.7811136833333334,
+     "source": "results/multidomain_test/summary.json"
+    }
+   }
+  },
+  {
+   "model": "t0-gamma",
+   "label": "t0-gamma",
+   "n_params": 255614272,
+   "teacher": true,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.667643506740082,
+     "ci": [
+      0.6133669539893963,
+      0.7250698440135858
+     ],
+     "cov80": 0.6945613461538462,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.48532037249778404,
+     "ci": [
+      0.44038230602311745,
+      0.5362432775061354
+     ],
+     "cov80": 0.8176561000000001,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.5106979883371865,
+     "ci": [
+      0.4766325660447555,
+      0.5469507724667926
+     ],
+     "cov80": 0.8005081,
+     "source": "results/multidomain_test/summary.json"
+    }
+   }
+  },
+  {
+   "model": "chronos-bolt-tiny",
+   "label": "Chronos-Bolt-tiny",
+   "n_params": 8652672,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.6736839392401608,
+     "ci": [
+      0.6294218741840529,
+      0.7195210379448097
+     ],
+     "cov80": 0.6984676602564104,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.6861199520839746,
+     "ci": [
+      0.6207763807811105,
+      0.7638351338392525
+     ],
+     "cov80": 0.8302343999999999,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.651481841493244,
+     "ci": [
+      0.617181684250412,
+      0.6894083549454171
+     ],
+     "cov80": 0.7783677,
+     "source": "results/multidomain_test/summary.json"
+    }
+   }
+  },
+  {
+   "model": "toto-2.0-4m",
+   "label": "Toto-2.0-4m",
+   "n_params": 4144448,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 0.7087379516437092,
+     "ci": [
+      0.6532151751347733,
+      0.7643317940024845
+     ],
+     "cov80": 0.7029248076923077,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 0.5194255914024989,
+     "ci": [
+      0.4752626914556136,
+      0.5685260615135291
+     ],
+     "cov80": 0.81234375,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.7206161068207827,
+     "ci": [
+      0.6902848218778956,
+      0.7550991996073144
+     ],
+     "cov80": 0.8085830333333333,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.5273974882898903,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    },
+    "gift_512": {
+     "score": 0.5634140791035279,
+     "ci": null,
+     "source": "results/gift_eval/Toto-2.0-4m@ctx512-univariate"
+    }
+   }
+  },
+  {
+   "model": "ttm-r2.1-l1",
+   "label": "TTM-R2.1",
+   "n_params": 855100,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 1.1592465874702031,
+     "ci": [
+      1.102633683598388,
+      1.2161831660505253
+     ],
+     "cov80": 0.0,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 1.7895335137015174,
+     "ci": [
+      1.5141461018183862,
+      2.134746331738395
+     ],
+     "cov80": 0.0,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.8841637695318783,
+     "ci": [
+      0.803068425969192,
+      0.9684980647405936
+     ],
+     "cov80": 0.0,
+     "source": "results/multidomain_test/summary.json"
+    }
+   }
+  },
+  {
+   "model": "ttm-r2",
+   "label": "TTM-R2",
+   "n_params": 805280,
+   "teacher": false,
+   "scores": {
+    "fresh_fr_power": {
+     "score": 1.1699769875487442,
+     "ci": [
+      1.1246026257959583,
+      1.2211637020900385
+     ],
+     "cov80": 0.0,
+     "source": "results/fresh_fr_power/summary.json"
+    },
+    "shapes": {
+     "score": 1.380395331118599,
+     "ci": [
+      1.236397037030756,
+      1.5528736122821867
+     ],
+     "cov80": 0.0,
+     "source": "results/shapes/summary.json"
+    },
+    "multidomain_test": {
+     "score": 0.9730120205777204,
+     "ci": [
+      0.9167989443791442,
+      1.0226900651649133
+     ],
+     "cov80": 0.0,
+     "source": "results/multidomain_test/summary.json"
+    },
+    "gift": {
+     "score": 0.9388348115231201,
+     "ci": null,
+     "source": "results/gift_eval/summary.json"
+    }
+   },
+   "gift_leakage": true
+  },
+  {
+   "model": "TimeH2O-v1-tiny",
+   "label": "TimeH2O-v1-tiny",
+   "n_params": 5825636,
+   "teacher": false,
+   "scores": {
+    "gift": {
+     "score": 0.4903898553627573,
+     "ci": null,
+     "source": "results/gift_eval/summary.json \u00b7 params: results/gift_eval/small_models.json"
+    }
+   }
+  },
+  {
+   "model": "FlowState-9.1M",
+   "label": "FlowState",
+   "n_params": 9069312,
+   "teacher": false,
+   "scores": {
+    "gift": {
+     "score": 0.5187736846977137,
+     "ci": null,
+     "source": "results/gift_eval/summary.json \u00b7 params: results/gift_eval/small_models.json"
+    }
+   }
+  },
+  {
+   "model": "Moirai_small",
+   "label": "Moirai-small",
+   "n_params": 13827528,
+   "teacher": false,
+   "scores": {
+    "gift": {
+     "score": 0.6658504600998629,
+     "ci": null,
+     "source": "results/gift_eval/summary.json \u00b7 params: results/gift_eval/small_models.json"
+    }
+   }
+  },
+  {
+   "model": "raws-tinycast",
+   "label": "raws-labs TinyCast",
+   "n_params": 146505,
+   "teacher": false,
+   "scores": {
+    "gift": {
+     "score": 0.569920641861948,
+     "ci": null,
+     "source": "results/gift_eval/summary.json (full history)"
+    },
+    "gift_512": {
+     "score": 0.6119262387208805,
+     "ci": null,
+     "source": "results/gift_eval/raws-tinycast@hist512"
+    }
+   }
+  }
+ ]
+}

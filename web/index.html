@@ -4,22 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>tinycast · a distilled forecaster</title>
-  <meta name="description" content="A 0.95M-parameter probabilistic forecaster distilled from Toto-2.0-313m, running in the browser. Results, code and what we learned." />
+  <meta name="description" content="A 0.87M-parameter probabilistic forecaster distilled from Timestral-5M, running in the browser. Results, code and what we learned." />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
   <main>
-    <h1>A 1M-parameter forecaster, distilled from a 313M one, running in your browser</h1>
+    <h1>A 0.87M-parameter forecaster, distilled from 3 million teacher forecasts, running in your browser</h1>
     <p class="lede" id="lede">Loading results…</p>
     <div class="numbers" id="numbers"></div>
 
     <h2>Draw a series, get a forecast</h2>
-    <p class="prose">Draw from left to right. The student forecasts the next 64 steps on every move of the pen. Move the pointer back over your drawing to forecast from an earlier point. Pick a shape to see the true continuation and the teacher's forecast.</p>
+    <p class="prose">Draw from left to right. The student forecasts on every move of the pen: 64 steps in one pass, and further by feeding its own sampled forecasts back in, 64 steps at a time. Move the pointer back over your drawing to forecast from an earlier point. Pick a shape to see the true continuation and the teacher's forecast.</p>
     <div class="figure">
       <div class="toolbar">
         <select id="preset" aria-label="Load a shape"><option value="">Load a shape…</option></select>
         <button id="clear" type="button">Clear</button>
         <button id="undo" type="button">Undo</button>
+        <select id="horizon" aria-label="Forecast length"><option value="long">Forecast to the edge (rolled out)</option><option value="short">64 steps (one pass)</option></select>
         <span class="grow"></span>
         <button id="teacher" type="button" aria-pressed="false" disabled>Show teacher</button>
       </div>
@@ -33,6 +34,13 @@
     <div class="figure">
       <svg id="pareto" role="img" aria-label="Error against number of parameters"></svg>
       <p class="cap" id="pareto-cap"></p>
+    </div>
+
+    <h2>Against other small models</h2>
+    <p class="prose" id="small-lede"></p>
+    <div class="figure">
+      <svg id="small" role="img" aria-label="GIFT-Eval score of small forecasting models"></svg>
+      <p class="cap" id="small-cap"></p>
     </div>
 
     <h2>Where it works, where it fails</h2>
