@@ -12,6 +12,7 @@ import numpy as np
 from tinycast.data import shapes as S
 
 TRAIN_SEED_MAX = S.GALLERY_SEED_OFFSET
+EXTRA_TRAIN_SEED_MIN = 100_000_000  # extra training seeds for corpora above 500k synthetic windows (corpus._synth_seeds)
 PERIODS = (12, 24, 48, 96, 168)
 
 
@@ -60,8 +61,12 @@ def _shape(rng: np.random.Generator, n: int, context_length: int) -> np.ndarray:
 
 def synthetic_series(seed: int, n: int = 576, context_length: int = 512) -> np.ndarray:
     """One training series of length n (context + horizon). May contain NaN (gaps) in the context."""
-    if not 0 <= seed < TRAIN_SEED_MAX:
-        raise ValueError(f"training seeds must be in [0, {TRAIN_SEED_MAX})")
+    if not (
+        0 <= seed < TRAIN_SEED_MAX or seed >= EXTRA_TRAIN_SEED_MIN
+    ):  # never the gallery/test seed range
+        raise ValueError(
+            f"training seeds must be in [0, {TRAIN_SEED_MAX}) or >= {EXTRA_TRAIN_SEED_MIN}"
+        )
     rng = np.random.default_rng([seed, 7919])
     u = rng.uniform()
     if u < 0.4:
