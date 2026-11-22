@@ -492,5 +492,5 @@ teacher pinball equal the ground-truth pinball; checked to 7 digits), same 1M wi
 **Surprise / learned:** the shapes win of real-future training transfers completely, but it costs 2–2.5% on held-out real
 data: the teacher's view of synthetic series is useful for real data, the generator's own draw is not. The pre-registered
 rule (hybrid only if its GIFT interval is below 1) kept C17 on pure distillation. **Also:** C17 first launch failed in 1
-minute (data v4 missing from `VERSIONS`; an edit script without an existence check). Fixed and relaunched 2026-11-23 00:0x.
+minute (data v4 missing from `VERSIONS`; an edit script without an existence check). Fixed and relaunched (2026-11-22 23:56:53).
 **Next:** C17 (10M windows) results in the morning; GIFT-Eval medium/long with the rolled-out 3M student.
