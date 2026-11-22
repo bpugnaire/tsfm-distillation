@@ -194,6 +194,7 @@ def windows_v2(
     seed: int,
     context_length: int = 512,
     horizon: int = 64,
+    ctx_out: np.ndarray | None = None,
 ):
     """Exactly n windows (or all available), targets inside the split, origins on a stride-`horizon` grid, no repeats."""
     lo, hi = H.SPLITS[split]
@@ -231,7 +232,15 @@ def windows_v2(
             if remaining == 0:
                 break
     picks = [p for nm in names for p in grids[nm][: quota[nm]]]
-    ctx = np.full((len(picks), context_length), np.nan, dtype=np.float32)
+    if (
+        ctx_out is not None
+    ):  # write straight into a (memory-mapped) array: 5M windows x 512 steps do not fit in RAM twice
+        if len(ctx_out) < len(picks):
+            raise ValueError(f"ctx_out has {len(ctx_out)} rows, need {len(picks)}")
+        ctx = ctx_out
+        ctx[: len(picks)] = np.nan
+    else:
+        ctx = np.full((len(picks), context_length), np.nan, dtype=np.float32)
     fut = np.empty((len(picks), horizon), dtype=np.float32)
     ids, seasons = [], []
     for j, (k, i) in enumerate(picks):

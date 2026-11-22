@@ -24,7 +24,16 @@ from tinycast.data.synthetic import TRAIN_SEED_MAX, synthetic_batch
 from tinycast.data.windows import window_id
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCES = ("multidomain", "multidomain_v2", "multidomain_v3", "synth", "rollout", "noise", "rte")
+SOURCES = (
+    "multidomain",
+    "multidomain_v2",
+    "multidomain_v3",
+    "multidomain_v4",
+    "synth",
+    "rollout",
+    "noise",
+    "rte",
+)
 
 
 @dataclass(frozen=True)
@@ -136,6 +145,21 @@ def _multidomain_v2(spec: CorpusSpec, n: int):
     return [window_id("md2", i, 0) for i in ids], ctx, fut
 
 
+V_SOURCES = {"multidomain_v2": "v2", "multidomain_v3": "v3", "multidomain_v4": "v4"}
+V_PREFIX = {"multidomain_v2": "md2", "multidomain_v3": "md3", "multidomain_v4": "md4"}
+
+
+def _multidomain_v4(spec: CorpusSpec, n: int):
+    """Data v4 (2026-11-22): the v3 subsets with larger caps (60M points per subset), for the 10M-window run."""
+    from tinycast.data.sources import data_v2 as V
+
+    ctx, fut, ids, _, quota = V.windows_v2(
+        V.load_v2("v4"), spec.split, n, spec.seed, spec.context_length, spec.horizon
+    )
+    print(f"  multidomain_v4 windows per dataset: {quota}", flush=True)
+    return [window_id("md4", i, 0) for i in ids], ctx, fut
+
+
 def _multidomain_v3(spec: CorpusSpec, n: int):
     """Data v3 (2026-11-21): v2 + 18 more GiftEvalPretrain subsets, capped by time points per subset."""
     from tinycast.data.sources import data_v2 as V
@@ -227,6 +251,7 @@ BUILDERS = {
     "multidomain": _multidomain,
     "multidomain_v2": _multidomain_v2,
     "multidomain_v3": _multidomain_v3,
+    "multidomain_v4": _multidomain_v4,
     "synth": _synth,
     "noise": _noise,
     "rte": _rte,
@@ -309,6 +334,17 @@ def build_corpus(spec: CorpusSpec, cache: bool = True, log=print) -> Corpus:
             i = [window_id("synth", str(int(s_)), 0) for s_ in seeds]
             f = np.concatenate(fs)
             c = None
+        elif (
+            big and name in V_SOURCES
+        ):  # real windows written straight into the memory-mapped contexts
+            from tinycast.data.sources import data_v2 as V
+
+            _, f, wids, _, quota = V.windows_v2(
+                V.load_v2(V_SOURCES[name]), spec.split, n, spec.seed, spec.context_length, spec.horizon,
+                ctx_out=mm[row : row + n],
+            )  # fmt: skip
+            log(f"  {name} windows per dataset: {quota}")
+            i, c = [window_id(V_PREFIX[name], w, 0) for w in wids], None
         else:
             i, c, f = BUILDERS[name](spec, n)
             c = np.asarray(c, dtype=np.float32)

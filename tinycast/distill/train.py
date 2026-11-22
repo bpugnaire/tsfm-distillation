@@ -208,16 +208,15 @@ def train(
     )  # large corpora stay on disk; batches are gathered from the file
     ctx_all = None if mmapped else torch.as_tensor(tr.context)
     fut_all = torch.as_tensor(tr.future)
+    gt_rows = None
     if (
         teacher_q is not None and cfg.data.gt_sources
-    ):  # hybrid target: real future for these sources
-        if isinstance(teacher_q, np.memmap):
-            raise ValueError("gt_sources is not supported with memory-mapped labels yet")
-        rows = np.isin(tr.source, cfg.data.gt_sources) & np.isfinite(tr.future).all(axis=1)
-        teacher_q = np.array(teacher_q, dtype=np.float32, copy=False)
-        teacher_q[rows] = np.asarray(tr.future, dtype=np.float32)[rows][:, None, :]
+    ):  # hybrid target: real future for these sources, per batch
+        gt_rows = torch.as_tensor(
+            np.isin(tr.source, cfg.data.gt_sources) & np.isfinite(tr.future).all(axis=1)
+        )
         log(
-            f"gt_sources {cfg.data.gt_sources}: {int(rows.sum())} windows trained on the real future"
+            f"gt_sources {cfg.data.gt_sources}: {int(gt_rows.sum())} windows trained on the real future"
         )
     tq_mm = isinstance(teacher_q, np.memmap)
     tq_all = torch.as_tensor(teacher_q) if teacher_q is not None and not tq_mm else None
@@ -260,6 +259,13 @@ def train(
             l_kd = None
             if tq_all is not None or tq_mm:
                 tq = torch.from_numpy(np.asarray(teacher_q[idx.numpy()])) if tq_mm else tq_all[idx]
+                if (
+                    gt_rows is not None
+                ):  # degenerate "teacher" = the real future: teacher pinball == ground-truth pinball
+                    g = gt_rows[idx]
+                    if g.any():
+                        tq = tq.clone()
+                        tq[g] = fut_all[idx][g][:, None, :].expand(-1, tq.shape[1], -1).to(tq.dtype)
                 qt = scaled_targets(model, tq.to(device), loc, scale)
                 if cfg.loss.kd == "pinball_teacher":
                     l_kd = L.kd_pinball_teacher(zq, qt, levels, t_levels, hw, t_mask)
