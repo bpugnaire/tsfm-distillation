@@ -8,7 +8,11 @@ Conventions copied from external/gift-eval/notebooks/chronos.ipynb (commit 0b57d
 names, `to_univariate` when target_dim > 1, `evaluate_model(..., axis=None, mask_invalid_label=True,
 allow_nan_forecast=False, seasonality=get_seasonality(freq))`, the 11 metrics, quantile levels 0.1..0.9.
 The student reads the last 512 steps (shorter series are left-padded with NaN, which it treats as missing) and forecasts
-64 steps in one pass; every short-term horizon is <= 64. Medium/long terms (up to 900 steps) are not run here.
+64 steps in one pass; every short-term horizon is <= 64. Medium/long terms (480-900 steps) need --rollout paths: the
+student is rolled out in 64-step blocks with sampled paths (tinycast/models/rollout.py, the mode validated in
+results/long_horizon/), quantiles taken across --paths paths.
+
+    .venv-gift/bin/python scripts/gift_eval_student.py --onnx ... --name ... --terms medium,long --datasets med_long --rollout paths
 """
 
 from __future__ import annotations
@@ -134,6 +138,41 @@ def upsample(q: np.ndarray, k: int, H: int) -> np.ndarray:
     return np.stack([np.interp(t, centres, row) for row in q])
 
 
+MED_LONG = [
+    "electricity/15T",
+    "electricity/H",
+    "solar/10T",
+    "solar/H",
+    "kdd_cup_2018_with_missing/H",
+    "LOOP_SEATTLE/5T",
+    "LOOP_SEATTLE/H",
+    "SZ_TAXI/15T",
+    "M_DENSE/H",
+    "ett1/15T",
+    "ett1/H",
+    "ett2/15T",
+    "ett2/H",
+    "jena_weather/10T",
+    "jena_weather/H",
+    "bitbrains_fast_storage/5T",
+    "bitbrains_rnd/5T",
+    "bizitobs_application",
+    "bizitobs_service",
+    "bizitobs_l2c/5T",
+    "bizitobs_l2c/H",
+]  # gift-eval notebooks
+
+
+class _Base:
+    """Adapter for RolloutForecaster: forecast(ctx, h) -> (n, 13, h) from the ONNX student (64-step blocks)."""
+
+    def __init__(self, run):
+        self.run = run
+
+    def forecast(self, ctx, h):
+        return self.run(np.ascontiguousarray(ctx, dtype=np.float32))[:, :, :h]
+
+
 class OnnxStudentPredictor:
     """GluonTS-style predictor: predict(test_data.input) -> list[QuantileForecast].
 
@@ -144,14 +183,25 @@ class OnnxStudentPredictor:
     """
 
     def __init__(self, onnx_path: str, prediction_length: int, context: int = 512, batch: int = 1024,
-                 flip: bool = False, downsample: bool = False):  # fmt: skip
+                 flip: bool = False, downsample: bool = False, rollout: str = "none", paths: int = 32):  # fmt: skip
         so = ort.SessionOptions()
         so.intra_op_num_threads = int(os.environ.get("GIFT_ORT_THREADS", "8"))
         self.sess = ort.InferenceSession(onnx_path, so, providers=["CPUExecutionProvider"])
         self.H, self.T, self.batch = prediction_length, context, batch
         self.flip, self.downsample = flip, downsample
+        if prediction_length > 64 and rollout == "none":
+            raise ValueError(
+                f"student horizon is 64, asked {prediction_length}: pass --rollout paths"
+            )
+        self.roll = None
         if prediction_length > 64:
-            raise ValueError(f"student horizon is 64, asked {prediction_length}")
+            import sys
+
+            sys.path.insert(0, str(ROOT))
+            from tinycast.models.rollout import RolloutForecaster
+
+            self.roll = RolloutForecaster(_Base(self._run), "student-rollout", mode=rollout, n_paths=paths,
+                                          context_length=context, batch=batch)  # fmt: skip
         self.idx = [OURS.index(q) for q in GIFT_LEVELS]
         self.keys = [str(q) for q in GIFT_LEVELS] + ["mean"]
 
@@ -195,7 +245,14 @@ class OnnxStudentPredictor:
                     ks[i] = k
             DS_COUNTS[int(ks[i])] = DS_COUNTS.get(int(ks[i]), 0) + 1
             x[i, self.T - len(t) :] = t
-        q = self._run(x)  # (N, 13, 64)
+        if (
+            self.roll is not None
+        ):  # chunks of series: N x paths contexts at once would not fit in memory
+            q = np.concatenate(
+                [self.roll.forecast(x[i : i + 256], self.H) for i in range(0, len(x), 256)]
+            )
+        else:
+            q = self._run(x)  # (N, 13, 64)
         # A series with no observed history at all (e.g. electricity/W MT_178: 184 NaN) has nothing to scale by:
         # forecast 0 for it, counted in config.json (empty_context_rows), never silently.
         empty = ~np.isfinite(x).any(axis=1)
@@ -234,7 +291,7 @@ def _eval_config(job):
     from gluonts.model import evaluate_model
     from gluonts.time_feature import get_seasonality
 
-    ds_name, term, onnx, context, flip, downsample, name = job
+    ds_name, term, onnx, context, flip, downsample, name, rollout, paths = job
     EMPTY.clear()
     GAP.clear()
     DS_COUNTS.clear()
@@ -253,7 +310,8 @@ def _eval_config(job):
     ds = Dataset(name=ds_name, term=term, to_univariate=uni)
     t0 = time.time()
     res = evaluate_model(
-        OnnxStudentPredictor(onnx, ds.prediction_length, context=context, flip=flip, downsample=downsample),
+        OnnxStudentPredictor(onnx, ds.prediction_length, context=context, flip=flip, downsample=downsample,
+                             rollout=rollout, paths=paths),
         test_data=ds.test_data, metrics=metrics, batch_size=1024, axis=None, mask_invalid_label=True,
         allow_nan_forecast=False, seasonality=get_seasonality(ds.freq),
     )  # fmt: skip
@@ -284,12 +342,16 @@ def main() -> None:
         "--workers", type=int, default=4, help="configs evaluated in parallel processes"
     )
     ap.add_argument("--downsample", action="store_true", help="Reverso-style period downsampling")
+    ap.add_argument(
+        "--rollout", default="none", choices=["none", "paths", "median"], help="horizons > 64"
+    )
+    ap.add_argument("--paths", type=int, default=32)
     a = ap.parse_args()
     out_dir = ROOT / "results" / "gift_eval" / a.name
     out_dir.mkdir(parents=True, exist_ok=True)
-    names = a.datasets.split(",") if a.datasets else SHORT
+    names = MED_LONG if a.datasets == "med_long" else a.datasets.split(",") if a.datasets else SHORT
     jobs = [
-        (ds_name, term, a.onnx, a.context, a.flip, a.downsample, a.name)
+        (ds_name, term, a.onnx, a.context, a.flip, a.downsample, a.name, a.rollout, a.paths)
         for ds_name in names
         for term in a.terms.split(",")
     ]
@@ -319,7 +381,7 @@ def main() -> None:
         "gift_eval_commit": "0b57dd6937eb9a69a3ae771f73ab36188bb33e47", "wall_seconds": round(time.time() - t_all, 1),
         "empty_context_rows": int(sum(EMPTY)), "empty_context_rule": "no observed history at all: forecast 0",
         "gap_skipped_rows": int(sum(GAP)), "gap_rule": "last 512 steps all missing: last 512 observed values",
-        "flip": a.flip, "downsample": a.downsample, "downsample_factors": {str(k): v for k, v in sorted(DS_COUNTS.items())},
+        "flip": a.flip, "downsample": a.downsample, "rollout": a.rollout, "paths": a.paths, "downsample_factors": {str(k): v for k, v in sorted(DS_COUNTS.items())},
     }, indent=1))  # fmt: skip
     print(f"{len(rows)} configs -> {out_dir / 'all_results.csv'}")
 
