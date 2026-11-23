@@ -516,3 +516,14 @@ schedule must finish); GIFT medium/long kept 25/42 configs thanks to per-config 
 **Rule from now on:** on this 16 GB Mac, one memory-heavy job at a time (training with in-RAM labels, rollout evaluation,
 teacher labelling); queues wait by PID, and a watcher flags < 8% free memory. Also fixed earlier tonight: the medium/long
 run had crashed on bitbrains (rows with no history) and lost everything because results were written only at the end.
+
+## 2026-11-23 — Stage F launched: what fine-tuning buys, and what it costs elsewhere
+**Design (fixed before any result; `scripts/study_configs/make_stage_f.py`):** start from the site student (C15 kd5m_3m);
+targets fresh French electricity and pedestrian counts (both clean); warm mode with 1 week / 1 month / 1 year of
+fine-tuning targets; 9 techniques (full lr 3e-4 / 1e-4, head only, head + last layer, L2-SP 1e-3 / 1e-2, 50% replay of
+distillation windows with Timestral-5M labels, fine-tuning on Timestral-5M labels of the history, scratch); 3 seeds;
+scored on the target test AND on shapes + multidomain_test (forgetting). L2-SP weights calibrated on a smoke run only from
+the weight drift of plain fine-tuning (sum of squares ~13 after 300 steps), not on any score. Frozen layers run without
+dropout (MPS cannot run attention dropout on inputs without gradient; dropout in frozen layers only adds noise anyway).
+Replay windows: a fixed 20k-window pool of C14's 1M corpus (`scripts/build_replay_pool.py`); target windows with any
+missing future step are dropped in the replay arm only (the label trick needs a complete future).
