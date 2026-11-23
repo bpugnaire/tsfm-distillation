@@ -150,55 +150,56 @@
 | 146 | **tinycast-c6-ctx2048-1m** | this project |  | see note | 0.603 | 0.809 |
 | 147 | Chronos_small | AWS AI Labs |  | Yes | 0.607 | 0.780 |
 | 148 | **tinycast-c7-l_209m** | this project |  | see note | 0.607 | 0.809 |
-| 149 | **tinycast-c7-l_28m** | this project |  | see note | 0.608 | 0.817 |
-| 150 | **tinycast-c5-209m** | this project |  | see note | 0.612 | 0.819 |
-| 151 | YingLong_6m | Alibaba |  | No | 0.612 | 0.819 |
-| 152 | **tinycast-c2** | this project |  | see note | 0.616 | 0.822 |
-| 153 | Migas-1.0 | Synthefy |  | No | 0.620 | 0.667 |
-| 154 | **tinycast-c9-mt_1m+flip+ds** | this project |  | see note | 0.620 | 0.834 |
-| 155 | **tinycast-mix_1m** | this project |  | see note | 0.621 | 0.823 |
-| 156 | ValBestSingle-cmtt | N/A |  | No | 0.621 | 0.677 |
-| 157 | **tinycast-c9-mt_1m+ds** | this project |  | see note | 0.621 | 0.833 |
-| 158 | **tinycast-mt_2048_p16** | this project |  | see note | 0.621 | 0.824 |
-| 159 | **tinycast-c4-ctx2048-trunc** | this project |  | see note | 0.622 | 0.831 |
-| 160 | **tinycast-mt_2048_p16_var** | this project |  | see note | 0.622 | 0.828 |
-| 161 | FLAIR | Mellon Inc. |  | No | 0.623 | 0.832 |
-| 162 | **tinycast-mt_2048_p64** | this project |  | see note | 0.624 | 0.833 |
-| 163 | **tinycast-c8-mt-300k** | this project |  | see note | 0.624 | 0.837 |
-| 164 | **tinycast-c3-kd_ens3_1m** | this project |  | see note | 0.627 | 0.829 |
-| 165 | **tinycast-c3-kd_toto_1m** | this project |  | see note | 0.627 | 0.830 |
-| 166 | PatchTST | Princeton University |  | No | 0.628 | 0.833 |
-| 167 | **tinycast-c4-ctx2048** | this project |  | see note | 0.629 | 0.832 |
-| 168 | **tinycast-mt_v3_300k** | this project |  | see note | 0.635 | 0.836 |
-| 169 | TimesFM | Google Research |  | Yes | 0.635 | 0.823 |
-| 170 | **tinycast-c2-300k-ctx512** | this project |  | see note | 0.638 | 0.853 |
-| 171 | **tinycast-c3-kd_t0_1m** | this project |  | see note | 0.640 | 0.856 |
-| 172 | **tinycast-mix_300k** | this project |  | see note | 0.644 | 0.856 |
-| 173 | Reverso | MIT |  | No | 0.651 | 0.700 |
-| 174 | TFT | Google Research |  | No | 0.651 | 0.884 |
-| 175 | **tinycast-gt_1m** | this project |  | see note | 0.664 | 0.866 |
-| 176 | Lingjiang | Alibaba Cloud |  | No | 0.664 | 0.954 |
-| 177 | Moirai_small | Salesforce AI Research |  | No | 0.666 | 0.888 |
-| 178 | Reverso-Small | MIT |  | No | 0.668 | 0.716 |
-| 179 | DLinear-t | Big Data CBNU |  | No | 0.669 | 0.864 |
-| 180 | **tinycast-gt_3m** | this project |  | see note | 0.671 | 0.879 |
-| 181 | iTransformer | Tsinghua University |  | No | 0.672 | 0.889 |
-| 182 | **tinycast-gt_300k** | this project |  | see note | 0.679 | 0.891 |
-| 183 | FFM | IBM Research |  | No | 0.684 | 0.924 |
-| 184 | Reverso-Nano | MIT |  | No | 0.709 | 0.753 |
-| 185 | Super-Linear | Ben-Gurion University of the Negev |  | Yes | 0.793 | 0.850 |
-| 186 | Auto_Arima |  |  | No | 0.808 | 0.935 |
-| 187 | N-BEATS | ServiceNow |  | No | 0.823 | 0.863 |
-| 188 | VisionTS | Zhejiang University |  | No | 0.825 | 0.872 |
-| 189 | DLinear | The Chinese University of Hong Kong |  | No | 0.873 | 1.016 |
-| 190 | DeepAR | Amazon Research |  | No | 0.874 | 1.200 |
-| 191 | TIDE | Google Research |  | No | 0.874 | 1.140 |
-| 192 | Auto_Theta |  |  | No | 0.897 | 0.955 |
-| 193 | TTM-R1-Pretrained | IBM Research |  | Yes | 0.904 | 0.994 |
-| 194 | TTM-R2-Pretrained | IBM Research | 0.8M | Yes | 0.939 | 1.005 |
-| 195 | Lag-Llama | Morgan Stanley & Service Now |  | Yes | 0.963 | 1.262 |
-| 196 | Seasonal_Naive |  |  | No | 1.000 | 1.000 |
-| 197 | Naive |  |  | No | 1.202 | 1.143 |
-| 198 | VISIT-1.0 |  |  | No | 1.202 | 1.143 |
-| 199 | Auto_ETS |  |  | No | 1.481 | 0.984 |
-| 200 | Crossformer | Shanghai Jiao Tong University |  | No | 4.407 | 3.575 |
+| 149 | **tinycast-hyb5m_1m** | this project |  | see note | 0.607 | 0.813 |
+| 150 | **tinycast-c7-l_28m** | this project |  | see note | 0.608 | 0.817 |
+| 151 | **tinycast-c5-209m** | this project |  | see note | 0.612 | 0.819 |
+| 152 | YingLong_6m | Alibaba |  | No | 0.612 | 0.819 |
+| 153 | **tinycast-c2** | this project |  | see note | 0.616 | 0.822 |
+| 154 | Migas-1.0 | Synthefy |  | No | 0.620 | 0.667 |
+| 155 | **tinycast-c9-mt_1m+flip+ds** | this project |  | see note | 0.620 | 0.834 |
+| 156 | **tinycast-mix_1m** | this project |  | see note | 0.621 | 0.823 |
+| 157 | ValBestSingle-cmtt | N/A |  | No | 0.621 | 0.677 |
+| 158 | **tinycast-c9-mt_1m+ds** | this project |  | see note | 0.621 | 0.833 |
+| 159 | **tinycast-mt_2048_p16** | this project |  | see note | 0.621 | 0.824 |
+| 160 | **tinycast-c4-ctx2048-trunc** | this project |  | see note | 0.622 | 0.831 |
+| 161 | **tinycast-mt_2048_p16_var** | this project |  | see note | 0.622 | 0.828 |
+| 162 | FLAIR | Mellon Inc. |  | No | 0.623 | 0.832 |
+| 163 | **tinycast-mt_2048_p64** | this project |  | see note | 0.624 | 0.833 |
+| 164 | **tinycast-c8-mt-300k** | this project |  | see note | 0.624 | 0.837 |
+| 165 | **tinycast-c3-kd_ens3_1m** | this project |  | see note | 0.627 | 0.829 |
+| 166 | **tinycast-c3-kd_toto_1m** | this project |  | see note | 0.627 | 0.830 |
+| 167 | PatchTST | Princeton University |  | No | 0.628 | 0.833 |
+| 168 | **tinycast-c4-ctx2048** | this project |  | see note | 0.629 | 0.832 |
+| 169 | **tinycast-mt_v3_300k** | this project |  | see note | 0.635 | 0.836 |
+| 170 | TimesFM | Google Research |  | Yes | 0.635 | 0.823 |
+| 171 | **tinycast-c2-300k-ctx512** | this project |  | see note | 0.638 | 0.853 |
+| 172 | **tinycast-c3-kd_t0_1m** | this project |  | see note | 0.640 | 0.856 |
+| 173 | **tinycast-mix_300k** | this project |  | see note | 0.644 | 0.856 |
+| 174 | Reverso | MIT |  | No | 0.651 | 0.700 |
+| 175 | TFT | Google Research |  | No | 0.651 | 0.884 |
+| 176 | **tinycast-gt_1m** | this project |  | see note | 0.664 | 0.866 |
+| 177 | Lingjiang | Alibaba Cloud |  | No | 0.664 | 0.954 |
+| 178 | Moirai_small | Salesforce AI Research |  | No | 0.666 | 0.888 |
+| 179 | Reverso-Small | MIT |  | No | 0.668 | 0.716 |
+| 180 | DLinear-t | Big Data CBNU |  | No | 0.669 | 0.864 |
+| 181 | **tinycast-gt_3m** | this project |  | see note | 0.671 | 0.879 |
+| 182 | iTransformer | Tsinghua University |  | No | 0.672 | 0.889 |
+| 183 | **tinycast-gt_300k** | this project |  | see note | 0.679 | 0.891 |
+| 184 | FFM | IBM Research |  | No | 0.684 | 0.924 |
+| 185 | Reverso-Nano | MIT |  | No | 0.709 | 0.753 |
+| 186 | Super-Linear | Ben-Gurion University of the Negev |  | Yes | 0.793 | 0.850 |
+| 187 | Auto_Arima |  |  | No | 0.808 | 0.935 |
+| 188 | N-BEATS | ServiceNow |  | No | 0.823 | 0.863 |
+| 189 | VisionTS | Zhejiang University |  | No | 0.825 | 0.872 |
+| 190 | DLinear | The Chinese University of Hong Kong |  | No | 0.873 | 1.016 |
+| 191 | DeepAR | Amazon Research |  | No | 0.874 | 1.200 |
+| 192 | TIDE | Google Research |  | No | 0.874 | 1.140 |
+| 193 | Auto_Theta |  |  | No | 0.897 | 0.955 |
+| 194 | TTM-R1-Pretrained | IBM Research |  | Yes | 0.904 | 0.994 |
+| 195 | TTM-R2-Pretrained | IBM Research | 0.8M | Yes | 0.939 | 1.005 |
+| 196 | Lag-Llama | Morgan Stanley & Service Now |  | Yes | 0.963 | 1.262 |
+| 197 | Seasonal_Naive |  |  | No | 1.000 | 1.000 |
+| 198 | Naive |  |  | No | 1.202 | 1.143 |
+| 199 | VISIT-1.0 |  |  | No | 1.202 | 1.143 |
+| 200 | Auto_ETS |  |  | No | 1.481 | 0.984 |
+| 201 | Crossformer | Shanghai Jiao Tong University |  | No | 4.407 | 3.575 |
