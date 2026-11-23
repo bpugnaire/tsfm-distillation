@@ -248,9 +248,15 @@ class OnnxStudentPredictor:
         if (
             self.roll is not None
         ):  # chunks of series: N x paths contexts at once would not fit in memory
-            q = np.concatenate(
-                [self.roll.forecast(x[i : i + 256], self.H) for i in range(0, len(x), 256)]
-            )
+            # rows with no observed history are left out of the rollout (the student cannot scale them) and get the
+            # same documented 0 forecast as in the short-term path below
+            keep = np.isfinite(x).any(axis=1)
+            q = np.zeros((len(x), 13, self.H), dtype=np.float32)
+            xk = x[keep]
+            if len(xk):
+                q[keep] = np.concatenate(
+                    [self.roll.forecast(xk[i : i + 256], self.H) for i in range(0, len(xk), 256)]
+                )
         else:
             q = self._run(x)  # (N, 13, 64)
         # A series with no observed history at all (e.g. electricity/W MT_178: 184 NaN) has nothing to scale by:
@@ -292,6 +298,12 @@ def _eval_config(job):
     from gluonts.time_feature import get_seasonality
 
     ds_name, term, onnx, context, flip, downsample, name, rollout, paths = job
+    part = (
+        ROOT / "results" / "gift_eval" / name / "parts" / f"{ds_name.replace('/', '_')}_{term}.json"
+    )
+    if part.exists():  # finished in an earlier (crashed) run: reuse it
+        d = json.loads(part.read_text())
+        return d["row"], tuple(d["counts"])
     EMPTY.clear()
     GAP.clear()
     DS_COUNTS.clear()
@@ -321,7 +333,12 @@ def _eval_config(job):
     print(f"{row['dataset']:40s} H={ds.prediction_length:3d} n={len(ds.test_data):6d} "
           f"MASE {row['eval_metrics/MASE[0.5]']:.3f} CRPS {row['eval_metrics/mean_weighted_sum_quantile_loss']:.4f} "
           f"({time.time() - t0:.1f}s)", flush=True)  # fmt: skip
-    return row, (int(sum(EMPTY)), int(sum(GAP)), dict(DS_COUNTS))
+    counts = (int(sum(EMPTY)), int(sum(GAP)), dict(DS_COUNTS))
+    part.parent.mkdir(parents=True, exist_ok=True)
+    part.write_text(
+        json.dumps({"row": row, "counts": counts})
+    )  # saved per config: a crash keeps finished work
+    return row, counts
 
 
 def main() -> None:
