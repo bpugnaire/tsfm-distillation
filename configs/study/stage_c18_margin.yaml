@@ -1,0 +1,16 @@
+# Stage C18 pilot (owner 2026-11-23): "use the bigger teacher only where it clearly beats the small one". Per training
+# window, Timestral-209M's labels replace Timestral-5M's only where 209M's WQL on that window's real future is >= 10% lower
+# (margin fixed before the run). Same 1M windows (key 48dd0113d4, both caches exist), student and 50k steps as C14 kd5m_1m.
+# Earlier soft version (per-window softmax weights, 30k windows, Stage B): no gain.
+name: stage_c18_margin
+base: configs/train/study_base_m.yaml
+teacher: timestral-5m
+reference_arm: kd5m_1m
+eval_suites: [shapes, multidomain_test, fresh_fr_power]
+arms:
+  - {name: kd5m_1m, type: existing, run: "stage_c14_teacher5m:kd5m_1m"}
+  - {name: margin_1m, mix: {synth: 500000, multidomain_v2: 500000}, alpha: 1.0,
+     teacher: "margin:timestral-5m+timestral-209m@0.1",
+     override: {student: {arch: patch_transformer_mt}, optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [margin_1m, kd5m_1m, "5M teacher + 209M where it is >= 10% better vs 5M teacher alone"]

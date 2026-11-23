@@ -172,6 +172,10 @@ def train(
             teacher_q, diag = qs[0], {}
         else:
             teacher_q, diag = combine(kind, qs, tr.future, t_levels, tau)
+            del (
+                qs,
+                q_m,
+            )  # members can be several GB each (q_m: the last one); keep only the combination
         native = set.intersection(*(set(m["native_levels"]) for m in mans))
         if diag:
             log(f"teacher combination {kind}: {diag}")
