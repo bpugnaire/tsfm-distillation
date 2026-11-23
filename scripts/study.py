@@ -109,6 +109,8 @@ def finetune_arm(study: dict, arm: dict) -> Path:
 
     arm: {name, type: finetune, init: "<stage>:<arm>" | "scratch", student_from: "<stage>:<arm>" (architecture when
     init = scratch), domain: fr_power | pedestrian, history: <steps>, steps: <int>, lr: <float>}
+    Stage F options: trainable (all | head | last), l2sp (anchor weight), replay (fraction of training windows drawn
+    from data/processed/replay_pool_*.npz, trained on their teacher labels; target windows keep their real future).
     """
     from tinycast.data.target_domain import history_corpora
 
@@ -128,6 +130,8 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         warmup_steps=max(10, arm["steps"] // 20),
         patience=6,
         batch_size=arm.get("batch_size", 128),
+        trainable=arm.get("trainable", "all"),
+        l2sp=arm.get("l2sp", 0.0),
     )
     cfg = from_dict(TrainConfig, base, where=f"finetune arm {arm['name']}")
     corpora = history_corpora(
@@ -138,6 +142,35 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         seed=0,  # same fine-tuning windows for every seed; the seed only changes init noise / batch order
         mode=arm.get("mode", "cold"),
     )
+    tq_override = None
+    if arm.get("replay"):  # mix distillation windows (teacher labels) into the fine-tuning set
+        from tinycast.data.corpus import Corpus
+
+        tr_t, va_t = corpora
+        ok = np.isfinite(tr_t.future).all(axis=1)  # the label trick below needs a complete future
+        tr_t = Corpus(tr_t.ids[ok], tr_t.source[ok], tr_t.context[ok], tr_t.future[ok])
+        pool = np.load(ROOT / "data" / "processed" / arm["replay_pool"], allow_pickle=False)
+        r = arm["replay"]
+        n_r = min(len(pool["ids"]), int(round(len(tr_t.ids) * r / (1 - r))))
+        pick = np.sort(
+            np.random.default_rng(base["seed"]).choice(len(pool["ids"]), n_r, replace=False)
+        )
+        K = len(cfg.student.quantile_levels)
+        tr_c = Corpus(np.concatenate([tr_t.ids, pool["ids"][pick]]),
+                      np.concatenate([tr_t.source, pool["source"][pick]]),
+                      np.concatenate([tr_t.context, pool["context"][pick]]),
+                      np.concatenate([tr_t.future, pool["future"][pick]]))  # fmt: skip
+        # target rows: "teacher" = the real future on every level, so the teacher pinball equals the real-future loss
+        tq_override = np.concatenate(
+            [np.repeat(tr_t.future[:, None, :], K, axis=1), pool["q"][pick]]
+        ).astype(np.float32)
+        corpora = (tr_c, va_t)
+
+        cfg.loss.alpha = 1.0  # every row is trained on its label (teacher or real future)
+        print(
+            f"[{arm['name']}] replay: {len(tr_t.ids)} target + {n_r} distillation windows",
+            flush=True,
+        )
     if (
         "epochs" in arm
     ):  # steps proportional to the data (capped): avoids 170 epochs on a 1-week history
@@ -176,6 +209,7 @@ def finetune_arm(study: dict, arm: dict) -> Path:
         corpora=corpora,
         init_from=init,
         teacher_corpus_key=teacher_key,
+        teacher_q_override=tq_override,
         extra_metrics={
             "finetune": {
                 **{k: arm[k] for k in ("domain", "history", "steps", "init")},
@@ -185,6 +219,9 @@ def finetune_arm(study: dict, arm: dict) -> Path:
                 "epochs": arm.get("epochs"),
                 "init_run": str(init) if init else None,
                 "seed": cfg.seed,
+                "trainable": cfg.optim.trainable,
+                "l2sp": cfg.optim.l2sp,
+                "replay": arm.get("replay", 0.0),
             }
         },
     )

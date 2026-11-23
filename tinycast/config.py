@@ -159,6 +159,10 @@ class OptimConfig:
     eval_every: int = 200
     patience: int = 5  # evals without val improvement before early stopping
     amp: bool = True  # only used on CUDA
+    # Fine-tuning controls (Stage F). trainable: "all" | "head" (output head only) | "last" (head + last encoder layer +
+    # final norm). l2sp: weight of sum((theta - theta_init)^2), the L2-SP anchor to the starting weights (Li et al. 2018).
+    trainable: str = "all"
+    l2sp: float = 0.0
 
 
 @dataclasses.dataclass

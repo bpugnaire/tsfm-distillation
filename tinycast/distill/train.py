@@ -16,7 +16,7 @@ import numpy as np
 import torch
 import yaml
 
-from tinycast.config import CORE_LEVELS, TrainConfig, to_dict
+from tinycast.config import CORE_LEVELS, QUANTILE_LEVELS, TrainConfig, to_dict
 from tinycast.data.corpus import CorpusSpec, build_corpus
 from tinycast.distill import losses as L
 from tinycast.eval import metrics as M
@@ -104,6 +104,7 @@ def train(
     teacher_corpus_key: str | None = None,
     init_from: Path | None = None,
     extra_metrics: dict | None = None,
+    teacher_q_override: np.ndarray | None = None,
 ) -> Path:
     """Train a student. `corpora` = (train, val) Corpus objects to use instead of building them from the config
     (fine-tuning on a target domain); `init_from` = a run dir whose best.pt initialises the weights."""
@@ -137,7 +138,19 @@ def train(
     levels = cfg.student.quantile_levels
     teacher_q = None
     teacher_diag: dict = {}
-    if cfg.loss.alpha > 0:
+    if (
+        teacher_q_override is not None
+    ):  # labels built by the caller (fine-tuning with replay): rows aligned with tr
+        if len(teacher_q_override) != len(tr.ids):
+            raise ValueError("teacher_q_override rows do not match the training corpus")
+        teacher_q, t_levels = (
+            np.asarray(teacher_q_override, dtype=np.float32),
+            tuple(QUANTILE_LEVELS),
+        )
+        t_mask = torch.ones(len(t_levels), dtype=torch.bool, device=device)
+        level_idx = [t_levels.index(lv) for lv in levels]
+        log("teacher labels: provided by the caller (override)")
+    elif cfg.loss.alpha > 0:
         from tinycast.data.cache import read_cache
 
         if not cfg.data.teacher:
@@ -194,8 +207,39 @@ def train(
         log(f"initialised from {init_from}")
     model = model.to(device)
     log(f"student {cfg.student.arch}: {model.n_params() / 1e6:.3f}M params on {device}")
-    decay = [p for n, p in model.named_parameters() if p.dim() >= 2]
-    no_decay = [p for n, p in model.named_parameters() if p.dim() < 2]
+    tr_mode = cfg.optim.trainable
+    if tr_mode not in ("all", "head", "last"):
+        raise ValueError(f"optim.trainable {tr_mode!r}")
+    if tr_mode != "all":
+        n_layers = len(model.net.encoder.layers)
+        prefixes = (
+            ("net.head",)
+            if tr_mode == "head"
+            else ("net.head", "net.norm", f"net.encoder.layers.{n_layers - 1}.")
+        )
+        for n, p in model.named_parameters():
+            p.requires_grad_(n.startswith(prefixes))
+        # no dropout inside frozen layers: it only adds noise there, and Apple MPS attention cannot run dropout on
+        # inputs that need no gradient (NotImplementedError in scaled_dot_product_attention)
+        for mn, mod in model.named_modules():
+            if any(p.requires_grad for p in mod.parameters(recurse=False)) or mn.startswith(
+                prefixes
+            ):
+                continue
+            if isinstance(mod, torch.nn.Dropout):
+                mod.p = 0.0
+            if isinstance(mod, torch.nn.MultiheadAttention):
+                mod.dropout = 0.0
+        log(
+            f"trainable={tr_mode}: {sum(p.numel() for p in model.parameters() if p.requires_grad)} parameters train"
+        )
+    anchor = None
+    if cfg.optim.l2sp > 0:  # L2-SP: penalise distance to the starting weights
+        if init_from is None:
+            raise ValueError("l2sp needs init_from (the weights to anchor to)")
+        anchor = {n: p.detach().clone() for n, p in model.named_parameters() if p.requires_grad}
+    decay = [p for n, p in model.named_parameters() if p.dim() >= 2 and p.requires_grad]
+    no_decay = [p for n, p in model.named_parameters() if p.dim() < 2 and p.requires_grad]
     opt = torch.optim.AdamW(
         [
             {"params": decay, "weight_decay": cfg.optim.weight_decay},
@@ -279,6 +323,11 @@ def train(
                 else:
                     raise ValueError(cfg.loss.kd)
             loss = L.mixed_objective(l_gt, l_kd, cfg.loss.alpha) / o.grad_accum
+            if anchor is not None:
+                pen = sum(
+                    ((p - anchor[n]) ** 2).sum() for n, p in model.named_parameters() if n in anchor
+                )
+                loss = loss + cfg.optim.l2sp * pen / o.grad_accum
             scaler.scale(loss).backward()
         scaler.unscale_(opt)
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), o.grad_clip)
