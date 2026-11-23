@@ -106,5 +106,8 @@ use: 2048-step versions score the same as 512-step ones (C6, C9, C11, C12). Evid
   Chronos and Chronos-Bolt clamp unsupported quantile levels with a log warning. Both pass naive integrity checks.
 - **Inference tricks do not transfer blindly:** sign-flip averaging gives ~1%, but Reverso's downsampling rule, tuned for
   2048-step histories, fires 4x too often at 512 and costs 3%.
+- **A 16 GB laptop panics, it does not slow down:** two memory-heavy jobs together (training with two teachers' labels in RAM
+  + a multi-worker rollout evaluation) exhausted the memory compressor and the kernel watchdog rebooted the Mac twice in
+  this project. Queue them, never overlap them; save evaluation results per item so a crash keeps finished work.
 - **Random noise as distillation input teaches nothing** (5.7x worse than structured synthetic, Stage A): the teacher
   answers every noise window the same way.

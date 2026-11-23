@@ -506,3 +506,13 @@ flat from 3M to 10M at fixed compute; the gain from 1M to 3M came from more dist
 **Also (my error):** the queued medium/long evaluation never started: its wait loop `pgrep -f "runs/night_c17.sh"` matched
 its own command line. Lost 09:15 → 20:25; launched by hand. Use a PID file or `pgrep -f '^bash runs/...'` next time.
 **Next:** GIFT-Eval medium/long (running); then compute/capacity rather than data (longer training, or size l on 3M).
+
+## 2026-11-23 — Kernel panic: two memory-heavy jobs at once
+**What happened:** 22:55 watchdog panic, memory compressor at "100% of segments limit (BAD)", 42 swap files. Running at
+the same time: the C18 margin pilot (two teachers' labels for 1M windows in RAM, ~10 GB with the corpus) and the GIFT-Eval
+medium/long rerun (3 workers, each forecasting 256 series x 32 sampled paths per chunk). Memory looked fine at launch (29%
+free); the rollout's footprint grows on the large datasets. Lost: C18 at step 39k/50k (rerun from scratch, the cosine
+schedule must finish); GIFT medium/long kept 25/42 configs thanks to per-config saving added the same evening.
+**Rule from now on:** on this 16 GB Mac, one memory-heavy job at a time (training with in-RAM labels, rollout evaluation,
+teacher labelling); queues wait by PID, and a watcher flags < 8% free memory. Also fixed earlier tonight: the medium/long
+run had crashed on bitbrains (rows with no history) and lost everything because results were written only at the end.
