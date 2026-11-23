@@ -494,3 +494,15 @@ data: the teacher's view of synthetic series is useful for real data, the genera
 rule (hybrid only if its GIFT interval is below 1) kept C17 on pure distillation. **Also:** C17 first launch failed in 1
 minute (data v4 missing from `VERSIONS`; an edit script without an existence check). Fixed and relaunched (2026-11-22 23:56:53).
 **Next:** C17 (10M windows) results in the morning; GIFT-Eval medium/long with the rolled-out 3M student.
+
+## 2026-11-23 — C17: 10M windows (data v4), same compute as C15
+**Did:** 5M data-v4 + 5M synthetic windows, Timestral-5M labels (1,150 windows/s on CPU, ~2.4 h for 10M; integrity check
+clean), multi-token m, 150k steps (`configs/study/stage_c17_10m.yaml`). Pipeline 23:57 → 09:15.
+**Result:** vs the 3M student (C15): shapes 1.056 [1.034, 1.081], multidomain_test 1.008 [0.998, 1.020], fresh_fr_power
+0.994 [0.980, 1.008]; GIFT-Eval short 0.585 vs 0.582, paired 1.004 [0.980, 1.031], better on 21/55
+(`results/study/stage_c17_10m/table.md`, `results/gift_eval/tinycast-kd5m_10m`). vs Toto-2.0-4m: 0.913 fresh, 0.947
+public, tie shapes; vs Timestral-5M: tie on fresh, 3% behind elsewhere. **Surprise / learned:** the data-scaling curve is
+flat from 3M to 10M at fixed compute; the gain from 1M to 3M came from more distinct series, and that need is met.
+**Also (my error):** the queued medium/long evaluation never started: its wait loop `pgrep -f "runs/night_c17.sh"` matched
+its own command line. Lost 09:15 → 20:25; launched by hand. Use a PID file or `pgrep -f '^bash runs/...'` next time.
+**Next:** GIFT-Eval medium/long (running); then compute/capacity rather than data (longer training, or size l on 3M).

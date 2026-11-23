@@ -75,6 +75,14 @@ labels are already denoised distributions, so each extra window adds a clean, in
 moving towards the teacher (at 3M it even beats Timestral-5M on our shapes test). We are far below the data scale where the
 theory's crossover would happen (raws-labs and Reverso train on ~150M windows of real futures).
 
+**Then it stopped (C17): 10M windows at the same compute as 3M did not help.** Same student, teacher and 150k steps
+(38M samples seen: 3.8 passes over 10M windows instead of 12.8 over 3M). GIFT-Eval 1.004 [0.980, 1.031] vs the 3M student,
+fresh electricity 0.994 [0.980, 1.008], held-out public data 1.008 [0.998, 1.020], shapes 5.6% worse [1.034, 1.081].
+**Intuition.** Between 1M and 3M windows the student was still seeing too few distinct series; by 3M it is not any more,
+and at a fixed step budget the extra windows only replace repeats. The shapes loss fits this: each synthetic window is
+seen 3.4x less often, and shapes reward knowing our own generator well. The next lever is compute or capacity, not windows.
+Evidence: `results/study/stage_c17_10m`, `results/gift_eval/tinycast-kd5m_10m`.
+
 ## 4. At equal history, our 0.87M student beats a 146k model that beats it on the leaderboard
 
 raws-labs/tinycast (146k params) scores 0.570 on the leaderboard and our best under 1M 0.603. Cut both to 512 steps of
