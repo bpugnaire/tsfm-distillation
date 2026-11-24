@@ -89,7 +89,20 @@ raws-labs/tinycast (146k params) scores 0.570 on the leaderboard and our best un
 history: theirs 0.612, ours 0.603. Its whole lead is long history (+7% from 512 to 2048 steps), which our students do not yet
 use: 2048-step versions score the same as 512-step ones (C6, C9, C11, C12). Evidence: `results/gift_eval/raws-tinycast@hist*`.
 
-## 5. Things that did not matter as much as expected
+## 5. Fine-tuning: worth it only where the zero-shot model is weak, and only with replay (Stage F)
+
+Site student, 2 clean domains, 1 week / 1 month / 1 year of history, 9 techniques, 3 seeds (`results/study/stage_f_finetune`).
+- **Where zero-shot is already good (fresh electricity, level with its teacher), fine-tuning does not pay:** worse with
+  1 week or 1 month of history (full fine-tuning 1.22x / 1.31x the error), a tie with a year.
+- **Where it is weaker (pedestrian counts), gains grow with history:** -2.5% / -9% / -16% for 1w / 1m / 1y.
+- **It forgets a lot**, even with 27k trainable weights: head-only fine-tuning doubles the error on the shapes.
+  **Replaying distillation windows (50% of batches, teacher labels) removes the forgetting** (shapes 1.02x, public data
+  0.99x) at almost no cost on the target. Intuition: in a 0.87M model the output head is shared by every domain, so
+  "freeze the backbone" is not a protection; showing the old data again is.
+- Labels chosen by the realised future help the in-house shapes test and hurt real-world benchmarks, twice: the
+  per-source hybrid (C16) and "209M teacher where it beat 5M by 10% on the window" (C18, GIFT 1.027 worse, shapes 0.87).
+
+## 6. Things that did not matter as much as expected
 - **Which teacher, at scale:** Toto-313m, t0-gamma, Timestral-28M and an ensemble of three all within 4% at 1M windows (C3).
   The ensemble gain seen at 30k windows (2%) disappeared.
 - **3x the parameters:** 0.95M -> 2.9M gave about 1.4% (C7).
@@ -98,7 +111,7 @@ use: 2048-step versions score the same as 512-step ones (C6, C9, C11, C12). Evid
 - **Bigger batches on an Apple GPU are slower:** 4,733 windows/s at batch 256, 2,934 at 1,024, 2,626 at 2,048; bf16 does not
   help (benchmark 2026-11-22).
 
-## 6. Things that silently cost us, and would cost anyone
+## 7. Things that silently cost us, and would cost anyone
 - **Early stopping with a cosine schedule:** stopping when validation plateaus skips the low-learning-rate phase; it made the
   209M-taught student look 3–10% worse than it was (C5a vs its full-schedule rerun).
 - **Validation can pick the wrong model:** the 3-teacher ensemble had the best validation score and lost on every test (C3).

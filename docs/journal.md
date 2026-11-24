@@ -527,3 +527,20 @@ the weight drift of plain fine-tuning (sum of squares ~13 after 300 steps), not 
 dropout (MPS cannot run attention dropout on inputs without gradient; dropout in frozen layers only adds noise anyway).
 Replay windows: a fixed 20k-window pool of C14's 1M corpus (`scripts/build_replay_pool.py`); target windows with any
 missing future step are dropped in the replay arm only (the label trick needs a complete future).
+
+## 2026-11-24 — Stage F results: fine-tuning a small foundation forecaster
+**Result** (`results/study/stage_f_finetune/table.md`, 3 seeds, ratios vs the zero-shot student, paired 95% CI):
+- Fresh electricity (zero-shot 0.651, already level with its teacher Timestral-5M 0.641): fine-tuning does not help.
+  1 week / 1 month: every technique is worse (full 1.22 / 1.31) except head-only at 1 week (0.978 [0.96, 0.99]);
+  1 year: ties (full 1.005, head 0.984 [0.97, 1.00]). Scratch on 1 year is only 2% behind the zero-shot student.
+- Pedestrians (zero-shot 0.556): gains grow with history. Full 0.975 / 0.907 / 0.844 (1w/1m/1y); replay 0.951 / 0.885 /
+  0.854; scratch 1.093 / 1.014 / 0.990, so the distilled start is worth ~15% at 1 year.
+- Forgetting is large: full fine-tuning on 1 year of pedestrians -> shapes 2.44x, public data 1.107x. **Replay removes
+  it** (shapes 1.021, public data 0.987) while keeping almost all the target gain (0.854 vs 0.844). Head-only still
+  doubles the shapes error (1.6-2.0x) with 27k trainable weights; strong L2-SP halves forgetting but costs gain.
+**Surprise / learned:** (1) once the zero-shot model is good on a domain, short-history fine-tuning only overfits; (2)
+forgetting is not a backbone problem: moving only the output head breaks other domains; (3) replay is the one technique
+that gets both. **Also:** GIFT-Eval medium/long with sampled-path rollout: 0.669 / 0.701 (3M student; all 97 configs 0.625)
+vs raws-labs/tinycast 0.515 / 0.515: chaining 64-step forecasts loses 30-36% to native long decoders. C18 margin teacher
+(209M where >= 10% better, 37% of windows): shapes 0.871, fresh/public ties, GIFT short 1.027 [1.011, 1.046] worse: the
+same pattern as C16 (choosing labels by the realised future helps the in-house shapes, hurts GIFT-Eval).
