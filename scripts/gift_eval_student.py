@@ -189,19 +189,24 @@ class OnnxStudentPredictor:
         self.sess = ort.InferenceSession(onnx_path, so, providers=["CPUExecutionProvider"])
         self.H, self.T, self.batch = prediction_length, context, batch
         self.flip, self.downsample = flip, downsample
-        if prediction_length > 64 and rollout == "none":
+        native = self.sess.get_outputs()[0].shape[
+            -1
+        ]  # the student's own horizon (64, or 1024 for C20)
+        if not isinstance(native, int):
+            raise ValueError(f"cannot read the student's horizon from {onnx_path}: {native}")
+        if prediction_length > native and rollout == "none":
             raise ValueError(
-                f"student horizon is 64, asked {prediction_length}: pass --rollout paths"
+                f"student horizon is {native}, asked {prediction_length}: pass --rollout paths"
             )
         self.roll = None
-        if prediction_length > 64:
+        if prediction_length > native:
             import sys
 
             sys.path.insert(0, str(ROOT))
             from tinycast.models.rollout import RolloutForecaster
 
             self.roll = RolloutForecaster(_Base(self._run), "student-rollout", mode=rollout, n_paths=paths,
-                                          context_length=context, batch=batch)  # fmt: skip
+                                          block=native, context_length=context, batch=batch)  # fmt: skip
         self.idx = [OURS.index(q) for q in GIFT_LEVELS]
         self.keys = [str(q) for q in GIFT_LEVELS] + ["mean"]
 

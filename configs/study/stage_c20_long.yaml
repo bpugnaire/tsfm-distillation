@@ -1,0 +1,20 @@
+# Stage C20 (owner 2026-11-24): a long-horizon student, like Timestral's layout. Reads 2048 steps in 32-step patches,
+# outputs 1024 steps in one pass (32 query tokens x 32 steps), 0.91M params. GIFT-Eval medium/long horizons (480-900)
+# need no chaining. Labels: Timestral-5M at context 2048 / horizon 1024 (one pass for it; 353 windows/s on CPU, measured).
+# 1M windows: 500k synthetic + 500k data v4 (data v2 has too few 1024-strided origins). 50k steps, batch 256
+# (3.8 steps/s measured: ~3.7 h). Reference: the 3M site student (512 / 64), and C17's 10M student.
+name: stage_c20_long
+base: configs/train/study_base_m.yaml
+teacher: timestral-5m
+reference_arm: kd5m_3m
+eval_suites: [shapes_ctx2048, multidomain_test_ctx2048, fresh_fr_power_ctx2048]
+arms:
+  - {name: kd5m_3m, type: existing, run: "stage_c15_3m:kd5m_3m"}
+  - {name: long_1m, mix: {synth: 500000, multidomain_v4: 500000}, alpha: 1.0,
+     override: {student: {arch: patch_transformer_mt, context_length: 2048, horizon: 1024, patch_size: 32, out_patch_size: 32},
+                data: {gt_sources: []},
+                optim: {max_steps: 50000, warmup_steps: 1000, eval_every: 2500, patience: 1000}}}
+pairs:
+  - [long_1m, kd5m_3m, "long-horizon student (2048 -> 1024, 1M windows) vs site student (512 -> 64, 3M windows), first 64 steps"]
+  - [long_1m, "zoo:toto-2.0-4m", "long-horizon student vs Toto-2.0-4m"]
+  - [long_1m, "zoo:timestral-5m", "long-horizon student vs its teacher Timestral-5M"]
