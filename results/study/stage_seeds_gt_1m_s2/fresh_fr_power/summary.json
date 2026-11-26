@@ -1,0 +1,85 @@
+{
+ "suite": "fresh_fr_power",
+ "baseline": "seasonal_naive",
+ "rows": [
+  {
+   "model": "gt_1m_s2",
+   "kind": "student",
+   "n_params": 866640,
+   "size_mb": 3.49,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 0.7349434977879395,
+   "rel_wql_ci": [
+    0.6858213425933007,
+    0.781757687231021
+   ],
+   "rel_mase": 0.7407886714794624,
+   "rel_mase_ci": [
+    0.6939977241998261,
+    0.7848334313653992
+   ],
+   "mean_wql": 0.048910064102564106,
+   "mean_cov80": 0.7293671794871794,
+   "mean_cov98": 0.9533257371794872,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  },
+  {
+   "model": "seasonal_naive",
+   "kind": "seasonal_naive",
+   "n_params": 0,
+   "size_mb": null,
+   "native_levels": [
+    0.01,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+   ],
+   "rel_wql": 1.0,
+   "rel_wql_ci": [
+    1.0,
+    1.0
+   ],
+   "rel_mase": 1.0,
+   "rel_mase_ci": [
+    1.0,
+    1.0
+   ],
+   "mean_wql": 0.06990044871794872,
+   "mean_cov80": 0.7369291346153847,
+   "mean_cov98": 0.9739086217948718,
+   "tails_extrapolated": false,
+   "latency_ms_t1_b1": null,
+   "latency_ms_t8_b32": null,
+   "n_windows": 312,
+   "n_clusters": 13
+  }
+ ],
+ "git_sha": "4972f16970e93f555b6e60049b4d00375f369bf8-dirty"
+}

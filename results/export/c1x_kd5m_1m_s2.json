@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-26_stage_seeds_kd5m_1m_s2_kd5m_1m_s2",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 24.0,
+  "max_rel_diff": 9.743395639816299e-05,
+  "p99_rel_diff": 1.328278472101374e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 687444.0,
+  "max_rel_diff": 0.21791373193264008,
+  "p99_rel_diff": 0.03211086988449097,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}

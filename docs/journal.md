@@ -557,3 +557,10 @@ on all 97 (raws-labs/tinycast 0.545, Chronos-Bolt-small 0.577, Toto-2.0-4m 0.524
 untested: a quarter of the training windows (720k vs 3M), and the data mix (series must be >= 3072 steps long, so short
 series such as M4 are absent). Synthetic generation at 3072 steps is ~60x slower (GP sampling is cubic in length): 13 h.
 **Also:** the Mac hibernated on battery 12:58 -> 21:57 (processes survived, 9 h lost).
+
+## 2026-11-27 — 3 seeds for the core claim
+**Result** (`results/seeds_core_claim.json`): KD / GT on GIFT-Eval short, 3 seeds each, configs + seeds resampled:
+1M 0.903 [0.862, 0.941], 3M 0.880 [0.831, 0.925]; per seed 0.893 / 0.919 / 0.896 and 0.868 / 0.895 / 0.876.
+**Surprise / learned:** the "gap widens with data" reading does not survive: 3M vs 1M 0.975 [0.942, 1.006]. Seed 0 of the
+real-future arm happened to be the worst of three at both scales (0.664, 0.671), which made the gap look larger. Seed
+noise: ~3% for real-future students, ~1% for distilled ones (distillation is also a variance reducer).

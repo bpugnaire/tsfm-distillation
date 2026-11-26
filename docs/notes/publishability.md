@@ -48,3 +48,10 @@ catches up with enough data) in the regime we can reach, and the time-series lit
 3. Write the protocol section first (selection rule, seeds, contamination), then the C1 figure: KD/GT ratio vs windows with
    seed bands.
 4. Optional: one point above 3M for C1 (3M → 10M GT run, ~6 h GPU at 150k steps) to see whether the gap keeps growing.
+
+## Update 2026-11-27: 3 seeds for C1
+`results/seeds_core_claim.json` (`scripts/seeds_summary.py`): teacher labels / real future on GIFT-Eval short, configs and
+seeds resampled: **1M 0.903 [0.862, 0.941], 3M 0.880 [0.831, 0.925]**, every seed below 1. Widening from 1M to 3M:
+0.975 [0.942, 1.006], not significant. C1 should therefore be stated as "teacher labels beat the real future by ~10-12% at
+1M and 3M windows, and only distillation improves with more data", not "the gap grows". Item 2.1 (seeds) is done for C1;
+C2 (teacher size) still has one seed.

@@ -58,7 +58,7 @@ something useful for real data that the generator's own continuation does not: t
 draw of a Gaussian process (not "the truth" except on the hand-built shape families), while the teacher answers with a
 calibrated spread and a real-data prior. Evidence: `results/study/stage_c16_hybrid`, `results/gift_eval/tinycast-hyb5m_1m`.
 
-## 3. More data makes distillation pull further ahead, not less
+## 3. Distillation keeps improving with data where real-future training stalls
 
 Theory (Busbridge et al. 2025) predicts supervised training catches up once the student has seen enough data. Here the
 opposite happened (C13, C15):
@@ -69,7 +69,17 @@ opposite happened (C13, C15):
 | 1M | 0.664 | 0.603 (28M), 0.593 (5M) | 0.908 |
 | 3M | 0.671 | **0.582** (5M) | **0.868** [0.819, 0.916] |
 
-Real-future training stops improving after 1M windows; distillation keeps improving. **Intuition.** With the real future,
+**Checked with 3 training seeds (2026-11-27, same teacher Timestral-5M at both scales, `results/seeds_core_claim.json`):**
+
+| windows | real future (3 seeds) | teacher labels (3 seeds) | teacher / real future, configs + seeds resampled |
+|---|---|---|---|
+| 1M | 0.664 / 0.646 / 0.655 | 0.593 / 0.593 / 0.587 | **0.903** [0.862, 0.941] |
+| 3M | 0.671 / 0.653 / 0.658 | 0.582 / 0.584 / 0.577 | **0.880** [0.831, 0.925] |
+
+Teacher labels win at both scales on every seed (10-12%). **Whether the gap widens is not established:** 3M vs 1M ratio
+0.975 [0.942, 1.006]. The earlier 0.908 -> 0.868 mixed teachers (28M at 1M, 5M at 3M). What holds: real-future training
+does not improve from 1M to 3M (0.655 -> 0.661 on average), distillation does (0.591 -> 0.581). Training noise is ~3%
+for real-future students and ~1% for distilled ones. **Intuition.** With the real future,
 more windows mostly add more noisy single draws; a 1M-parameter model saturates on what it can extract from them. Teacher
 labels are already denoised distributions, so each extra window adds a clean, informative example, and the student keeps
 moving towards the teacher (at 3M it even beats Timestral-5M on our shapes test). We are far below the data scale where the

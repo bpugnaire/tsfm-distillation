@@ -1,0 +1,22 @@
+{
+ "run": "2026-11-26_stage_seeds_gt_1m_s2_gt_1m_s2",
+ "n_params": 866640,
+ "fp32": {
+  "n": 1000,
+  "max_abs_diff": 48.0,
+  "max_rel_diff": 9.761912224348634e-05,
+  "p99_rel_diff": 1.636523961678904e-06,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 3.621
+ },
+ "int8": {
+  "n": 1000,
+  "max_abs_diff": 941524.0,
+  "max_rel_diff": 0.10604136437177658,
+  "p99_rel_diff": 0.030131004750728607,
+  "finite": true,
+  "monotone": true,
+  "size_mb": 1.21
+ }
+}
