@@ -1,0 +1,288 @@
+{
+ "study": "stage_c20_long",
+ "reference_arm": "kd5m_3m",
+ "suites": {
+  "shapes_ctx2048": {
+   "arms": {
+    "kd5m_3m": {
+     "rel_wql": 0.46656225944015034,
+     "rel_wql_ci": [
+      0.42094278925677125,
+      0.5182176328958198
+     ],
+     "cov80": 0.8160157000000001
+    },
+    "long_1m": {
+     "rel_wql": 0.5550675506066323,
+     "rel_wql_ci": [
+      0.5002171500801491,
+      0.6195736273478544
+     ],
+     "cov80": 0.8333601500000001,
+     "vs_reference": [
+      1.1896966361417307,
+      1.1256352851637499,
+      1.2599015753457623
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.76929685
+    }
+   },
+   "pairs": [
+    {
+     "a": "long_1m",
+     "b": "kd5m_3m",
+     "question": "long-horizon student (2048 -> 1024, 1M windows) vs site student (512 -> 64, 3M windows), first 64 steps",
+     "ratio": [
+      1.1896966361417307,
+      1.1256352851637499,
+      1.2599015753457623
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "long-horizon student vs Toto-2.0-4m",
+     "ratio": [
+      1.1531521192574234,
+      1.1010270720873392,
+      1.2122408636945328
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:timestral-5m",
+     "question": "long-horizon student vs its teacher Timestral-5M",
+     "ratio": [
+      1.287218829637882,
+      1.224279324252189,
+      1.354649000097801
+     ]
+    }
+   ],
+   "seed_spread": {},
+   "zero_shot_models": {
+    "timestral-28m": {
+     "rel_wql": 0.39892615155662514,
+     "rel_wql_ci": [
+      0.36169987309213225,
+      0.44170157316690617
+     ],
+     "n_params": 27821184
+    },
+    "timestral-5m": {
+     "rel_wql": 0.43121459834671844,
+     "rel_wql_ci": [
+      0.3857286160197681,
+      0.4834004224403386
+     ],
+     "n_params": 5208960
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.4813480731094438,
+     "rel_wql_ci": [
+      0.43740853052454687,
+      0.5328100801931583
+     ],
+     "n_params": 4144448
+    }
+   },
+   "n_windows": 200,
+   "flag": null
+  },
+  "multidomain_test_ctx2048": {
+   "arms": {
+    "kd5m_3m": {
+     "rel_wql": 0.6586874176077503,
+     "rel_wql_ci": [
+      0.6238126061899437,
+      0.6938088007675437
+     ],
+     "cov80": 0.8026929833333334
+    },
+    "long_1m": {
+     "rel_wql": 0.6949776447146998,
+     "rel_wql_ci": [
+      0.6608892123460544,
+      0.7342164758342571
+     ],
+     "cov80": 0.8001721166666667,
+     "vs_reference": [
+      1.0550947629131127,
+      1.0289789799648927,
+      1.0861816277388507
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.6717479333333334
+    }
+   },
+   "pairs": [
+    {
+     "a": "long_1m",
+     "b": "kd5m_3m",
+     "question": "long-horizon student (2048 -> 1024, 1M windows) vs site student (512 -> 64, 3M windows), first 64 steps",
+     "ratio": [
+      1.0550947629131127,
+      1.0289789799648927,
+      1.0861816277388507
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "long-horizon student vs Toto-2.0-4m",
+     "ratio": [
+      1.0774999510930268,
+      1.0542552108693841,
+      1.1029590981961523
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:timestral-5m",
+     "question": "long-horizon student vs its teacher Timestral-5M",
+     "ratio": [
+      1.1466873235010637,
+      1.1198653585042238,
+      1.1750954960580349
+     ]
+    }
+   ],
+   "seed_spread": {},
+   "zero_shot_models": {
+    "timestral-28m": {
+     "rel_wql": 0.5916908778526104,
+     "rel_wql_ci": [
+      0.5579086180593257,
+      0.6301185683524078
+     ],
+     "n_params": 27821184
+    },
+    "timestral-5m": {
+     "rel_wql": 0.6060742370403078,
+     "rel_wql_ci": [
+      0.5743865044496425,
+      0.6420485130833569
+     ],
+     "n_params": 5208960
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.6449908828392126,
+     "rel_wql_ci": [
+      0.6127598740732463,
+      0.6803974831309608
+     ],
+     "n_params": 4144448
+    }
+   },
+   "n_windows": 600,
+   "flag": "public datasets: teachers may have seen them in pretraining"
+  },
+  "fresh_fr_power_ctx2048": {
+   "arms": {
+    "kd5m_3m": {
+     "rel_wql": 0.6565576232273479,
+     "rel_wql_ci": [
+      0.6097247655996256,
+      0.7032353465657716
+     ],
+     "cov80": 0.6670672115384615
+    },
+    "long_1m": {
+     "rel_wql": 0.7903599464816177,
+     "rel_wql_ci": [
+      0.7338083792546691,
+      0.8459076037400309
+     ],
+     "cov80": 0.646484358974359,
+     "vs_reference": [
+      1.2037937242988004,
+      1.1632962524456671,
+      1.2524292369909549
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.7229569871794872
+    }
+   },
+   "pairs": [
+    {
+     "a": "long_1m",
+     "b": "kd5m_3m",
+     "question": "long-horizon student (2048 -> 1024, 1M windows) vs site student (512 -> 64, 3M windows), first 64 steps",
+     "ratio": [
+      1.2037937242988004,
+      1.1632962524456671,
+      1.2524292369909549
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:toto-2.0-4m",
+     "question": "long-horizon student vs Toto-2.0-4m",
+     "ratio": [
+      1.1212998263338674,
+      1.0877423284232886,
+      1.1558665979959297
+     ]
+    },
+    {
+     "a": "long_1m",
+     "b": "zoo:timestral-5m",
+     "question": "long-horizon student vs its teacher Timestral-5M",
+     "ratio": [
+      1.2254286605179752,
+      1.1771516871996226,
+      1.2760763087068676
+     ]
+    }
+   ],
+   "seed_spread": {},
+   "zero_shot_models": {
+    "timestral-28m": {
+     "rel_wql": 0.6260997933967583,
+     "rel_wql_ci": [
+      0.5865644329058273,
+      0.6696013193235101
+     ],
+     "n_params": 27821184
+    },
+    "timestral-5m": {
+     "rel_wql": 0.6449661020230596,
+     "rel_wql_ci": [
+      0.6031071757299423,
+      0.6918689347924917
+     ],
+     "n_params": 5208960
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.704860491297613,
+     "rel_wql_ci": [
+      0.6567495359309475,
+      0.7548989399814264
+     ],
+     "n_params": 4144448
+    }
+   },
+   "n_windows": 312,
+   "flag": null
+  }
+ }
+}

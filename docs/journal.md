@@ -544,3 +544,16 @@ that gets both. **Also:** GIFT-Eval medium/long with sampled-path rollout: 0.669
 vs raws-labs/tinycast 0.515 / 0.515: chaining 64-step forecasts loses 30-36% to native long decoders. C18 margin teacher
 (209M where >= 10% better, 37% of windows): shapes 0.871, fresh/public ties, GIFT short 1.027 [1.011, 1.046] worse: the
 same pattern as C16 (choosing labels by the realised future helps the in-house shapes, hurts GIFT-Eval).
+
+## 2026-11-26 — C20: long-horizon student (2048 -> 1024 in one pass)
+**Did:** multi-token student, 2048-step history in 32-step patches, 32 query tokens x 32 steps = 1024 steps per pass
+(0.91M); 720k windows (360k synthetic + 360k data v4: only 363k data-v4 origins exist on a 1024 stride), Timestral-5M
+labels at 2048 / 1024, 50k steps (`configs/study/stage_c20_long.yaml`). **Result:** GIFT-Eval short / medium / long /
+all 97: **0.643 / 0.582 / 0.573 / 0.614**, vs the chained 3M site student 0.582 / 0.669 / 0.701 / 0.625: 13% better on
+medium (0.870 [0.823, 0.919]), 18% better on long (0.816 [0.762, 0.873]), 10.5% worse on short (1.105). Our suites
+(first 64 steps): 5-20% worse than the site student. Routing by horizon (site student for <= 64, C20 above) gives 0.580
+on all 97 (raws-labs/tinycast 0.545, Chronos-Bolt-small 0.577, Toto-2.0-4m 0.524).
+**Surprise / learned:** native long decoding fixes most of the chaining loss but costs the short horizon. Likely causes,
+untested: a quarter of the training windows (720k vs 3M), and the data mix (series must be >= 3072 steps long, so short
+series such as M4 are absent). Synthetic generation at 3072 steps is ~60x slower (GP sampling is cubic in length): 13 h.
+**Also:** the Mac hibernated on battery 12:58 -> 21:57 (processes survived, 9 h lost).
