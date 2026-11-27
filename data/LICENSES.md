@@ -18,3 +18,9 @@ The Timestral licence does not mention distillation or training on its outputs. 
 derivatives, modifications, or combined works based on it"; whether a distilled student is a "derivative" is undefined. Until clarified,
 a student distilled (even partly) from Timestral is released with Timestral's attribution notice and licence conditions, or the released
 model is distilled from Apache-2.0 teachers only (pending owner decision, docs/status.yaml).
+
+## City of Melbourne pedestrian counts (fresh pedestrian test, `fresh_mel_ped`, fine-tuning domain `mel_ped`)
+- Source: City of Melbourne Open Data, "Pedestrian Counting System (counts per hour)",
+  https://data.melbourne.vic.gov.au/explore/dataset/pedestrian-counting-system-monthly-counts-per-hour
+- Licence: CC BY (Creative Commons Attribution). Downloaded 2026-11-27 (rolling two years, 2024-11-27 to 2026-11-26).
+- Use: evaluation (targets after splits.fresh_start) and fine-tuning on the history before it; never in distillation.

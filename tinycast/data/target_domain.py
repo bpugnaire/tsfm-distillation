@@ -5,6 +5,7 @@ histories give short, left-padded contexts. The history ends right before the do
   fr_power    hourly RTE series, history ends 1 h before splits.fresh_start (the fresh test starts there)
   pedestrian  hourly Melbourne pedestrian counts (held out of distillation), history ends at 85% of each series
               (where pedestrian_test targets start)
+  mel_ped     fresh Melbourne pedestrian counts (City of Melbourne portal), history ends 1 h before splits.fresh_start
 The last 20% of history origins are a fine-tuning validation set (early stopping), never the test.
 """
 
@@ -15,7 +16,7 @@ import numpy as np
 from tinycast.data.corpus import Corpus
 from tinycast.data.windows import window_id
 
-DOMAINS = ("fr_power", "pedestrian")
+DOMAINS = ("fr_power", "pedestrian", "mel_ped")
 
 
 def _domain_series(domain: str, end_time=None) -> list[tuple[str, np.ndarray, int]]:
@@ -39,6 +40,16 @@ def _domain_series(domain: str, end_time=None) -> list[tuple[str, np.ndarray, in
             (s.series_id, s.values, int(0.85 * len(s.values)))
             for s in H.load("monash_pedestrian_counts")
         ]
+    if (
+        domain == "mel_ped"
+    ):  # fresh Melbourne counts: history ends 1 h before splits.fresh_start (as fr_power)
+        from tinycast.data.sources.melbourne_ped import series_arrays as mel_arrays
+        from tinycast.data.splits import load_splits
+
+        fresh = load_splits().fresh_start if end_time is None else end_time
+        if fresh > load_splits().fresh_start:
+            raise ValueError("fine-tuning history may not extend into the fresh test period")
+        return [(sid, v, int(np.searchsorted(ts, fresh))) for sid, (ts, v) in mel_arrays().items()]
     raise ValueError(f"unknown domain {domain}; expected one of {DOMAINS}")
 
 

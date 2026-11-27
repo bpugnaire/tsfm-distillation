@@ -60,6 +60,10 @@ def load_suite(name: str, cfg: BenchConfig) -> Suite:
         from tinycast.data.sources.rte_eco2mix import fresh_suite
 
         return fresh_suite(cfg)
+    if name == "fresh_mel_ped":
+        from tinycast.data.sources.melbourne_ped import fresh_suite as mel_suite
+
+        return mel_suite(cfg)
     raise ValueError(f"unknown suite {name}")
 
 
