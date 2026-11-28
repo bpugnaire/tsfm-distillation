@@ -58,7 +58,11 @@ def select(n: int = 150, seed: int = 0) -> list[str]:
 
 def archive(days: int = 3) -> int:
     RAW.mkdir(parents=True, exist_ok=True)
-    stations = [s for s in STATIONS.read_text().split() if not s.startswith("#")]
+    stations = [
+        ln.strip()
+        for ln in STATIONS.read_text().splitlines()
+        if ln.strip() and not ln.startswith("#")
+    ]
     start = (datetime.now(UTC) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
     rows = []
     for s in stations:
