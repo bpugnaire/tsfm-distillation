@@ -117,6 +117,12 @@ the 0.87M student fine-tuned with replay on one year of history beats its teache
 every model up to 28M parameters, and ties Toto-2.0-313m (360x its size); Chronos-2, t0-gamma and Timestral-209M stay
 3-8% ahead. Without forgetting (shapes 1.02x, public data 1.00x). `results/study/stage_g_fresh_ped/headline.txt`.
 
+**On five fresh datasets (Stage H, same pre-registered arm):** the fine-tuned student beats its zero-shot teacher on
+3 of 5: pedestrians -12%, bike counters -8%, solar -6% (solar: also beats Chronos-2, ties 200-300M models). It loses on
+wind (+2.4%) and electricity (+6.7%). **Intuition.** Fine-tuning teaches each series' own repeating profile (where a
+counter is, how much solar a region has installed). Wind follows weather that no history reveals, and national-scale
+electricity is a smooth aggregate the general model already handles. `results/fresh_headline.json`.
+
 ## 6. Things that did not matter as much as expected
 - **Which teacher, at scale:** Toto-313m, t0-gamma, Timestral-28M and an ensemble of three all within 4% at 1M windows (C3).
   The ensemble gain seen at 30k windows (2%) disappeared.

@@ -1,0 +1,4294 @@
+{
+ "study": "stage_h_fresh_multi",
+ "reference_arm": "zero_shot",
+ "suites": {
+  "fresh_fr_solar": {
+   "arms": {
+    "replay_solar_1y_s0": {
+     "rel_wql": 0.7040251564614011,
+     "rel_wql_ci": [
+      0.6770809721354045,
+      0.735048651946871
+     ],
+     "cov80": 0.889490064102564,
+     "vs_reference": [
+      0.8876498290065015,
+      0.8635592140025455,
+      0.9098009287393186
+     ]
+    },
+    "replay_solar_1y_s2": {
+     "rel_wql": 0.7101355277904146,
+     "rel_wql_ci": [
+      0.6767764850887232,
+      0.7473880257709616
+     ],
+     "cov80": 0.8870862179487179,
+     "vs_reference": [
+      0.8953539146000143,
+      0.856706507719005,
+      0.932237896793812
+     ]
+    },
+    "full_solar_1y_s2": {
+     "rel_wql": 0.7189967747522179,
+     "rel_wql_ci": [
+      0.6921186459261738,
+      0.7500545200501225
+     ],
+     "cov80": 0.9081529273504274,
+     "vs_reference": [
+      0.9065263624567983,
+      0.8779072784198747,
+      0.9336663240710976
+     ]
+    },
+    "full_solar_1y_s0": {
+     "rel_wql": 0.7235106361423548,
+     "rel_wql_ci": [
+      0.6913395910101875,
+      0.7607396869831337
+     ],
+     "cov80": 0.9141963034188035,
+     "vs_reference": [
+      0.9122175345041905,
+      0.8794105007729479,
+      0.9428584323268974
+     ]
+    },
+    "full_solar_1y_s1": {
+     "rel_wql": 0.7448025502272092,
+     "rel_wql_ci": [
+      0.7073612008312334,
+      0.7861147761002892
+     ],
+     "cov80": 0.9097559615384616,
+     "vs_reference": [
+      0.9390628307598483,
+      0.893261725461459,
+      0.9825615790596052
+     ]
+    },
+    "replay_solar_1y_s1": {
+     "rel_wql": 0.749635986687103,
+     "rel_wql_ci": [
+      0.7135241663614477,
+      0.7886827883607246
+     ],
+     "cov80": 0.9064839316239317,
+     "vs_reference": [
+      0.9451569298240111,
+      0.9013364356492312,
+      0.9884948964196464
+     ]
+    },
+    "kd_solar_1y_s2": {
+     "rel_wql": 0.779979021660111,
+     "rel_wql_ci": [
+      0.7414757647510569,
+      0.8194728214371567
+     ],
+     "cov80": 0.8655513034188035,
+     "vs_reference": [
+      0.9834140710044562,
+      0.9387631816185379,
+      1.028408028215162
+     ]
+    },
+    "kd_solar_1y_s1": {
+     "rel_wql": 0.7824969757087644,
+     "rel_wql_ci": [
+      0.7432285857296187,
+      0.8229043247562259
+     ],
+     "cov80": 0.852631047008547,
+     "vs_reference": [
+      0.9865887608010075,
+      0.940513082549117,
+      1.032037744636934
+     ]
+    },
+    "zero_shot": {
+     "rel_wql": 0.7931338839431519,
+     "rel_wql_ci": [
+      0.7670738172244307,
+      0.8207211805501136
+     ],
+     "cov80": 0.761484829059829
+    },
+    "kd_solar_1y_s0": {
+     "rel_wql": 0.7970744888043562,
+     "rel_wql_ci": [
+      0.7591637352870767,
+      0.8365693051737662
+     ],
+     "cov80": 0.8858509615384614,
+     "vs_reference": [
+      1.0049683980737438,
+      0.9599322499938754,
+      1.050516734905165
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.8158052136752137
+    }
+   },
+   "pairs": [
+    {
+     "a": "replay_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: replay vs zero-shot student",
+     "ratio": [
+      0.9121133134612553,
+      0.8760888268482017,
+      0.9454238787446135
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9259241328233314,
+      0.8926921237705359,
+      0.9591197633461326
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9357203027545449,
+      0.9115249266768303,
+      0.9609947631874403
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0015182119863246,
+      0.9835410980026185,
+      1.0192979866383127
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      0.9381189996940581,
+      0.9256183612862944,
+      0.9494140179701073
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      0.9844300691268516,
+      0.9684175460637456,
+      0.9994866434522751
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      0.9935040611224109,
+      0.9760976140042634,
+      1.0088255899665328
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      0.9516888617924428,
+      0.9319690750523002,
+      0.9742290664678976
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.0305765406049525,
+      1.014760083975,
+      1.0442222995728845
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: full vs zero-shot student",
+     "ratio": [
+      0.92116103526513,
+      0.8853175304673709,
+      0.9551000104543116
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9351088512586855,
+      0.902680804048641,
+      0.9678591924960842
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.945002194445648,
+      0.9203551721667079,
+      0.971421108711808
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0114527870329055,
+      0.9946185152977013,
+      1.0292176743135528
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      0.9474246852957207,
+      0.9337965671795766,
+      0.9595894241758657
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      0.994195138081968,
+      0.9774620518949033,
+      1.0102835847149356
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0033591396783246,
+      0.9862437154501061,
+      1.0191293174350158
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      0.9611291538463642,
+      0.9410372845221106,
+      0.9828441453952437
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.0407993601816228,
+      1.0247841245477565,
+      1.0544488935261738
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: kd vs zero-shot student",
+     "ratio": [
+      0.9917570922622985,
+      0.9465583894562567,
+      1.0373433148787716
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.00677384275826,
+      0.968158569637879,
+      1.0460200033812757
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0174253932431663,
+      0.9854502012885709,
+      1.0474850141491014
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0889686348268452,
+      1.069002000675624,
+      1.108115556645167
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.020033539256212,
+      1.012891705071871,
+      1.0276074846912597
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0703883919728485,
+      1.059880862303759,
+      1.081735498939375
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.080254705493235,
+      1.0679156227581026,
+      1.0934123190928602
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.0347882926168712,
+      1.0052192465859182,
+      1.0698718835170353
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.1205642743943154,
+      1.0982321051968902,
+      1.145607907333732
+     ]
+    }
+   ],
+   "seed_spread": {
+    "kd_bike_1y": [],
+    "replay_bike_1y": [],
+    "replay_solar_1y": [
+     0.7040251564614011,
+     0.7101355277904146,
+     0.749635986687103
+    ],
+    "full_wind_1y": [],
+    "kd_wind_1y": [],
+    "full_bike_1y": [],
+    "kd_solar_1y": [
+     0.779979021660111,
+     0.7824969757087644,
+     0.7970744888043562
+    ],
+    "full_solar_1y": [
+     0.7189967747522179,
+     0.7235106361423548,
+     0.7448025502272092
+    ],
+    "replay_wind_1y": []
+   },
+   "zero_shot_models": {
+    "t0-gamma": {
+     "rel_wql": 0.7019643339417836,
+     "rel_wql_ci": [
+      0.669161102966071,
+      0.7397084702741663
+     ],
+     "n_params": 255614272
+    },
+    "toto-2.0-313m": {
+     "rel_wql": 0.7223313228293656,
+     "rel_wql_ci": [
+      0.6941625860921417,
+      0.7525243426126084
+     ],
+     "n_params": 312684608
+    },
+    "timestral-209m": {
+     "rel_wql": 0.7281580450556896,
+     "rel_wql_ci": [
+      0.6950708245369817,
+      0.7631115888493776
+     ],
+     "n_params": 209312256
+    },
+    "timestral-28m": {
+     "rel_wql": 0.7348698476301455,
+     "rel_wql_ci": [
+      0.7007283702460255,
+      0.7709904377080514
+     ],
+     "n_params": 27821184
+    },
+    "chronos-bolt-mini": {
+     "rel_wql": 0.7523021159720247,
+     "rel_wql_ci": [
+      0.7062043821959035,
+      0.8039753403665127
+     ],
+     "n_params": 21236096
+    },
+    "chronos-bolt-tiny": {
+     "rel_wql": 0.7594464117994609,
+     "rel_wql_ci": [
+      0.7175892910477006,
+      0.8056024703956839
+     ],
+     "n_params": 8652672
+    },
+    "chronos-2": {
+     "rel_wql": 0.7601517722286404,
+     "rel_wql_ci": [
+      0.7206078373405623,
+      0.8042082819275704
+     ],
+     "n_params": 119477664
+    },
+    "timestral-5m": {
+     "rel_wql": 0.7711473439272729,
+     "rel_wql_ci": [
+      0.7354265161755464,
+      0.8093076167148404
+     ],
+     "n_params": 5208960
+    },
+    "toto-2.0-22m": {
+     "rel_wql": 0.7731241619661109,
+     "rel_wql_ci": [
+      0.7514574196031298,
+      0.7950780628006607
+     ],
+     "n_params": 21915584
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.7813037259282828,
+     "rel_wql_ci": [
+      0.7496910342027634,
+      0.8160705859798559
+     ],
+     "n_params": 4144448
+    },
+    "chronos-2-small": {
+     "rel_wql": 0.795305626527669,
+     "rel_wql_ci": [
+      0.758967869170889,
+      0.8385770316138769
+     ],
+     "n_params": 27934624
+    },
+    "ets": {
+     "rel_wql": 2.6683668252977175,
+     "rel_wql_ci": [
+      2.2808489607360882,
+      3.0285015080032043
+     ],
+     "n_params": 0
+    }
+   },
+   "n_windows": 468,
+   "flag": null
+  },
+  "fresh_fr_wind": {
+   "arms": {
+    "full_wind_1y_s1": {
+     "rel_wql": 0.721507023917177,
+     "rel_wql_ci": [
+      0.6809604738885262,
+      0.7665702823307178
+     ],
+     "cov80": 0.6959499067599068,
+     "vs_reference": [
+      0.9799745677636429,
+      0.9575443324024007,
+      1.0015413415261423
+     ]
+    },
+    "kd_wind_1y_s1": {
+     "rel_wql": 0.7221452447776397,
+     "rel_wql_ci": [
+      0.6920255677710675,
+      0.7551265165383652
+     ],
+     "cov80": 0.7789554545454546,
+     "vs_reference": [
+      0.9808414203252078,
+      0.9754065831124108,
+      0.9876088582201654
+     ]
+    },
+    "replay_wind_1y_s1": {
+     "rel_wql": 0.7272260501826306,
+     "rel_wql_ci": [
+      0.6893253985564504,
+      0.7688913483409441
+     ],
+     "cov80": 0.7023236363636363,
+     "vs_reference": [
+      0.9877423373164451,
+      0.9650432939614548,
+      1.009167164877853
+     ]
+    },
+    "kd_wind_1y_s0": {
+     "rel_wql": 0.7273765486374293,
+     "rel_wql_ci": [
+      0.6967653340277241,
+      0.7601381849468765
+     ],
+     "cov80": 0.7818692074592074,
+     "vs_reference": [
+      0.987946749267128,
+      0.9826529061011151,
+      0.9933836990783446
+     ]
+    },
+    "kd_wind_1y_s2": {
+     "rel_wql": 0.7296543390470523,
+     "rel_wql_ci": [
+      0.697497511320245,
+      0.7630636712892277
+     ],
+     "cov80": 0.7830345687645688,
+     "vs_reference": [
+      0.9910405191101542,
+      0.9868723076132573,
+      0.9947316774855454
+     ]
+    },
+    "replay_wind_1y_s2": {
+     "rel_wql": 0.7346973791097247,
+     "rel_wql_ci": [
+      0.6963334259404661,
+      0.7752519312224314
+     ],
+     "cov80": 0.7936334265734266,
+     "vs_reference": [
+      0.9978901419714826,
+      0.9831998087182352,
+      1.0126973805804842
+     ]
+    },
+    "zero_shot": {
+     "rel_wql": 0.7362507636945076,
+     "rel_wql_ci": [
+      0.7018348944607472,
+      0.7725410576614519
+     ],
+     "cov80": 0.7812861771561772
+    },
+    "full_wind_1y_s0": {
+     "rel_wql": 0.7445103610589164,
+     "rel_wql_ci": [
+      0.7068924165253849,
+      0.7861089047498683
+     ],
+     "cov80": 0.685715407925408,
+     "vs_reference": [
+      1.0112184567700306,
+      0.9861300134907914,
+      1.0307322798693417
+     ]
+    },
+    "full_wind_1y_s2": {
+     "rel_wql": 0.7520358799006094,
+     "rel_wql_ci": [
+      0.7068591880355444,
+      0.8032919415450626
+     ],
+     "cov80": 0.6009981818181818,
+     "vs_reference": [
+      1.021439863949196,
+      0.9920672655586091,
+      1.0512811668090485
+     ]
+    },
+    "replay_wind_1y_s0": {
+     "rel_wql": 0.7541593551908006,
+     "rel_wql_ci": [
+      0.7130239512879932,
+      0.7976399276391526
+     ],
+     "cov80": 0.7565925874125874,
+     "vs_reference": [
+      1.0243240379221172,
+      1.0071709423776445,
+      1.040950213341749
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.7969113752913755
+    }
+   },
+   "pairs": [
+    {
+     "a": "replay_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: replay vs zero-shot student",
+     "ratio": [
+      1.0072675441226635,
+      0.9909720184914353,
+      1.022798410165838
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.0134393404815643,
+      0.9901422671177936,
+      1.0366686047063125
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0107482036226698,
+      0.9916467056980763,
+      1.0319384290271745
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0027424792795596,
+      0.9839211876804327,
+      1.0225420067296487
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.024169922122478,
+      1.009348952865145,
+      1.0395088262074377
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0253613048534391,
+      1.0101057132427722,
+      1.0407728396216709
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0257838542031084,
+      1.0111860882466996,
+      1.0410850166588383
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.0160452006301968,
+      0.9995522227574455,
+      1.0316652967105329
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.0209869885011327,
+      1.0130630914450858,
+      1.0288474259266465
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: full vs zero-shot student",
+     "ratio": [
+      1.0134542413996421,
+      0.9898506147652363,
+      1.0359496339314647
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.0196639452995437,
+      0.9923663121967474,
+      1.0470857691355557
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0169562793177027,
+      0.9932443620558676,
+      1.0439379678168754
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0089013833386327,
+      0.9858896303533999,
+      1.0339406707950585
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.030460434812309,
+      1.0109676282714584,
+      1.051851202944444
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0316591350869957,
+      1.009925196449588,
+      1.0535885701585694
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0320842797599494,
+      1.0109257486792476,
+      1.05436289378708
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.022285810796487,
+      1.005681331664218,
+      1.0406996814801248
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.027257951422997,
+      1.016153782378565,
+      1.03893550656234
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: kd vs zero-shot student",
+     "ratio": [
+      0.986876057535094,
+      0.9821560334972803,
+      0.9917894795033835
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9929229098278348,
+      0.9742589636397351,
+      1.0079452317105404
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9902862533118082,
+      0.9768502861309356,
+      1.0016441128902798
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      0.9824425997328349,
+      0.9698012185583815,
+      0.9928767926844295
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.0034362577130453,
+      0.9946388331270434,
+      1.011654440740912
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0046035216633304,
+      0.996390258475393,
+      1.0135442228390004
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0050175167719275,
+      0.9988397148703746,
+      1.011760030931522
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      0.9954760160060052,
+      0.9691172294046977,
+      1.016363301245841
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.00031776054518,
+      0.9799511929388217,
+      1.0187569103391165
+     ]
+    }
+   ],
+   "seed_spread": {
+    "kd_bike_1y": [],
+    "replay_bike_1y": [],
+    "replay_solar_1y": [],
+    "full_wind_1y": [
+     0.721507023917177,
+     0.7445103610589164,
+     0.7520358799006094
+    ],
+    "kd_wind_1y": [
+     0.7221452447776397,
+     0.7273765486374293,
+     0.7296543390470523
+    ],
+    "full_bike_1y": [],
+    "kd_solar_1y": [],
+    "full_solar_1y": [],
+    "replay_wind_1y": [
+     0.7272260501826306,
+     0.7346973791097247,
+     0.7541593551908006
+    ]
+   },
+   "zero_shot_models": {
+    "timestral-209m": {
+     "rel_wql": 0.7229607831770013,
+     "rel_wql_ci": [
+      0.692814924909949,
+      0.7562017121747886
+     ],
+     "n_params": 209312256
+    },
+    "timestral-28m": {
+     "rel_wql": 0.723258713874524,
+     "rel_wql_ci": [
+      0.6930827681164239,
+      0.7555438339185396
+     ],
+     "n_params": 27821184
+    },
+    "timestral-5m": {
+     "rel_wql": 0.724100056627435,
+     "rel_wql_ci": [
+      0.6939987821121611,
+      0.7576909687949831
+     ],
+     "n_params": 5208960
+    },
+    "t0-gamma": {
+     "rel_wql": 0.7263574432948607,
+     "rel_wql_ci": [
+      0.6883329480154211,
+      0.768814146277273
+     ],
+     "n_params": 255614272
+    },
+    "chronos-2": {
+     "rel_wql": 0.7298902628987644,
+     "rel_wql_ci": [
+      0.6909964094680399,
+      0.7745415128713313
+     ],
+     "n_params": 119477664
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.7317670323046757,
+     "rel_wql_ci": [
+      0.7047298874460052,
+      0.7601861687290852
+     ],
+     "n_params": 4144448
+    },
+    "chronos-2-small": {
+     "rel_wql": 0.7327752378902825,
+     "rel_wql_ci": [
+      0.6962148321168341,
+      0.7720554102941481
+     ],
+     "n_params": 27934624
+    },
+    "toto-2.0-22m": {
+     "rel_wql": 0.7337153763390264,
+     "rel_wql_ci": [
+      0.706561142188054,
+      0.7612616241265205
+     ],
+     "n_params": 21915584
+    },
+    "toto-2.0-313m": {
+     "rel_wql": 0.7395732343341239,
+     "rel_wql_ci": [
+      0.7138425606140142,
+      0.7682469678697856
+     ],
+     "n_params": 312684608
+    },
+    "chronos-bolt-tiny": {
+     "rel_wql": 0.7476500895778111,
+     "rel_wql_ci": [
+      0.7156268793760635,
+      0.7824295442162732
+     ],
+     "n_params": 8652672
+    },
+    "chronos-bolt-mini": {
+     "rel_wql": 0.7564826506308452,
+     "rel_wql_ci": [
+      0.7098482412532641,
+      0.8082953822094531
+     ],
+     "n_params": 21236096
+    },
+    "ets": {
+     "rel_wql": 0.9497938525616756,
+     "rel_wql_ci": [
+      0.8879460856340017,
+      1.0453118828847798
+     ],
+     "n_params": 0
+    }
+   },
+   "n_windows": 429,
+   "flag": null
+  },
+  "fresh_paris_bike": {
+   "arms": {
+    "full_bike_1y_s0": {
+     "rel_wql": 0.49949612058898946,
+     "rel_wql_ci": [
+      0.4884334624147959,
+      0.5106969094444528
+     ],
+     "cov80": 0.8050620741989882,
+     "vs_reference": [
+      0.8881689055755164,
+      0.878003855131743,
+      0.8988255604547516
+     ]
+    },
+    "replay_bike_1y_s2": {
+     "rel_wql": 0.5018372867246017,
+     "rel_wql_ci": [
+      0.4906171383741497,
+      0.5131456687117247
+     ],
+     "cov80": 0.7804332450012046,
+     "vs_reference": [
+      0.892331802700694,
+      0.8819608372047409,
+      0.9026979753381146
+     ]
+    },
+    "full_bike_1y_s2": {
+     "rel_wql": 0.5092903723222617,
+     "rel_wql_ci": [
+      0.49745436396732445,
+      0.5212984064546354
+     ],
+     "cov80": 0.7520514743435316,
+     "vs_reference": [
+      0.9055843558348979,
+      0.8935747362583674,
+      0.9175467849958464
+     ]
+    },
+    "full_bike_1y_s1": {
+     "rel_wql": 0.5188994336394098,
+     "rel_wql_ci": [
+      0.5083555008294993,
+      0.5292404605699677
+     ],
+     "cov80": 0.8128349771139484,
+     "vs_reference": [
+      0.9226705135083466,
+      0.9145730683031491,
+      0.9309966951296224
+     ]
+    },
+    "replay_bike_1y_s0": {
+     "rel_wql": 0.5194809163357439,
+     "rel_wql_ci": [
+      0.509252048534968,
+      0.5294494480041364
+     ],
+     "cov80": 0.761804461575524,
+     "vs_reference": [
+      0.9237044651822959,
+      0.9162370215221064,
+      0.9311861005873662
+     ]
+    },
+    "replay_bike_1y_s1": {
+     "rel_wql": 0.5216966289244328,
+     "rel_wql_ci": [
+      0.5106565433505716,
+      0.5326279458702335
+     ],
+     "cov80": 0.7566850734762707,
+     "vs_reference": [
+      0.9276442896250668,
+      0.918264196176088,
+      0.9370704345203549
+     ]
+    },
+    "kd_bike_1y_s2": {
+     "rel_wql": 0.5421085014173814,
+     "rel_wql_ci": [
+      0.5317946027972672,
+      0.5524450161633915
+     ],
+     "cov80": 0.8590136979041195,
+     "vs_reference": [
+      0.9639392470942696,
+      0.9571027428888214,
+      0.9692812140238259
+     ]
+    },
+    "kd_bike_1y_s1": {
+     "rel_wql": 0.544156392349653,
+     "rel_wql_ci": [
+      0.5336201347231335,
+      0.5546305154122727
+     ],
+     "cov80": 0.8486885690195134,
+     "vs_reference": [
+      0.9675806628592386,
+      0.9604150664366456,
+      0.9733335376417741
+     ]
+    },
+    "kd_bike_1y_s0": {
+     "rel_wql": 0.5487060113889788,
+     "rel_wql_ci": [
+      0.5387284759719365,
+      0.5587266638489786
+     ],
+     "cov80": 0.8465392580101181,
+     "vs_reference": [
+      0.9756704757654506,
+      0.9690295261740821,
+      0.9806886071614048
+     ]
+    },
+    "zero_shot": {
+     "rel_wql": 0.5623886599197317,
+     "rel_wql_ci": [
+      0.5541629717998022,
+      0.570986582205123
+     ],
+     "cov80": 0.869109089376054
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.8264952083835221
+    }
+   },
+   "pairs": [
+    {
+     "a": "replay_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: replay vs zero-shot student",
+     "ratio": [
+      0.9172100530207075,
+      0.9084453784526798,
+      0.9261451891680449
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.7168880950185499,
+      0.7039097598187787,
+      0.7304151399256547
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.941654177527576,
+      0.9345691289088537,
+      0.9485778340243226
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0305613221667558,
+      1.0231158918987198,
+      1.0388534240020009
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      0.9230860900677861,
+      0.9149656466667034,
+      0.9319876461180929
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      0.9872899141993553,
+      0.9799740297039958,
+      0.9946745181110463
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0698811794662202,
+      1.0628956096993538,
+      1.0768058000801297
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.1256390793132351,
+      1.1173581557347803,
+      1.1338746258602375
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.162614224354945,
+      1.152515882532641,
+      1.172393825848052
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: full vs zero-shot student",
+     "ratio": [
+      0.90760833254058,
+      0.8978283656726442,
+      0.9177438196708093
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.7093834246529888,
+      0.6954336023937567,
+      0.7242157955500219
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9317965662074786,
+      0.9235721843469826,
+      0.9402326316156803
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0197729954138084,
+      1.0114277239078233,
+      1.0292586894982245
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      0.9134228568893721,
+      0.9041312494646284,
+      0.9232772568124653
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      0.9769545697951252,
+      0.968754071861756,
+      0.9857824729865956
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.0586812367722298,
+      1.0515497273870242,
+      1.0666743508111363
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.113855440695801,
+      1.1055304200779017,
+      1.1225018022012998
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.1504435151791004,
+      1.1412009038059785,
+      1.1601015746559113
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: kd vs zero-shot student",
+     "ratio": [
+      0.969186362900652,
+      0.9623290403022672,
+      0.9744574647275959
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.7575125928129345,
+      0.7472542059354923,
+      0.7683433545109355
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9950156830733645,
+      0.9885518511840091,
+      1.0017320591691627
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0889610033028447,
+      1.081440280293293,
+      1.096899115910159
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      0.9753953822579648,
+      0.9726605395170582,
+      0.9780985304327088
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0432374982372408,
+      1.0390164913660884,
+      1.0480001230294773
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.1305090318709312,
+      1.1213964575948585,
+      1.1407961586299318
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.189426611304055,
+      1.1787697645866644,
+      1.2006714287273843
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.2284970578420957,
+      1.2148054274704911,
+      1.2428030143143665
+     ]
+    }
+   ],
+   "seed_spread": {
+    "kd_bike_1y": [
+     0.5421085014173814,
+     0.544156392349653,
+     0.5487060113889788
+    ],
+    "replay_bike_1y": [
+     0.5018372867246017,
+     0.5194809163357439,
+     0.5216966289244328
+    ],
+    "replay_solar_1y": [],
+    "full_wind_1y": [],
+    "kd_wind_1y": [],
+    "full_bike_1y": [
+     0.49949612058898946,
+     0.5092903723222617,
+     0.5188994336394098
+    ],
+    "kd_solar_1y": [],
+    "full_solar_1y": [],
+    "replay_wind_1y": []
+   },
+   "zero_shot_models": {
+    "t0-gamma": {
+     "rel_wql": 0.44367987400929976,
+     "rel_wql_ci": [
+      0.43234268459682024,
+      0.45524188532330107
+     ],
+     "n_params": 255614272
+    },
+    "chronos-2": {
+     "rel_wql": 0.4582539306452779,
+     "rel_wql_ci": [
+      0.446996634367723,
+      0.46951163887545877
+     ],
+     "n_params": 119477664
+    },
+    "timestral-209m": {
+     "rel_wql": 0.48213628062938396,
+     "rel_wql_ci": [
+      0.4703464117471578,
+      0.4937690918826171
+     ],
+     "n_params": 209312256
+    },
+    "chronos-2-small": {
+     "rel_wql": 0.48465818291767715,
+     "rel_wql_ci": [
+      0.47399473826777294,
+      0.4951494480745443
+     ],
+     "n_params": 27934624
+    },
+    "toto-2.0-313m": {
+     "rel_wql": 0.5005316243566098,
+     "rel_wql_ci": [
+      0.48899866424609284,
+      0.511532729864185
+     ],
+     "n_params": 312684608
+    },
+    "timestral-28m": {
+     "rel_wql": 0.5224691604406128,
+     "rel_wql_ci": [
+      0.5114353835762735,
+      0.5334391869763756
+     ],
+     "n_params": 27821184
+    },
+    "chronos-bolt-mini": {
+     "rel_wql": 0.5301891998775552,
+     "rel_wql_ci": [
+      0.5222956194479075,
+      0.5378160277538222
+     ],
+     "n_params": 21236096
+    },
+    "toto-2.0-22m": {
+     "rel_wql": 0.5477897777054316,
+     "rel_wql_ci": [
+      0.536227920274688,
+      0.5589424860550166
+     ],
+     "n_params": 21915584
+    },
+    "timestral-5m": {
+     "rel_wql": 0.5588086941547806,
+     "rel_wql_ci": [
+      0.5492496430414746,
+      0.5682897966825424
+     ],
+     "n_params": 5208960
+    },
+    "chronos-bolt-tiny": {
+     "rel_wql": 0.5597555046457925,
+     "rel_wql_ci": [
+      0.552258912580684,
+      0.5673100160552002
+     ],
+     "n_params": 8652672
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.7195384275001449,
+     "rel_wql_ci": [
+      0.7082303852368785,
+      0.730665120261494
+     ],
+     "n_params": 4144448
+    },
+    "ets": {
+     "rel_wql": 0.996540624657355,
+     "rel_wql_ci": [
+      0.9684498637447289,
+      1.0279507631446498
+     ],
+     "n_params": 0
+    }
+   },
+   "n_windows": 4151,
+   "flag": null
+  },
+  "multidomain_test": {
+   "arms": {
+    "zero_shot": {
+     "rel_wql": 0.6764872652894155,
+     "rel_wql_ci": [
+      0.6437958890176754,
+      0.7123603361463873
+     ],
+     "cov80": 0.8026929833333334
+    },
+    "replay_bike_1y_s0": {
+     "rel_wql": 0.6778244203571171,
+     "rel_wql_ci": [
+      0.6478950788008008,
+      0.711825621977609
+     ],
+     "cov80": 0.7885204,
+     "vs_reference": [
+      1.0019766152835552,
+      0.9890595084153458,
+      1.0149706866674404
+     ]
+    },
+    "replay_bike_1y_s2": {
+     "rel_wql": 0.6791404626692469,
+     "rel_wql_ci": [
+      0.6478444188376411,
+      0.7143462963270422
+     ],
+     "cov80": 0.7986107166666666,
+     "vs_reference": [
+      1.0039220211761064,
+      0.9920739737185977,
+      1.0156963521561415
+     ]
+    },
+    "replay_bike_1y_s1": {
+     "rel_wql": 0.6807663356261912,
+     "rel_wql_ci": [
+      0.6486265659778966,
+      0.7180182251352419
+     ],
+     "cov80": 0.7989523000000001,
+     "vs_reference": [
+      1.0063254262960073,
+      0.9950062994579112,
+      1.0174710486122973
+     ]
+    },
+    "replay_solar_1y_s1": {
+     "rel_wql": 0.6820643517162333,
+     "rel_wql_ci": [
+      0.6513183307168315,
+      0.7176222059386993
+     ],
+     "cov80": 0.8161997333333334,
+     "vs_reference": [
+      1.0082441853867445,
+      0.995276033329462,
+      1.0219568309475193
+     ]
+    },
+    "replay_solar_1y_s2": {
+     "rel_wql": 0.6853507262815491,
+     "rel_wql_ci": [
+      0.6533802227169152,
+      0.7221865499124738
+     ],
+     "cov80": 0.8068128666666666,
+     "vs_reference": [
+      1.0131021845449548,
+      1.00069312529551,
+      1.026806724036022
+     ]
+    },
+    "replay_solar_1y_s0": {
+     "rel_wql": 0.6870258848803419,
+     "rel_wql_ci": [
+      0.6538020359324038,
+      0.7261746114942693
+     ],
+     "cov80": 0.8106521666666666,
+     "vs_reference": [
+      1.0155784449045286,
+      1.0031484518684897,
+      1.0292414504442362
+     ]
+    },
+    "full_solar_1y_s1": {
+     "rel_wql": 0.6970685854246707,
+     "rel_wql_ci": [
+      0.6680188747327443,
+      0.7259235166715317
+     ],
+     "cov80": 0.7249917333333333,
+     "vs_reference": [
+      1.0304238101606393,
+      1.0073835434086842,
+      1.0515398203789348
+     ]
+    },
+    "full_solar_1y_s2": {
+     "rel_wql": 0.7013266168199392,
+     "rel_wql_ci": [
+      0.6726644092844409,
+      0.7317202055462858
+     ],
+     "cov80": 0.7213774166666667,
+     "vs_reference": [
+      1.0367181361793958,
+      1.016209350545791,
+      1.0580815593864006
+     ]
+    },
+    "full_solar_1y_s0": {
+     "rel_wql": 0.7029831912041635,
+     "rel_wql_ci": [
+      0.673621081081638,
+      0.7318025924082389
+     ],
+     "cov80": 0.7101196666666667,
+     "vs_reference": [
+      1.039166924899041,
+      1.0146766814832826,
+      1.0620773637630803
+     ]
+    },
+    "replay_wind_1y_s2": {
+     "rel_wql": 0.7142590381585106,
+     "rel_wql_ci": [
+      0.6682201687973804,
+      0.7565724543160425
+     ],
+     "cov80": 0.7954113,
+     "vs_reference": [
+      1.055835157300316,
+      1.0110091822984124,
+      1.1134267487555571
+     ]
+    },
+    "replay_wind_1y_s0": {
+     "rel_wql": 0.718856294222625,
+     "rel_wql_ci": [
+      0.6757523228260183,
+      0.7588081782158057
+     ],
+     "cov80": 0.8239075333333333,
+     "vs_reference": [
+      1.0626309335107487,
+      1.0211926180576976,
+      1.118428418080627
+     ]
+    },
+    "kd_wind_1y_s2": {
+     "rel_wql": 0.7195511740211726,
+     "rel_wql_ci": [
+      0.6870697301693187,
+      0.7571208210348416
+     ],
+     "cov80": 0.8003599,
+     "vs_reference": [
+      1.0636581218026826,
+      1.0376344251829157,
+      1.0964328288912457
+     ]
+    },
+    "replay_wind_1y_s1": {
+     "rel_wql": 0.7210446498911998,
+     "rel_wql_ci": [
+      0.6774367598624416,
+      0.7627997003962255
+     ],
+     "cov80": 0.78668555,
+     "vs_reference": [
+      1.0658658143146593,
+      1.0207682317949374,
+      1.1273538623554635
+     ]
+    },
+    "kd_bike_1y_s0": {
+     "rel_wql": 0.7233278203731698,
+     "rel_wql_ci": [
+      0.6895148920842574,
+      0.7593569737121115
+     ],
+     "cov80": 0.7694456833333334,
+     "vs_reference": [
+      1.0692408526917574,
+      1.0380013240255472,
+      1.103691059545587
+     ]
+    },
+    "kd_wind_1y_s1": {
+     "rel_wql": 0.7287434330796941,
+     "rel_wql_ci": [
+      0.69407586947358,
+      0.7676544888688184
+     ],
+     "cov80": 0.7993664666666667,
+     "vs_reference": [
+      1.0772463436808708,
+      1.0475089406187077,
+      1.1145686431317723
+     ]
+    },
+    "kd_wind_1y_s0": {
+     "rel_wql": 0.7322746314428401,
+     "rel_wql_ci": [
+      0.6961056008801769,
+      0.772600618050817
+     ],
+     "cov80": 0.8077720333333334,
+     "vs_reference": [
+      1.0824662473573063,
+      1.0503424487876543,
+      1.1238982120578327
+     ]
+    },
+    "kd_bike_1y_s1": {
+     "rel_wql": 0.73236124050333,
+     "rel_wql_ci": [
+      0.6964371744905522,
+      0.772240648606828
+     ],
+     "cov80": 0.7555308333333333,
+     "vs_reference": [
+      1.0825942749861086,
+      1.0500794800042093,
+      1.1193599459339614
+     ]
+    },
+    "full_bike_1y_s1": {
+     "rel_wql": 0.7326357528303071,
+     "rel_wql_ci": [
+      0.6909713637384992,
+      0.771207794298849
+     ],
+     "cov80": 0.7358617666666667,
+     "vs_reference": [
+      1.083000065813316,
+      1.0278946365574484,
+      1.1463615020464955
+     ]
+    },
+    "kd_bike_1y_s2": {
+     "rel_wql": 0.73643461416873,
+     "rel_wql_ci": [
+      0.6990776705352162,
+      0.7776759010351244
+     ],
+     "cov80": 0.7572922666666667,
+     "vs_reference": [
+      1.0886156354379677,
+      1.056463629545826,
+      1.1264913148530173
+     ]
+    },
+    "full_bike_1y_s2": {
+     "rel_wql": 0.7526668046542597,
+     "rel_wql_ci": [
+      0.7075490178656683,
+      0.7939046971693876
+     ],
+     "cov80": 0.67110475,
+     "vs_reference": [
+      1.1126104559148695,
+      1.0517286622181239,
+      1.18316836646258
+     ]
+    },
+    "full_bike_1y_s0": {
+     "rel_wql": 0.7731687115751704,
+     "rel_wql_ci": [
+      0.7177551786724825,
+      0.8283258752972588
+     ],
+     "cov80": 0.6713822833333334,
+     "vs_reference": [
+      1.1429168755222505,
+      1.0706031288343123,
+      1.2312323840725614
+     ]
+    },
+    "kd_solar_1y_s0": {
+     "rel_wql": 0.793435287487542,
+     "rel_wql_ci": [
+      0.7395970673523723,
+      0.8541839024451304
+     ],
+     "cov80": 0.6557900833333333,
+     "vs_reference": [
+      1.172875423084415,
+      1.1142596694127924,
+      1.242014565813022
+     ]
+    },
+    "kd_solar_1y_s1": {
+     "rel_wql": 0.7957966975222959,
+     "rel_wql_ci": [
+      0.7404582552344734,
+      0.8577486625271555
+     ],
+     "cov80": 0.6496496,
+     "vs_reference": [
+      1.1763661170795836,
+      1.1151202759760925,
+      1.248821768400541
+     ]
+    },
+    "kd_solar_1y_s2": {
+     "rel_wql": 0.8041352338798571,
+     "rel_wql_ci": [
+      0.7471623606807709,
+      0.8685804164451775
+     ],
+     "cov80": 0.6516451666666666,
+     "vs_reference": [
+      1.188692345207461,
+      1.1251492638577365,
+      1.2639291369944534
+     ]
+    },
+    "full_wind_1y_s1": {
+     "rel_wql": 0.8066123671889182,
+     "rel_wql_ci": [
+      0.7496172327822594,
+      0.8618663322540151
+     ],
+     "cov80": 0.717614,
+     "vs_reference": [
+      1.1923541041734649,
+      1.1200976035649235,
+      1.2805165075300764
+     ]
+    },
+    "full_wind_1y_s0": {
+     "rel_wql": 0.8225719084362678,
+     "rel_wql_ci": [
+      0.7570598645458765,
+      0.8946380704624557
+     ],
+     "cov80": 0.7070793166666666,
+     "vs_reference": [
+      1.2159458878865284,
+      1.126556824459166,
+      1.3369675825510743
+     ]
+    },
+    "full_wind_1y_s2": {
+     "rel_wql": 0.9322936123076516,
+     "rel_wql_ci": [
+      0.8571131840225327,
+      1.0091361462579043
+     ],
+     "cov80": 0.6414882999999999,
+     "vs_reference": [
+      1.3781391907041987,
+      1.273153988128455,
+      1.506630416073488
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.8127446166666668
+    }
+   },
+   "pairs": [
+    {
+     "a": "replay_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: replay vs zero-shot student",
+     "ratio": [
+      1.0162682578130438,
+      1.0057620797215796,
+      1.028070958503276
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9540343714512116,
+      0.9317359771726504,
+      0.9765850218390641
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0091689270637711,
+      0.9883070133659279,
+      1.0340081578184197
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.031035252326363,
+      1.0075920753847414,
+      1.0575483890493604
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.0419517464152,
+      1.0266334817343177,
+      1.0591769754985065
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0779751511914717,
+      1.0606511834263606,
+      1.0971426374349196
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.095158026785877,
+      1.076020568296912,
+      1.1167634604227488
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.118983899984838,
+      1.095222896357394,
+      1.1443901845893478
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.3461821863971593,
+      1.236744829867704,
+      1.4787570546338937
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: full vs zero-shot student",
+     "ratio": [
+      1.0362517121972492,
+      1.0134387018186855,
+      1.0571115454791562
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9727940859225521,
+      0.9447398370275618,
+      0.9996287355184663
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0290127833142202,
+      1.0051994583419688,
+      1.0520857228298828
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0513090784298267,
+      1.0221705056675783,
+      1.0796135297892013
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.0624402296822448,
+      1.0372588118308494,
+      1.0872626459731838
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0991719829290862,
+      1.0726538018735778,
+      1.124909342825593
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.1166927350713325,
+      1.086543179373793,
+      1.1451689972519339
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.1409871098165878,
+      1.1059941512706108,
+      1.1755778029788762
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.3726529239291845,
+      1.2608621743961201,
+      1.5009805887604653
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: kd vs zero-shot student",
+     "ratio": [
+      1.1795716081499041,
+      1.1184130843156919,
+      1.2522591478231122
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.1073374073344444,
+      1.0538956318924722,
+      1.1702712686117618
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.1713314915032143,
+      1.1029951927276458,
+      1.2498525273925072
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.196711499445044,
+      1.1297181139472592,
+      1.2766755054402414
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.2093821564184681,
+      1.1480933465360257,
+      1.2829898768931272
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.2511941338922334,
+      1.187224439764596,
+      1.3271482687558827
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.2711381123070948,
+      1.207030939071927,
+      1.3484479234424902
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.2987925464083363,
+      1.2356116619525932,
+      1.3767084330051762
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.5624991475069467,
+      1.4055155348988317,
+      1.7489037781500185
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: replay vs zero-shot student",
+     "ratio": [
+      1.066381447719432,
+      1.0239219266769246,
+      1.1230575576186854
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.001078747054008,
+      0.9472099365747266,
+      1.0645673613482747
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0589320419704618,
+      1.011751991390914,
+      1.112669818405289
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0818766172935221,
+      1.0292085133949938,
+      1.1439017357422208
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.0933314144703283,
+      1.0450251906273418,
+      1.156184368665947
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.1311311688577872,
+      1.080510883168878,
+      1.1964425846130096
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.1491613489913042,
+      1.095459873568282,
+      1.2158335559569982
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.1741620994917314,
+      1.1152727057878673,
+      1.246202951634968
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.4125637574409025,
+      1.2843412310594993,
+      1.5455437719499616
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: full vs zero-shot student",
+     "ratio": [
+      1.2763174805950723,
+      1.1872417554063153,
+      1.3913513395227655
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.1981587892866346,
+      1.104221782973008,
+      1.3173028178452195
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.2674015276799222,
+      1.1777761232065092,
+      1.3762193569074779
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.29486314812754,
+      1.1988912958979023,
+      1.4138035608003643
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.3085730245556186,
+      1.2139867698231523,
+      1.4326140624744805
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.3538143285843878,
+      1.2550094554496016,
+      1.4800869551678144
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.3753940683031347,
+      1.2743637609882807,
+      1.503730052236962
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.4053166583481245,
+      1.299032365165224,
+      1.5422322485750222
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.6906518956537815,
+      1.5153722055765098,
+      1.8645379216022182
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: kd vs zero-shot student",
+     "ratio": [
+      1.075653249139579,
+      1.0467894742679669,
+      1.1124294356978741
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.0097827650847646,
+      0.9815794971690252,
+      1.0412221079859176
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.068139073498981,
+      1.0337137583259994,
+      1.1074937870591643
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0912831436149413,
+      1.0564614282396507,
+      1.1332633146715678
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.1028375361147518,
+      1.0744118995008622,
+      1.1399827755387586
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.14096594571012,
+      1.1117516284420965,
+      1.1793647760317623
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.1591528917458616,
+      1.1281899684741619,
+      1.1976330865712885
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.1843710147394904,
+      1.1507843527155532,
+      1.2246602343301085
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.4248454889735525,
+      1.3036045871703072,
+      1.5698893140404995
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: replay vs zero-shot student",
+     "ratio": [
+      1.0065265927498992,
+      0.9965215878392578,
+      1.0166241239069524
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9448892631257728,
+      0.9192574956574175,
+      0.9695093639685508
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      0.9994953142120385,
+      0.9794673479534703,
+      1.022621894983511
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0211520349580747,
+      0.9978358361238054,
+      1.0455496939215052
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.031963886568649,
+      1.013909627241871,
+      1.0503307651062304
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.0676419809988908,
+      1.0491954188042716,
+      1.0857075242583347
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.084660146323566,
+      1.0642980936834239,
+      1.104999632877083
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.1082576313240797,
+      1.0819625171345764,
+      1.1338109799329914
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.3332780581091486,
+      1.2222641056858652,
+      1.458335485767372
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: full vs zero-shot student",
+     "ratio": [
+      1.1195715679743319,
+      1.057171957765504,
+      1.1926919082075382
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.0510116290019287,
+      0.9877546129183771,
+      1.1282212386768935
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.1117505927569855,
+      1.05182833711005,
+      1.1805758172664826
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.135839622274407,
+      1.0713005916739136,
+      1.2118456280440724
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.1478657741391933,
+      1.084117248825005,
+      1.2259077295521563
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.1875509453123385,
+      1.1197630232303646,
+      1.2709154685634776
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.206480454153768,
+      1.1365425885716898,
+      1.293702611436935
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.2327282189645288,
+      1.15986261500185,
+      1.3240729617203573
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.4830211311008417,
+      1.3438689596820155,
+      1.6267275236606957
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: kd vs zero-shot student",
+     "ratio": [
+      1.0822566714953,
+      1.0499343788630662,
+      1.1178470508776366
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.015981809331334,
+      0.9794674074999893,
+      1.0518641895872411
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0746963664208444,
+      1.0407510627079815,
+      1.1114272223093753
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.0979825177048097,
+      1.0618050972016324,
+      1.1345457949900013
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.1096078424811704,
+      1.0759314967540374,
+      1.1458921515283154
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.147970321924337,
+      1.113754241907285,
+      1.1843626004773047
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.1662689174029923,
+      1.1306176865660629,
+      1.202445549793861
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.19164185415029,
+      1.1544307515405203,
+      1.2309319033896717
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.4335925982886244,
+      1.313471509810664,
+      1.5747703510737245
+     ]
+    }
+   ],
+   "seed_spread": {
+    "kd_bike_1y": [
+     0.7233278203731698,
+     0.73236124050333,
+     0.73643461416873
+    ],
+    "replay_bike_1y": [
+     0.6778244203571171,
+     0.6791404626692469,
+     0.6807663356261912
+    ],
+    "replay_solar_1y": [
+     0.6820643517162333,
+     0.6853507262815491,
+     0.6870258848803419
+    ],
+    "full_wind_1y": [
+     0.8066123671889182,
+     0.8225719084362678,
+     0.9322936123076516
+    ],
+    "kd_wind_1y": [
+     0.7195511740211726,
+     0.7287434330796941,
+     0.7322746314428401
+    ],
+    "full_bike_1y": [
+     0.7326357528303071,
+     0.7526668046542597,
+     0.7731687115751704
+    ],
+    "kd_solar_1y": [
+     0.793435287487542,
+     0.7957966975222959,
+     0.8041352338798571
+    ],
+    "full_solar_1y": [
+     0.6970685854246707,
+     0.7013266168199392,
+     0.7029831912041635
+    ],
+    "replay_wind_1y": [
+     0.7142590381585106,
+     0.718856294222625,
+     0.7210446498911998
+    ]
+   },
+   "zero_shot_models": {
+    "t0-gamma": {
+     "rel_wql": 0.5106979883371865,
+     "rel_wql_ci": [
+      0.4766325660447555,
+      0.5469507724667926
+     ],
+     "n_params": 255614272
+    },
+    "chronos-2": {
+     "rel_wql": 0.6143900144923443,
+     "rel_wql_ci": [
+      0.5817346745227319,
+      0.648980792872497
+     ],
+     "n_params": 119477664
+    },
+    "timestral-209m": {
+     "rel_wql": 0.6277564677547688,
+     "rel_wql_ci": [
+      0.5980441200778494,
+      0.6622431158077786
+     ],
+     "n_params": 209312256
+    },
+    "chronos-bolt-mini": {
+     "rel_wql": 0.6368012451377048,
+     "rel_wql_ci": [
+      0.5973881400687853,
+      0.680892791504564
+     ],
+     "n_params": 21236096
+    },
+    "timestral-28m": {
+     "rel_wql": 0.6377628777143037,
+     "rel_wql_ci": [
+      0.6081162495374917,
+      0.6719962034465359
+     ],
+     "n_params": 27821184
+    },
+    "chronos-2-small": {
+     "rel_wql": 0.6419157491441998,
+     "rel_wql_ci": [
+      0.6111875316929276,
+      0.6732054685344127
+     ],
+     "n_params": 27934624
+    },
+    "chronos-bolt-tiny": {
+     "rel_wql": 0.651481841493244,
+     "rel_wql_ci": [
+      0.617181684250412,
+      0.6894083549454171
+     ],
+     "n_params": 8652672
+    },
+    "timestral-5m": {
+     "rel_wql": 0.6598122579991632,
+     "rel_wql_ci": [
+      0.630711782821703,
+      0.6941979912212608
+     ],
+     "n_params": 5208960
+    },
+    "toto-2.0-313m": {
+     "rel_wql": 0.6667982816078982,
+     "rel_wql_ci": [
+      0.6343065199474456,
+      0.7028386132555556
+     ],
+     "n_params": 312684608
+    },
+    "toto-2.0-22m": {
+     "rel_wql": 0.6812462374646032,
+     "rel_wql_ci": [
+      0.6504195811801028,
+      0.714143537605656
+     ],
+     "n_params": 21915584
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.7206161068207827,
+     "rel_wql_ci": [
+      0.6902848218778956,
+      0.7550991996073144
+     ],
+     "n_params": 4144448
+    },
+    "ttm-r2.1-l1": {
+     "rel_wql": 0.8841637695318783,
+     "rel_wql_ci": [
+      0.803068425969192,
+      0.9684980647405936
+     ],
+     "n_params": 855100
+    },
+    "ttm-r2": {
+     "rel_wql": 0.9730120205777204,
+     "rel_wql_ci": [
+      0.9167989443791442,
+      1.0226900651649133
+     ],
+     "n_params": 805280
+    },
+    "ets": {
+     "rel_wql": 1.2196670845607764,
+     "rel_wql_ci": [
+      1.143315551296107,
+      1.2997476167404498
+     ],
+     "n_params": 0
+    }
+   },
+   "n_windows": 600,
+   "flag": "public datasets: teachers may have seen them in pretraining"
+  },
+  "shapes": {
+   "arms": {
+    "zero_shot": {
+     "rel_wql": 0.4812847626574221,
+     "rel_wql_ci": [
+      0.4362621509444803,
+      0.5332056312561675
+     ],
+     "cov80": 0.82851545
+    },
+    "replay_bike_1y_s2": {
+     "rel_wql": 0.4925008574528821,
+     "rel_wql_ci": [
+      0.4458798862762992,
+      0.5481473144411995
+     ],
+     "cov80": 0.8389838000000001,
+     "vs_reference": [
+      1.0233044876250186,
+      1.0111147414510557,
+      1.0363860842207664
+     ]
+    },
+    "replay_bike_1y_s1": {
+     "rel_wql": 0.4932700282485439,
+     "rel_wql_ci": [
+      0.44794153464972963,
+      0.5464481085023716
+     ],
+     "cov80": 0.8428127499999999,
+     "vs_reference": [
+      1.0249026491612676,
+      1.0089114326691682,
+      1.04175025303089
+     ]
+    },
+    "replay_solar_1y_s0": {
+     "rel_wql": 0.5031441499383039,
+     "rel_wql_ci": [
+      0.4573140386297954,
+      0.5553081416676854
+     ],
+     "cov80": 0.85226555,
+     "vs_reference": [
+      1.0454188226533183,
+      1.0238351911420822,
+      1.0676459536016878
+     ]
+    },
+    "replay_solar_1y_s1": {
+     "rel_wql": 0.5094343233146631,
+     "rel_wql_ci": [
+      0.4582561545501221,
+      0.5702976593413874
+     ],
+     "cov80": 0.8152346500000001,
+     "vs_reference": [
+      1.0584883687192022,
+      1.0346429419299596,
+      1.0837364608913382
+     ]
+    },
+    "replay_bike_1y_s0": {
+     "rel_wql": 0.5119422741931224,
+     "rel_wql_ci": [
+      0.46504174809885557,
+      0.5656089878810799
+     ],
+     "cov80": 0.8313281,
+     "vs_reference": [
+      1.0636993188116413,
+      1.0359997975970205,
+      1.0919189946728611
+     ]
+    },
+    "replay_solar_1y_s2": {
+     "rel_wql": 0.5241569064940148,
+     "rel_wql_ci": [
+      0.4769440955859075,
+      0.578992873750712
+     ],
+     "cov80": 0.8590625,
+     "vs_reference": [
+      1.0890785396983553,
+      1.072219028433829,
+      1.106212472971327
+     ]
+    },
+    "replay_wind_1y_s0": {
+     "rel_wql": 0.5365353688100679,
+     "rel_wql_ci": [
+      0.49140004205401017,
+      0.5893651886429744
+     ],
+     "cov80": 0.8931253000000001,
+     "vs_reference": [
+      1.1147981620020102,
+      1.0859968437152931,
+      1.1433910330645725
+     ]
+    },
+    "replay_wind_1y_s1": {
+     "rel_wql": 0.5661057863558799,
+     "rel_wql_ci": [
+      0.5113061892191172,
+      0.627608234355568
+     ],
+     "cov80": 0.8617187,
+     "vs_reference": [
+      1.176238747368849,
+      1.1404853711417366,
+      1.2120588303459736
+     ]
+    },
+    "replay_wind_1y_s2": {
+     "rel_wql": 0.568403480380022,
+     "rel_wql_ci": [
+      0.5167623318292931,
+      0.6263756782121527
+     ],
+     "cov80": 0.8561718500000001,
+     "vs_reference": [
+      1.181012831658273,
+      1.128015944749012,
+      1.239194189361768
+     ]
+    },
+    "full_solar_1y_s1": {
+     "rel_wql": 0.6386224886124093,
+     "rel_wql_ci": [
+      0.586240139929915,
+      0.7023042904385197
+     ],
+     "cov80": 0.6160161000000001,
+     "vs_reference": [
+      1.3269119202657575,
+      1.2588110199934088,
+      1.4057061474300607
+     ]
+    },
+    "full_solar_1y_s0": {
+     "rel_wql": 0.7039769904809733,
+     "rel_wql_ci": [
+      0.6455238214045982,
+      0.7712330724355608
+     ],
+     "cov80": 0.55101555,
+     "vs_reference": [
+      1.4627036737958463,
+      1.3678942966452985,
+      1.5722129490466064
+     ]
+    },
+    "full_solar_1y_s2": {
+     "rel_wql": 0.7118715942506672,
+     "rel_wql_ci": [
+      0.6506254636963175,
+      0.7813366093028801
+     ],
+     "cov80": 0.56625,
+     "vs_reference": [
+      1.4791068603960282,
+      1.3679184923151635,
+      1.607146989186171
+     ]
+    },
+    "kd_wind_1y_s2": {
+     "rel_wql": 0.7625283550556399,
+     "rel_wql_ci": [
+      0.6880474901779117,
+      0.8488977750423043
+     ],
+     "cov80": 0.68382845,
+     "vs_reference": [
+      1.5843600591993114,
+      1.457865792283739,
+      1.7230182083487329
+     ]
+    },
+    "full_wind_1y_s0": {
+     "rel_wql": 0.7816614653954066,
+     "rel_wql_ci": [
+      0.7105167911833643,
+      0.8617469982238808
+     ],
+     "cov80": 0.6084375999999999,
+     "vs_reference": [
+      1.6241142999820923,
+      1.4955616802946592,
+      1.7734246158303362
+     ]
+    },
+    "kd_wind_1y_s0": {
+     "rel_wql": 0.8239468144218036,
+     "rel_wql_ci": [
+      0.7373815006630897,
+      0.9301453328152722
+     ],
+     "cov80": 0.7230471,
+     "vs_reference": [
+      1.7119736138588038,
+      1.5670181849589744,
+      1.8701588342545452
+     ]
+    },
+    "kd_wind_1y_s1": {
+     "rel_wql": 0.8378042270665961,
+     "rel_wql_ci": [
+      0.7504862219493854,
+      0.9431328639234251
+     ],
+     "cov80": 0.69703135,
+     "vs_reference": [
+      1.7407661577329927,
+      1.5924806195791872,
+      1.9053106873897145
+     ]
+    },
+    "full_wind_1y_s1": {
+     "rel_wql": 0.901872043999135,
+     "rel_wql_ci": [
+      0.8065758363852543,
+      1.010543486167193
+     ],
+     "cov80": 0.5493747,
+     "vs_reference": [
+      1.8738844733405498,
+      1.6801445392775642,
+      2.1050793866112616
+     ]
+    },
+    "full_wind_1y_s2": {
+     "rel_wql": 0.9589107225802589,
+     "rel_wql_ci": [
+      0.8569454772921139,
+      1.0787672364615386
+     ],
+     "cov80": 0.584453,
+     "vs_reference": [
+      1.992397842154023,
+      1.7786041272308404,
+      2.234679059573221
+     ]
+    },
+    "seasonal_naive": {
+     "rel_wql": 1.0,
+     "rel_wql_ci": [
+      1.0,
+      1.0
+     ],
+     "cov80": 0.76281305
+    },
+    "full_bike_1y_s0": {
+     "rel_wql": 1.0121244152566824,
+     "rel_wql_ci": [
+      0.906581967144368,
+      1.1355080944958726
+     ],
+     "cov80": 0.56624995,
+     "vs_reference": [
+      2.1029637623851207,
+      1.8706794196621261,
+      2.36645202633081
+     ]
+    },
+    "full_bike_1y_s1": {
+     "rel_wql": 1.0131417360039974,
+     "rel_wql_ci": [
+      0.9108722130269985,
+      1.1325345815530516
+     ],
+     "cov80": 0.5721874,
+     "vs_reference": [
+      2.1050775229407175,
+      1.8722907023610906,
+      2.386063869409564
+     ]
+    },
+    "kd_bike_1y_s0": {
+     "rel_wql": 1.0479154294816366,
+     "rel_wql_ci": [
+      0.9279262734288962,
+      1.1912229720236385
+     ],
+     "cov80": 0.6432032000000001,
+     "vs_reference": [
+      2.177329329305074,
+      1.93477761519958,
+      2.4407031426177204
+     ]
+    },
+    "kd_bike_1y_s1": {
+     "rel_wql": 1.1320639994133344,
+     "rel_wql_ci": [
+      0.9945656625715938,
+      1.2978404575195808
+     ],
+     "cov80": 0.5822655999999999,
+     "vs_reference": [
+      2.35217087107147,
+      2.0690152819543344,
+      2.655255758543385
+     ]
+    },
+    "full_bike_1y_s2": {
+     "rel_wql": 1.1383415574650841,
+     "rel_wql_ci": [
+      1.0047797955858184,
+      1.2981300698744396
+     ],
+     "cov80": 0.5051564500000001,
+     "vs_reference": [
+      2.365214205369211,
+      2.0758212366063695,
+      2.686925580972466
+     ]
+    },
+    "kd_bike_1y_s2": {
+     "rel_wql": 1.1784989163796942,
+     "rel_wql_ci": [
+      1.0326943820233334,
+      1.3560554432986658
+     ],
+     "cov80": 0.5570312,
+     "vs_reference": [
+      2.4486520409925134,
+      2.146837600646955,
+      2.7708712860347853
+     ]
+    },
+    "kd_solar_1y_s0": {
+     "rel_wql": 1.4117535685274103,
+     "rel_wql_ci": [
+      1.2144490390807994,
+      1.6619815582436133
+     ],
+     "cov80": 0.41421875,
+     "vs_reference": [
+      2.933302024216159,
+      2.5404044756880233,
+      3.390554114240888
+     ]
+    },
+    "kd_solar_1y_s1": {
+     "rel_wql": 1.450823470724945,
+     "rel_wql_ci": [
+      1.2439267454112313,
+      1.707211919262516
+     ],
+     "cov80": 0.41070325,
+     "vs_reference": [
+      3.014480372730269,
+      2.6028940966247025,
+      3.493771116903509
+     ]
+    },
+    "kd_solar_1y_s2": {
+     "rel_wql": 1.480488943644481,
+     "rel_wql_ci": [
+      1.2710318956410265,
+      1.7409159419817715
+     ],
+     "cov80": 0.4114062,
+     "vs_reference": [
+      3.0761184614903154,
+      2.6547263313550173,
+      3.566741496985368
+     ]
+    }
+   },
+   "pairs": [
+    {
+     "a": "replay_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: replay vs zero-shot student",
+     "ratio": [
+      1.0694947799205246,
+      1.0523594826406304,
+      1.0872533004214555
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9909629980447768,
+      0.9590651985341124,
+      1.0256213838783426
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0830906325728222,
+      1.034795194084344,
+      1.1364367727143423
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.171649699063755,
+      1.1245591970315492,
+      1.2245434921063543
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.0465286426605034,
+      1.0203115330931665,
+      1.074749713601156
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.1521342810341473,
+      1.1148263372203104,
+      1.1938218775371632
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.2794791573831192,
+      1.2267242838625343,
+      1.3393937921975423
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.0214575475413668,
+      0.9587548216832421,
+      1.0879802411167425
+     ]
+    },
+    {
+     "a": "replay_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.0606015541203186,
+      1.0062674874355566,
+      1.117666433399207
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: full vs zero-shot student",
+     "ratio": [
+      1.4307065527297085,
+      1.3388417921360856,
+      1.535223013108041
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.3256514023571917,
+      1.2629990596134806,
+      1.3920737596195563
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.4488942763584627,
+      1.370028322785315,
+      1.5282182531369242
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.567363332132273,
+      1.4689156365627594,
+      1.6696777745202476
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.3999838192618146,
+      1.312026783951472,
+      1.497079689782062
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.541256765762408,
+      1.4436332606715465,
+      1.646503628029554
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.711611172786786,
+      1.5917562228405073,
+      1.841841393510577
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.3664451982750678,
+      1.2603380992408555,
+      1.4773388544059725
+     ]
+    },
+    {
+     "a": "full_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.4188097238099777,
+      1.3096609269235278,
+      1.5352264002803646
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zero_shot",
+     "question": "fr_solar 1y: kd vs zero-shot student",
+     "ratio": [
+      3.008850101444383,
+      2.6009896712707925,
+      3.486899964916966
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      2.7879136702436518,
+      2.4539537599290266,
+      3.1604961421992837
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      3.0470998277638777,
+      2.648478734465312,
+      3.491755013401804
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_solar 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      3.296246397899418,
+      2.8416779931658556,
+      3.821313950286586
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      2.944238599151931,
+      2.5403269981844034,
+      3.3963892569962155
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      3.2413429344879567,
+      2.79383044297656,
+      3.7585463106033465
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_solar 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      3.599607089970324,
+      3.094581717639568,
+      4.196151542183963
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_solar 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      2.8737051393269644,
+      2.4481745967373953,
+      3.3671868449591713
+     ]
+    },
+    {
+     "a": "kd_solar_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_solar 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      2.9838304530519837,
+      2.554014928641761,
+      3.476093169063192
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: replay vs zero-shot student",
+     "ratio": [
+      1.1697896808335166,
+      1.1326934882733788,
+      1.207544731302003
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.083893358775222,
+      1.0420255458885024,
+      1.1289784830096996
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.1846605230605096,
+      1.128765237082467,
+      1.2446035916256915
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.2815244667377672,
+      1.2273491169302522,
+      1.3438596823658067
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.1446698290308033,
+      1.104309335033285,
+      1.1872390573428404
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.2601789351308863,
+      1.2124494360234874,
+      1.3110335033715952
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.3994659377950016,
+      1.3457067183609803,
+      1.4604780571456453
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.117247620986234,
+      1.049824993393137,
+      1.1860177551164592
+     ]
+    },
+    {
+     "a": "replay_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.1600624676056255,
+      1.0984002044630607,
+      1.2212687066462145
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: full vs zero-shot student",
+     "ratio": [
+      1.8535062017746509,
+      1.6780328707408296,
+      2.062783023905715
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.7174053553975144,
+      1.5859591665026211,
+      1.8620610716580972
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.8770687265130328,
+      1.7135224241871763,
+      2.0571572387039567
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      2.0305475298191284,
+      1.8395398844575102,
+      2.2327015186950385
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.8137043451957708,
+      1.6374994146095245,
+      2.013436215995225
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.996726001161652,
+      1.805701592636314,
+      2.208889626534856
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      2.2174232149382225,
+      1.9965306888592695,
+      2.4704590850222576
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.7702544554337518,
+      1.580407622394195,
+      1.972480195508183
+     ]
+    },
+    {
+     "a": "full_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.8380936448515688,
+      1.6366147858962332,
+      2.050726839140614
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zero_shot",
+     "question": "fr_wind 1y: kd vs zero-shot student",
+     "ratio": [
+      1.6853873446431453,
+      1.5454536668115826,
+      1.838296389836947
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      1.56163127419697,
+      1.4555345195896379,
+      1.6735568077951462
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.7068126740884355,
+      1.5687010125383618,
+      1.8552142637750297
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "fr_wind 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.846370465972488,
+      1.6890881490032448,
+      2.020085999818849
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-5m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.6491956419625082,
+      1.5068666085165974,
+      1.798060529735467
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-28m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.815616656613114,
+      1.6573410676926776,
+      1.9813632047633474
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:timestral-209m",
+     "question": "fr_wind 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      2.0162959371792635,
+      1.839691155703184,
+      2.214957873484914
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:chronos-2",
+     "question": "fr_wind 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      1.609686794211725,
+      1.443459196076393,
+      1.782592983147651
+     ]
+    },
+    {
+     "a": "kd_wind_1y",
+     "b": "zoo:t0-gamma",
+     "question": "fr_wind 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.6713727552331488,
+      1.5092604745992768,
+      1.8435290973647271
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: replay vs zero-shot student",
+     "ratio": [
+      1.0409317835284653,
+      1.0235781932374,
+      1.0582516457653166
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      0.9644973499002196,
+      0.9343172168801854,
+      0.9964803658280336
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      1.0541645317528165,
+      1.0086830070037434,
+      1.1020393655632592
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: replay fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      1.1403584513125484,
+      1.0979772492952957,
+      1.1880878337405965
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      1.018579002881317,
+      0.9928498108749367,
+      1.0440412175410971
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      1.1213642315395704,
+      1.0868373524772874,
+      1.160418702495024
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: replay fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      1.2453081083586772,
+      1.197953716436817,
+      1.298681821734141
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: replay fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      0.9941774814832287,
+      0.937479315562231,
+      1.054735585408157
+     ]
+    },
+    {
+     "a": "replay_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: replay fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      1.0322760691039239,
+      0.9811900954611754,
+      1.0852103517295424
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: full vs zero-shot student",
+     "ratio": [
+      2.222066866996299,
+      1.966951222525303,
+      2.515312900897896
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      2.0589030313343364,
+      1.8567360305485083,
+      2.278286891772125
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      2.250314684820599,
+      2.02005419789816,
+      2.5025539443250557
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: full fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      2.4343119993621873,
+      2.161340560366105,
+      2.735428460659962
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      2.1743506054244803,
+      1.9277551941624569,
+      2.44314989902243
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      2.3937652247417485,
+      2.121003386194017,
+      2.687678667962275
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: full fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      2.6583470027265075,
+      2.3431451855100605,
+      3.011080488723771
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: full fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      2.122260917069306,
+      1.8685060244092186,
+      2.39634800359892
+     ]
+    },
+    {
+     "a": "full_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: full fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      2.2035895983248026,
+      1.9432484230728795,
+      2.493107984096688
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zero_shot",
+     "question": "paris_bike 1y: kd vs zero-shot student",
+     "ratio": [
+      2.339067282208958,
+      2.0602471988315525,
+      2.632391010853035
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-4m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-4m zero-shot",
+     "ratio": [
+      2.1673122395029223,
+      1.9285183306554563,
+      2.427400060632175
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-22m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-22m zero-shot",
+     "ratio": [
+      2.3688024569005877,
+      2.0917334789063764,
+      2.6769883641864207
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:toto-2.0-313m",
+     "question": "paris_bike 1y: kd fine-tuning vs toto-2.0-313m zero-shot",
+     "ratio": [
+      2.5624879417304456,
+      2.2492462819505548,
+      2.910287872389987
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-5m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-5m zero-shot",
+     "ratio": [
+      2.2888385749050966,
+      2.0180495530339355,
+      2.5811790974394704
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-28m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-28m zero-shot",
+     "ratio": [
+      2.519806222596596,
+      2.220200928419733,
+      2.8483427108003356
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:timestral-209m",
+     "question": "paris_bike 1y: kd fine-tuning vs timestral-209m zero-shot",
+     "ratio": [
+      2.798319254560118,
+      2.436648256816516,
+      3.194170230760796
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:chronos-2",
+     "question": "paris_bike 1y: kd fine-tuning vs chronos-2 zero-shot",
+     "ratio": [
+      2.23400616298189,
+      1.9636291454415868,
+      2.537807165957546
+     ]
+    },
+    {
+     "a": "kd_bike_1y",
+     "b": "zoo:t0-gamma",
+     "question": "paris_bike 1y: kd fine-tuning vs t0-gamma zero-shot",
+     "ratio": [
+      2.3196171138742376,
+      2.042398452898983,
+      2.6414426279335186
+     ]
+    }
+   ],
+   "seed_spread": {
+    "kd_bike_1y": [
+     1.0479154294816366,
+     1.1320639994133344,
+     1.1784989163796942
+    ],
+    "replay_bike_1y": [
+     0.4925008574528821,
+     0.4932700282485439,
+     0.5119422741931224
+    ],
+    "replay_solar_1y": [
+     0.5031441499383039,
+     0.5094343233146631,
+     0.5241569064940148
+    ],
+    "full_wind_1y": [
+     0.7816614653954066,
+     0.901872043999135,
+     0.9589107225802589
+    ],
+    "kd_wind_1y": [
+     0.7625283550556399,
+     0.8239468144218036,
+     0.8378042270665961
+    ],
+    "full_bike_1y": [
+     1.0121244152566824,
+     1.0131417360039974,
+     1.1383415574650841
+    ],
+    "kd_solar_1y": [
+     1.4117535685274103,
+     1.450823470724945,
+     1.480488943644481
+    ],
+    "full_solar_1y": [
+     0.6386224886124093,
+     0.7039769904809733,
+     0.7118715942506672
+    ],
+    "replay_wind_1y": [
+     0.5365353688100679,
+     0.5661057863558799,
+     0.568403480380022
+    ]
+   },
+   "zero_shot_models": {
+    "timestral-209m": {
+     "rel_wql": 0.4022977149312591,
+     "rel_wql_ci": [
+      0.3661675995754396,
+      0.44303207021247215
+     ],
+     "n_params": 209312256
+    },
+    "toto-2.0-313m": {
+     "rel_wql": 0.4393220445741715,
+     "rel_wql_ci": [
+      0.4053175122944783,
+      0.47624132895979954
+     ],
+     "n_params": 312684608
+    },
+    "timestral-28m": {
+     "rel_wql": 0.446763497788975,
+     "rel_wql_ci": [
+      0.4094515337583436,
+      0.4885133896908922
+     ],
+     "n_params": 27821184
+    },
+    "toto-2.0-22m": {
+     "rel_wql": 0.4752432768204126,
+     "rel_wql_ci": [
+      0.43941619023901296,
+      0.5138336342029056
+     ],
+     "n_params": 21915584
+    },
+    "t0-gamma": {
+     "rel_wql": 0.48532037249778404,
+     "rel_wql_ci": [
+      0.44038230602311745,
+      0.5362432775061354
+     ],
+     "n_params": 255614272
+    },
+    "timestral-5m": {
+     "rel_wql": 0.49184658721699404,
+     "rel_wql_ci": [
+      0.4457930920426655,
+      0.5456025005190859
+     ],
+     "n_params": 5208960
+    },
+    "chronos-2-small": {
+     "rel_wql": 0.4941730166328879,
+     "rel_wql_ci": [
+      0.4557785405506189,
+      0.5375718278929378
+     ],
+     "n_params": 27934624
+    },
+    "chronos-2": {
+     "rel_wql": 0.5039186822363325,
+     "rel_wql_ci": [
+      0.4685080935715394,
+      0.5425159657039957
+     ],
+     "n_params": 119477664
+    },
+    "toto-2.0-4m": {
+     "rel_wql": 0.5194255914024989,
+     "rel_wql_ci": [
+      0.4752626914556136,
+      0.5685260615135291
+     ],
+     "n_params": 4144448
+    },
+    "chronos-bolt-mini": {
+     "rel_wql": 0.6512977065518273,
+     "rel_wql_ci": [
+      0.5933030179850557,
+      0.7195342898271262
+     ],
+     "n_params": 21236096
+    },
+    "chronos-bolt-tiny": {
+     "rel_wql": 0.6861199520839746,
+     "rel_wql_ci": [
+      0.6207763807811105,
+      0.7638351338392525
+     ],
+     "n_params": 8652672
+    },
+    "ets": {
+     "rel_wql": 1.2462394935485,
+     "rel_wql_ci": [
+      1.0077046466249022,
+      1.575325729748843
+     ],
+     "n_params": 0
+    },
+    "ttm-r2": {
+     "rel_wql": 1.380395331118599,
+     "rel_wql_ci": [
+      1.236397037030756,
+      1.5528736122821867
+     ],
+     "n_params": 805280
+    },
+    "ttm-r2.1-l1": {
+     "rel_wql": 1.7895335137015174,
+     "rel_wql_ci": [
+      1.5141461018183862,
+      2.134746331738395
+     ],
+     "n_params": 855100
+    }
+   },
+   "n_windows": 200,
+   "flag": null
+  }
+ }
+}

@@ -577,3 +577,17 @@ score, shapes 2.66x).
 **Surprise / learned:** (1) the old Monash pedestrian test flattered t0-gamma: 0.346 there, 0.460 on fresh counts;
 (2) 1 week / 1 month of history hurts on fresh data for every technique except teacher-label fine-tuning at 1 month
 (0.958): the gains need a year; (3) the Mac slept on battery 20:30 -> 12:09 again (processes survived).
+
+## 2026-11-28 — Stage H: the fine-tuning headline on five fresh datasets
+**Data:** three more fresh suites (targets after every model's release): RTE solar (12 regions, 468 windows), RTE wind
+(11 regions, 429), Paris bike counters (108 counters, 4,151). Same protocol and pre-registered arm as Stage G (replay,
+1 year). Summary: `results/fresh_headline.json` (`scripts/fresh_headline.py`).
+**Result (fine-tuned student vs its zero-shot teacher Timestral-5M, 3 seeds):** pedestrians 0.880 [0.869, 0.890], bikes
+0.923 [0.915, 0.932], solar 0.938 [0.926, 0.949]: wins; wind 1.024 [1.009, 1.040], electricity 1.067 [1.038, 1.097]:
+losses. On solar it also beats Chronos-2 (0.952) and ties Timestral-209M and Toto-2.0-313m. Gain over the untouched
+student: pedestrians -14%, bikes -8%, solar -9%, wind +0.7%, electricity +3%. Replay keeps forgetting small (shapes
+1.02-1.17x, public data 1.00-1.07x) vs plain fine-tuning (1.43-2.66x, 1.04-1.28x).
+**Surprise / learned:** fine-tuning pays where each series has its own repeating profile (a counter's location, a
+region's installed solar capacity and orientation) that a general model cannot know in advance; it does not pay where
+the future is driven by weather the history cannot reveal (wind), or where the series is a smooth aggregate the
+untouched model already handles (electricity).
