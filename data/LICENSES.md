@@ -24,3 +24,15 @@ model is distilled from Apache-2.0 teachers only (pending owner decision, docs/s
   https://data.melbourne.vic.gov.au/explore/dataset/pedestrian-counting-system-monthly-counts-per-hour
 - Licence: CC BY (Creative Commons Attribution). Downloaded 2026-11-27 (rolling two years, 2024-11-27 to 2026-11-26).
 - Use: evaluation (targets after splits.fresh_start) and fine-tuning on the history before it; never in distillation.
+
+## RTE éCO2mix production by source (fresh solar / wind tests, `fresh_fr_solar`, `fresh_fr_wind`)
+- Source: ODRÉ, datasets eco2mix-regional-cons-def and eco2mix-regional-tr (fields `solaire`, `eolien`),
+  https://odre.opendatasoft.com. Licence Ouverte v2.0 (Etalab), as RTE consumption. Downloaded 2026-11-28.
+- Use: evaluation (targets after splits.fresh_start) and fine-tuning on the history before it; never in distillation.
+
+## Paris bike counters (fresh test `fresh_paris_bike`, fine-tuning domain `paris_bike`)
+- Source: Ville de Paris open data, "Comptage vélo - Données compteurs",
+  https://opendata.paris.fr/explore/dataset/comptage-velo-donnees-compteurs. Licence: ODbL. Downloaded 2026-11-28
+  (rolling ~13 months: 2025-10-28 to 2026-11-27). ODbL: derived databases must stay under ODbL if redistributed; we
+  publish only aggregate scores and forecasts.
+- Use: evaluation (targets after splits.fresh_start) and fine-tuning on the history before it; never in distillation.

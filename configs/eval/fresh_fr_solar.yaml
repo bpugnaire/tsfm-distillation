@@ -1,0 +1,23 @@
+# Fresh RTE solar production, 12 regions (Licence Ouverte): targets >= fresh_start, daily origins 00:00 UTC (tinycast/data/fresh_sources.py).
+suite: fresh_fr_solar
+season: 24
+horizon: 64
+context_length: 512
+latency: false
+models:
+  - {kind: seasonal_naive, name: seasonal_naive}
+  - {kind: ets, name: ets}
+  - {kind: toto, name: toto-2.0-4m, checkpoint: Datadog/Toto-2.0-4m}
+  - {kind: toto, name: toto-2.0-22m, checkpoint: Datadog/Toto-2.0-22m}
+  - {kind: toto, name: toto-2.0-313m, checkpoint: Datadog/Toto-2.0-313m}
+  - {kind: t0, name: t0-gamma, checkpoint: theforecastingcompany/t0-gamma}
+  - {kind: chronos2, name: chronos-2-small, checkpoint: autogluon/chronos-2-small}
+  - {kind: chronos2, name: chronos-2, checkpoint: amazon/chronos-2}
+  - {kind: chronos_bolt, name: chronos-bolt-tiny, checkpoint: amazon/chronos-bolt-tiny}
+  - {kind: chronos_bolt, name: chronos-bolt-mini, checkpoint: amazon/chronos-bolt-mini}
+  # Timestral: comparator only (owner confirmed licence eligibility 2026-11-13, personal project)
+  - {kind: timestral, name: timestral-5m, checkpoint: mistralai/Timestral-5M}
+  - {kind: timestral, name: timestral-28m, checkpoint: mistralai/Timestral-28M}
+  - {kind: timestral, name: timestral-209m, checkpoint: mistralai/Timestral-209M}
+  - {kind: student_onnx, name: student-site-onnx-fp32, checkpoint: web/public/models/c1x_kd5m_3m.fp32.onnx}  # site model since 2026-11-22 (C15 kd5m_3m)
+  - {kind: student_onnx, name: student-site-onnx-int8, checkpoint: web/public/models/c1x_kd5m_3m.int8.onnx}
