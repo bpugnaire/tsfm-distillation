@@ -13,11 +13,14 @@ ARMS = {  # identical to the seed-0 originals (configs/study/stage_c13/c14/c15)
     "gt_1m": ({"synth": 500000, "multidomain_v2": 500000}, 0.0, 50000, 1000, 2500),
     "kd5m_3m": ({"synth": 1500000, "multidomain_v2": 1500000}, 1.0, 150000, 2000, 5000),
     "gt_3m": ({"synth": 1500000, "multidomain_v2": 1500000}, 0.0, 150000, 2000, 5000),
+    # teacher size (finding 1): Timestral-28M labels, seed 0 = C9 mt_1m (2026-11-28)
+    "kd28m_1m": ({"synth": 500000, "multidomain_v2": 500000}, 1.0, 50000, 1000, 2500),
 }
+TEACHER = {"kd28m_1m": "timestral-28m"}  # default timestral-5m
 for name, (mix, alpha, steps, warm, ev) in ARMS.items():
     for seed in (1, 2):
         study = {
-            "name": f"stage_seeds_{name}_s{seed}", "base": "configs/train/study_base_m.yaml", "teacher": "timestral-5m",
+            "name": f"stage_seeds_{name}_s{seed}", "base": "configs/train/study_base_m.yaml", "teacher": TEACHER.get(name, "timestral-5m"),
             "reference_arm": f"{name}_s{seed}", "eval_suites": ["shapes", "multidomain_test", "fresh_fr_power"],
             "arms": [{"name": f"{name}_s{seed}", "seed": seed, "mix": mix, "alpha": alpha,
                       "override": {"student": MT, "optim": {"max_steps": steps, "warmup_steps": warm,
