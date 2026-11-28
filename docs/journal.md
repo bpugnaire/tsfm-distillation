@@ -564,3 +564,16 @@ series such as M4 are absent). Synthetic generation at 3072 steps is ~60x slower
 **Surprise / learned:** the "gap widens with data" reading does not survive: 3M vs 1M 0.975 [0.942, 1.006]. Seed 0 of the
 real-future arm happened to be the worst of three at both scales (0.664, 0.671), which made the gap look larger. Seed
 noise: ~3% for real-future students, ~1% for distilled ones (distillation is also a variance reducer).
+
+## 2026-11-28 — Stage G: fine-tuning on FRESH pedestrian counts; the headline holds
+**Data:** City of Melbourne counts (CC BY), 87 sensors, targets after splits.fresh_start (2,207 windows), fine-tuning
+history = the year before. Fresh electricity refreshed to 2026-11-27 (494 windows, the original 312 unchanged; TTM files
+set aside as stale, `results/fresh_fr_power/_stale_312_windows/`).
+**Pre-registered headline** (`results/study/stage_g_fresh_ped/headline.txt`): replay, 1 year, 3 seeds -> 0.481 (zero-shot
+student 0.560). vs its teacher Timestral-5M 0.880 [0.869, 0.890]; Toto-2.0-22m 0.861; Timestral-28M 0.947;
+Chronos-Bolt-tiny 0.982; ties Toto-2.0-313m (0.996 [0.988, 1.002]) and Chronos-Bolt-mini; behind Timestral-209M 1.032,
+t0-gamma 1.046, Chronos-2 1.082. Forgetting with replay: shapes 1.018, public data 1.000 (full fine-tuning: same target
+score, shapes 2.66x).
+**Surprise / learned:** (1) the old Monash pedestrian test flattered t0-gamma: 0.346 there, 0.460 on fresh counts;
+(2) 1 week / 1 month of history hurts on fresh data for every technique except teacher-label fine-tuning at 1 month
+(0.958): the gains need a year; (3) the Mac slept on battery 20:30 -> 12:09 again (processes survived).

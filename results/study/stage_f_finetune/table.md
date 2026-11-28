@@ -1,154 +1,154 @@
 # stage_f_finetune: relative WQL vs seasonal naive (95% CI); paired ratio vs `zero_shot` (<1 = better)
 
-## fresh_fr_power (312 windows)
+## fresh_fr_power (494 windows)
 
 | arm | rel. WQL | 95% CI | vs reference | 80% cov. |
 |---|---|---|---|---|
-| replay_fr_1y_s0 | 0.625 | [0.579, 0.671] | 0.961 [0.944, 0.977] | 0.72 |
-| full_lowlr_fr_1y_s1 | 0.626 | [0.577, 0.675] | 0.962 [0.942, 0.980] | 0.68 |
-| head_fr_1w_s1 | 0.635 | [0.583, 0.684] | 0.975 [0.961, 0.991] | 0.65 |
-| head_fr_1w_s2 | 0.636 | [0.584, 0.685] | 0.977 [0.962, 0.993] | 0.65 |
-| head_fr_1y_s2 | 0.636 | [0.592, 0.682] | 0.977 [0.965, 0.991] | 0.76 |
-| l2sp_s_fr_1y_s0 | 0.637 | [0.590, 0.688] | 0.979 [0.959, 1.000] | 0.75 |
-| full_fr_1y_s0 | 0.637 | [0.590, 0.689] | 0.979 [0.959, 1.001] | 0.75 |
-| l2sp_l_fr_1y_s0 | 0.638 | [0.590, 0.689] | 0.980 [0.961, 1.001] | 0.75 |
-| head_fr_1w_s0 | 0.639 | [0.587, 0.689] | 0.982 [0.965, 1.000] | 0.64 |
-| head_fr_1y_s1 | 0.639 | [0.595, 0.685] | 0.983 [0.969, 0.997] | 0.76 |
-| replay_fr_1y_s2 | 0.640 | [0.588, 0.694] | 0.983 [0.954, 1.013] | 0.67 |
-| kd_fr_1y_s2 | 0.642 | [0.592, 0.693] | 0.987 [0.972, 1.001] | 0.65 |
-| last_fr_1y_s1 | 0.642 | [0.598, 0.688] | 0.987 [0.964, 1.014] | 0.76 |
-| full_lowlr_fr_1y_s2 | 0.643 | [0.593, 0.694] | 0.988 [0.962, 1.017] | 0.71 |
-| last_fr_1y_s2 | 0.643 | [0.596, 0.689] | 0.988 [0.975, 1.004] | 0.78 |
-| l2sp_l_fr_1y_s1 | 0.645 | [0.589, 0.703] | 0.991 [0.960, 1.022] | 0.66 |
-| head_fr_1y_s0 | 0.645 | [0.600, 0.692] | 0.992 [0.981, 1.003] | 0.75 |
-| kd_fr_1y_s0 | 0.647 | [0.596, 0.698] | 0.994 [0.976, 1.015] | 0.65 |
-| kd_fr_1y_s1 | 0.647 | [0.596, 0.699] | 0.994 [0.977, 1.012] | 0.65 |
-| kd_fr_1m_s2 | 0.647 | [0.601, 0.693] | 0.995 [0.982, 1.007] | 0.69 |
-| last_fr_1y_s0 | 0.648 | [0.602, 0.696] | 0.996 [0.983, 1.009] | 0.77 |
-| l2sp_l_fr_1y_s2 | 0.648 | [0.602, 0.695] | 0.997 [0.966, 1.029] | 0.67 |
-| zero_shot | 0.651 | [0.603, 0.697] | – | 0.67 |
-| l2sp_s_fr_1y_s2 | 0.652 | [0.605, 0.697] | 1.002 [0.967, 1.040] | 0.66 |
-| full_fr_1y_s2 | 0.652 | [0.606, 0.697] | 1.002 [0.967, 1.041] | 0.65 |
-| full_lowlr_fr_1y_s0 | 0.653 | [0.599, 0.718] | 1.004 [0.969, 1.044] | 0.65 |
-| scratch_fr_1y_s2 | 0.654 | [0.609, 0.696] | 1.004 [0.987, 1.024] | 0.75 |
-| full_fr_1y_s1 | 0.654 | [0.597, 0.717] | 1.005 [0.966, 1.042] | 0.64 |
-| l2sp_s_fr_1y_s1 | 0.655 | [0.598, 0.717] | 1.006 [0.968, 1.043] | 0.64 |
-| scratch_fr_1y_s0 | 0.655 | [0.609, 0.702] | 1.007 [0.976, 1.041] | 0.72 |
-| kd_fr_1w_s0 | 0.659 | [0.613, 0.707] | 1.013 [1.001, 1.026] | 0.67 |
-| kd_fr_1w_s2 | 0.659 | [0.614, 0.705] | 1.013 [1.005, 1.022] | 0.65 |
-| head_fr_1m_s2 | 0.660 | [0.615, 0.707] | 1.014 [0.998, 1.031] | 0.66 |
-| scratch_fr_1y_s1 | 0.660 | [0.618, 0.707] | 1.015 [0.994, 1.036] | 0.73 |
-| kd_fr_1m_s0 | 0.662 | [0.617, 0.707] | 1.018 [1.003, 1.034] | 0.66 |
-| last_fr_1w_s0 | 0.663 | [0.618, 0.708] | 1.018 [0.998, 1.040] | 0.57 |
-| kd_fr_1w_s1 | 0.667 | [0.621, 0.715] | 1.026 [1.012, 1.040] | 0.67 |
-| last_fr_1w_s1 | 0.668 | [0.623, 0.714] | 1.027 [1.003, 1.051] | 0.56 |
-| head_fr_1m_s0 | 0.668 | [0.623, 0.716] | 1.027 [1.009, 1.047] | 0.64 |
-| head_fr_1m_s1 | 0.669 | [0.624, 0.716] | 1.028 [1.010, 1.047] | 0.65 |
-| last_fr_1w_s2 | 0.670 | [0.625, 0.716] | 1.029 [1.006, 1.054] | 0.56 |
-| kd_fr_1m_s1 | 0.676 | [0.631, 0.720] | 1.039 [1.024, 1.056] | 0.65 |
-| replay_fr_1y_s1 | 0.688 | [0.622, 0.769] | 1.057 [1.006, 1.124] | 0.58 |
-| l2sp_l_fr_1w_s2 | 0.693 | [0.646, 0.744] | 1.065 [1.035, 1.094] | 0.59 |
-| full_lowlr_fr_1w_s1 | 0.694 | [0.646, 0.746] | 1.066 [1.033, 1.098] | 0.56 |
-| last_fr_1m_s2 | 0.698 | [0.652, 0.746] | 1.072 [1.045, 1.099] | 0.58 |
-| replay_fr_1w_s1 | 0.706 | [0.658, 0.756] | 1.085 [1.048, 1.124] | 0.56 |
-| full_lowlr_fr_1w_s0 | 0.709 | [0.660, 0.761] | 1.089 [1.052, 1.126] | 0.52 |
-| full_lowlr_fr_1w_s2 | 0.714 | [0.665, 0.767] | 1.097 [1.059, 1.135] | 0.53 |
-| replay_fr_1m_s1 | 0.721 | [0.675, 0.766] | 1.108 [1.082, 1.139] | 0.56 |
-| l2sp_s_fr_1w_s2 | 0.729 | [0.680, 0.782] | 1.121 [1.078, 1.164] | 0.51 |
-| replay_fr_1w_s2 | 0.730 | [0.680, 0.782] | 1.122 [1.081, 1.164] | 0.50 |
-| l2sp_l_fr_1w_s0 | 0.732 | [0.677, 0.788] | 1.124 [1.087, 1.167] | 0.57 |
-| l2sp_l_fr_1m_s2 | 0.735 | [0.687, 0.785] | 1.130 [1.094, 1.172] | 0.57 |
-| full_fr_1w_s2 | 0.737 | [0.686, 0.791] | 1.133 [1.088, 1.178] | 0.50 |
-| l2sp_l_fr_1m_s0 | 0.739 | [0.689, 0.792] | 1.136 [1.104, 1.173] | 0.52 |
-| l2sp_s_fr_1m_s1 | 0.766 | [0.715, 0.822] | 1.178 [1.139, 1.223] | 0.52 |
-| full_lowlr_fr_1m_s2 | 0.786 | [0.733, 0.839] | 1.208 [1.162, 1.262] | 0.44 |
-| last_fr_1m_s0 | 0.791 | [0.727, 0.862] | 1.215 [1.161, 1.282] | 0.45 |
-| replay_fr_1w_s0 | 0.792 | [0.746, 0.844] | 1.217 [1.154, 1.285] | 0.45 |
-| full_lowlr_fr_1m_s0 | 0.793 | [0.739, 0.848] | 1.218 [1.170, 1.272] | 0.46 |
-| replay_fr_1m_s2 | 0.796 | [0.744, 0.848] | 1.223 [1.184, 1.272] | 0.47 |
-| l2sp_l_fr_1m_s1 | 0.796 | [0.740, 0.857] | 1.223 [1.173, 1.282] | 0.47 |
-| replay_fr_1m_s0 | 0.796 | [0.750, 0.842] | 1.224 [1.191, 1.265] | 0.42 |
-| full_lowlr_fr_1m_s1 | 0.801 | [0.744, 0.857] | 1.230 [1.180, 1.290] | 0.45 |
-| l2sp_s_fr_1w_s0 | 0.807 | [0.745, 0.879] | 1.241 [1.173, 1.317] | 0.46 |
-| l2sp_l_fr_1w_s1 | 0.811 | [0.753, 0.880] | 1.246 [1.187, 1.315] | 0.52 |
-| full_fr_1m_s2 | 0.814 | [0.758, 0.872] | 1.251 [1.203, 1.307] | 0.41 |
-| full_fr_1w_s1 | 0.814 | [0.753, 0.887] | 1.251 [1.179, 1.330] | 0.42 |
-| full_fr_1w_s0 | 0.817 | [0.754, 0.891] | 1.256 [1.185, 1.335] | 0.43 |
-| l2sp_s_fr_1m_s0 | 0.824 | [0.766, 0.885] | 1.266 [1.211, 1.330] | 0.43 |
-| l2sp_s_fr_1w_s1 | 0.829 | [0.768, 0.901] | 1.274 [1.203, 1.351] | 0.43 |
-| l2sp_s_fr_1m_s2 | 0.833 | [0.775, 0.892] | 1.281 [1.223, 1.350] | 0.40 |
-| full_fr_1m_s1 | 0.836 | [0.772, 0.903] | 1.285 [1.223, 1.360] | 0.42 |
-| last_fr_1m_s1 | 0.863 | [0.785, 0.952] | 1.326 [1.254, 1.414] | 0.38 |
-| full_fr_1m_s0 | 0.901 | [0.839, 0.966] | 1.385 [1.325, 1.461] | 0.33 |
-| seasonal_naive | 1.000 | [1.000, 1.000] | – | 0.74 |
-| scratch_fr_1m_s1 | 1.144 | [1.033, 1.268] | 1.759 [1.637, 1.890] | 0.28 |
-| scratch_fr_1m_s2 | 1.150 | [1.046, 1.267] | 1.768 [1.641, 1.911] | 0.27 |
-| scratch_fr_1m_s0 | 1.168 | [1.044, 1.299] | 1.794 [1.640, 1.966] | 0.25 |
-| scratch_fr_1w_s0 | 1.396 | [1.261, 1.543] | 2.146 [1.995, 2.328] | 0.55 |
-| scratch_fr_1w_s1 | 1.453 | [1.357, 1.554] | 2.233 [2.096, 2.397] | 0.58 |
-| scratch_fr_1w_s2 | 1.613 | [1.489, 1.758] | 2.479 [2.315, 2.672] | 0.64 |
+| replay_fr_1y_s0 | 0.646 | [0.603, 0.689] | 0.954 [0.947, 0.960] | 0.71 |
+| kd_fr_1y_s2 | 0.657 | [0.616, 0.699] | 0.971 [0.964, 0.981] | 0.67 |
+| head_fr_1y_s2 | 0.662 | [0.620, 0.703] | 0.978 [0.969, 0.988] | 0.75 |
+| kd_fr_1m_s2 | 0.662 | [0.623, 0.702] | 0.979 [0.971, 0.989] | 0.69 |
+| kd_fr_1y_s1 | 0.664 | [0.622, 0.706] | 0.981 [0.970, 0.993] | 0.68 |
+| head_fr_1y_s1 | 0.665 | [0.623, 0.705] | 0.982 [0.972, 0.993] | 0.75 |
+| kd_fr_1y_s0 | 0.665 | [0.623, 0.708] | 0.983 [0.971, 0.998] | 0.67 |
+| last_fr_1y_s2 | 0.666 | [0.623, 0.709] | 0.984 [0.975, 0.994] | 0.77 |
+| l2sp_l_fr_1y_s0 | 0.667 | [0.622, 0.713] | 0.986 [0.972, 1.002] | 0.72 |
+| full_lowlr_fr_1y_s1 | 0.668 | [0.623, 0.713] | 0.987 [0.971, 1.005] | 0.66 |
+| l2sp_l_fr_1y_s1 | 0.668 | [0.621, 0.718] | 0.987 [0.969, 1.007] | 0.65 |
+| kd_fr_1m_s0 | 0.669 | [0.629, 0.707] | 0.988 [0.978, 0.998] | 0.67 |
+| kd_fr_1w_s0 | 0.669 | [0.627, 0.710] | 0.988 [0.980, 0.997] | 0.68 |
+| last_fr_1y_s1 | 0.669 | [0.628, 0.709] | 0.988 [0.971, 1.006] | 0.74 |
+| l2sp_s_fr_1y_s0 | 0.670 | [0.625, 0.716] | 0.990 [0.976, 1.006] | 0.72 |
+| head_fr_1w_s1 | 0.670 | [0.626, 0.712] | 0.990 [0.981, 1.000] | 0.68 |
+| full_fr_1y_s0 | 0.670 | [0.625, 0.716] | 0.991 [0.976, 1.007] | 0.72 |
+| l2sp_l_fr_1y_s2 | 0.670 | [0.629, 0.712] | 0.991 [0.977, 1.006] | 0.66 |
+| head_fr_1y_s0 | 0.671 | [0.629, 0.712] | 0.992 [0.983, 1.000] | 0.75 |
+| kd_fr_1w_s2 | 0.672 | [0.631, 0.712] | 0.993 [0.988, 0.998] | 0.67 |
+| last_fr_1y_s0 | 0.672 | [0.629, 0.714] | 0.993 [0.983, 1.003] | 0.75 |
+| head_fr_1w_s2 | 0.672 | [0.629, 0.715] | 0.993 [0.984, 1.004] | 0.67 |
+| full_lowlr_fr_1y_s2 | 0.674 | [0.630, 0.719] | 0.996 [0.982, 1.013] | 0.69 |
+| head_fr_1w_s0 | 0.675 | [0.631, 0.718] | 0.997 [0.988, 1.010] | 0.66 |
+| l2sp_s_fr_1y_s2 | 0.676 | [0.634, 0.717] | 0.999 [0.982, 1.017] | 0.65 |
+| full_fr_1y_s2 | 0.676 | [0.634, 0.718] | 1.000 [0.983, 1.018] | 0.65 |
+| zero_shot | 0.677 | [0.635, 0.719] | – | 0.69 |
+| kd_fr_1m_s1 | 0.678 | [0.638, 0.716] | 1.002 [0.992, 1.013] | 0.67 |
+| kd_fr_1w_s1 | 0.678 | [0.637, 0.719] | 1.002 [0.995, 1.010] | 0.68 |
+| scratch_fr_1y_s0 | 0.680 | [0.641, 0.719] | 1.005 [0.979, 1.033] | 0.68 |
+| head_fr_1m_s2 | 0.682 | [0.641, 0.722] | 1.008 [0.997, 1.020] | 0.67 |
+| scratch_fr_1y_s1 | 0.683 | [0.642, 0.726] | 1.009 [0.992, 1.029] | 0.69 |
+| last_fr_1w_s0 | 0.686 | [0.646, 0.724] | 1.013 [1.000, 1.028] | 0.58 |
+| l2sp_s_fr_1y_s1 | 0.686 | [0.635, 0.739] | 1.014 [0.990, 1.040] | 0.62 |
+| full_fr_1y_s1 | 0.687 | [0.635, 0.740] | 1.015 [0.990, 1.042] | 0.62 |
+| head_fr_1m_s1 | 0.689 | [0.648, 0.729] | 1.018 [1.006, 1.030] | 0.67 |
+| head_fr_1m_s0 | 0.689 | [0.647, 0.729] | 1.018 [1.006, 1.031] | 0.66 |
+| last_fr_1w_s1 | 0.690 | [0.649, 0.729] | 1.019 [1.003, 1.036] | 0.58 |
+| replay_fr_1y_s2 | 0.690 | [0.643, 0.738] | 1.020 [1.000, 1.040] | 0.65 |
+| last_fr_1w_s2 | 0.691 | [0.651, 0.730] | 1.021 [1.006, 1.038] | 0.57 |
+| full_lowlr_fr_1w_s1 | 0.698 | [0.653, 0.741] | 1.032 [1.009, 1.055] | 0.58 |
+| full_lowlr_fr_1y_s0 | 0.698 | [0.646, 0.757] | 1.032 [0.999, 1.069] | 0.61 |
+| l2sp_l_fr_1w_s2 | 0.698 | [0.654, 0.741] | 1.032 [1.013, 1.052] | 0.61 |
+| scratch_fr_1y_s2 | 0.702 | [0.658, 0.744] | 1.037 [1.016, 1.061] | 0.68 |
+| replay_fr_1m_s1 | 0.708 | [0.664, 0.749] | 1.047 [1.031, 1.063] | 0.59 |
+| last_fr_1m_s2 | 0.709 | [0.668, 0.750] | 1.048 [1.033, 1.065] | 0.59 |
+| replay_fr_1w_s1 | 0.712 | [0.668, 0.753] | 1.052 [1.025, 1.083] | 0.60 |
+| full_lowlr_fr_1w_s0 | 0.713 | [0.666, 0.758] | 1.054 [1.029, 1.082] | 0.54 |
+| l2sp_l_fr_1m_s2 | 0.715 | [0.671, 0.757] | 1.056 [1.031, 1.086] | 0.59 |
+| full_lowlr_fr_1w_s2 | 0.719 | [0.671, 0.763] | 1.062 [1.036, 1.091] | 0.55 |
+| l2sp_l_fr_1m_s0 | 0.719 | [0.672, 0.764] | 1.063 [1.040, 1.090] | 0.55 |
+| replay_fr_1y_s1 | 0.725 | [0.663, 0.792] | 1.071 [1.029, 1.123] | 0.57 |
+| replay_fr_1w_s2 | 0.726 | [0.680, 0.771] | 1.073 [1.044, 1.105] | 0.54 |
+| l2sp_s_fr_1w_s2 | 0.728 | [0.681, 0.772] | 1.076 [1.048, 1.106] | 0.53 |
+| l2sp_l_fr_1w_s0 | 0.728 | [0.680, 0.774] | 1.076 [1.051, 1.106] | 0.60 |
+| full_fr_1w_s2 | 0.735 | [0.688, 0.780] | 1.086 [1.056, 1.118] | 0.52 |
+| l2sp_s_fr_1m_s1 | 0.737 | [0.689, 0.784] | 1.089 [1.064, 1.119] | 0.55 |
+| full_lowlr_fr_1m_s0 | 0.755 | [0.705, 0.803] | 1.115 [1.084, 1.153] | 0.50 |
+| full_lowlr_fr_1m_s2 | 0.755 | [0.706, 0.802] | 1.116 [1.087, 1.153] | 0.47 |
+| full_lowlr_fr_1m_s1 | 0.762 | [0.712, 0.811] | 1.126 [1.093, 1.167] | 0.48 |
+| l2sp_l_fr_1m_s1 | 0.765 | [0.715, 0.814] | 1.130 [1.098, 1.169] | 0.51 |
+| replay_fr_1w_s0 | 0.766 | [0.723, 0.811] | 1.133 [1.089, 1.182] | 0.50 |
+| replay_fr_1m_s2 | 0.766 | [0.719, 0.813] | 1.133 [1.110, 1.159] | 0.53 |
+| replay_fr_1m_s0 | 0.774 | [0.728, 0.819] | 1.144 [1.121, 1.170] | 0.47 |
+| l2sp_s_fr_1m_s0 | 0.778 | [0.725, 0.830] | 1.150 [1.115, 1.190] | 0.46 |
+| full_fr_1m_s2 | 0.779 | [0.723, 0.833] | 1.152 [1.114, 1.193] | 0.44 |
+| full_fr_1m_s1 | 0.787 | [0.730, 0.843] | 1.162 [1.121, 1.211] | 0.46 |
+| last_fr_1m_s0 | 0.787 | [0.730, 0.848] | 1.163 [1.121, 1.216] | 0.45 |
+| l2sp_s_fr_1w_s0 | 0.792 | [0.740, 0.848] | 1.171 [1.125, 1.223] | 0.49 |
+| l2sp_s_fr_1m_s2 | 0.794 | [0.740, 0.845] | 1.173 [1.133, 1.220] | 0.42 |
+| l2sp_l_fr_1w_s1 | 0.795 | [0.745, 0.845] | 1.175 [1.136, 1.220] | 0.55 |
+| full_fr_1w_s1 | 0.796 | [0.743, 0.851] | 1.176 [1.128, 1.230] | 0.45 |
+| full_fr_1w_s0 | 0.801 | [0.747, 0.859] | 1.184 [1.136, 1.240] | 0.46 |
+| l2sp_s_fr_1w_s1 | 0.810 | [0.757, 0.865] | 1.198 [1.151, 1.252] | 0.46 |
+| full_fr_1m_s0 | 0.846 | [0.784, 0.905] | 1.250 [1.206, 1.299] | 0.35 |
+| last_fr_1m_s1 | 0.858 | [0.790, 0.931] | 1.268 [1.210, 1.335] | 0.37 |
+| scratch_fr_1m_s1 | 0.969 | [0.889, 1.051] | 1.432 [1.377, 1.493] | 0.33 |
+| scratch_fr_1m_s2 | 0.989 | [0.912, 1.071] | 1.461 [1.393, 1.537] | 0.32 |
+| seasonal_naive | 1.000 | [1.000, 1.000] | – | 0.75 |
+| scratch_fr_1m_s0 | 1.016 | [0.936, 1.096] | 1.502 [1.427, 1.576] | 0.30 |
+| scratch_fr_1w_s0 | 1.208 | [1.113, 1.305] | 1.785 [1.697, 1.885] | 0.61 |
+| scratch_fr_1w_s1 | 1.277 | [1.202, 1.351] | 1.888 [1.807, 1.980] | 0.63 |
+| scratch_fr_1w_s2 | 1.463 | [1.347, 1.600] | 2.162 [2.017, 2.322] | 0.68 |
 
-zero-shot models (same suite, same baseline): timestral-209m 0.614, timestral-28m 0.615, toto-2.0-313m 0.619, chronos-2 0.624, toto-2.0-22m 0.638, timestral-5m 0.641, chronos-2-small 0.642, chronos-bolt-mini 0.651, t0-gamma 0.668, chronos-bolt-tiny 0.674, toto-2.0-4m 0.709, ttm-r2.1-l1 1.159, ttm-r2 1.170, ets 1.391
+zero-shot models (same suite, same baseline): timestral-209m 0.618, timestral-28m 0.625, chronos-2 0.629, toto-2.0-313m 0.635, chronos-bolt-mini 0.643, chronos-2-small 0.651, timestral-5m 0.653, chronos-bolt-tiny 0.656, t0-gamma 0.663, toto-2.0-22m 0.668, toto-2.0-4m 0.727, ets 1.361
 
 | contrast (paired, same windows) | ratio a/b | 95% CI | verdict |
 |---|---|---|---|
-| fr_power 1w: full vs zero-shot student: `full_fr_1w` vs `zero_shot` | 1.223 | [1.160, 1.293] | b better |
-| fr_power 1w: full_lowlr vs zero-shot student: `full_lowlr_fr_1w` vs `zero_shot` | 1.085 | [1.049, 1.120] | b better |
-| fr_power 1w: full_lowlr vs full fine-tuning: `full_lowlr_fr_1w` vs `full_fr_1w` | 0.887 | [0.865, 0.908] | a better |
-| fr_power 1w: head vs zero-shot student: `head_fr_1w` vs `zero_shot` | 0.978 | [0.963, 0.995] | a better |
-| fr_power 1w: head vs full fine-tuning: `head_fr_1w` vs `full_fr_1w` | 0.800 | [0.760, 0.841] | a better |
-| fr_power 1w: last vs zero-shot student: `last_fr_1w` vs `zero_shot` | 1.025 | [1.002, 1.048] | b better |
-| fr_power 1w: last vs full fine-tuning: `last_fr_1w` vs `full_fr_1w` | 0.838 | [0.804, 0.870] | a better |
-| fr_power 1w: l2sp_s vs zero-shot student: `l2sp_s_fr_1w` vs `zero_shot` | 1.223 | [1.161, 1.290] | b better |
-| fr_power 1w: l2sp_s vs full fine-tuning: `l2sp_s_fr_1w` vs `full_fr_1w` | 1.000 | [0.995, 1.004] | no detectable difference |
-| fr_power 1w: l2sp_l vs zero-shot student: `l2sp_l_fr_1w` vs `zero_shot` | 1.158 | [1.114, 1.205] | b better |
-| fr_power 1w: l2sp_l vs full fine-tuning: `l2sp_l_fr_1w` vs `full_fr_1w` | 0.946 | [0.929, 0.964] | a better |
-| fr_power 1w: replay vs zero-shot student: `replay_fr_1w` vs `zero_shot` | 1.148 | [1.102, 1.196] | b better |
-| fr_power 1w: replay vs full fine-tuning: `replay_fr_1w` vs `full_fr_1w` | 0.939 | [0.919, 0.958] | a better |
-| fr_power 1w: kd vs zero-shot student: `kd_fr_1w` vs `zero_shot` | 1.018 | [1.008, 1.030] | b better |
-| fr_power 1w: kd vs full fine-tuning: `kd_fr_1w` vs `full_fr_1w` | 0.832 | [0.792, 0.874] | a better |
-| fr_power 1w: scratch vs zero-shot student: `scratch_fr_1w` vs `zero_shot` | 2.303 | [2.167, 2.471] | b better |
-| fr_power 1w: scratch vs full fine-tuning: `scratch_fr_1w` vs `full_fr_1w` | 1.882 | [1.749, 2.040] | b better |
-| fr_power 1w: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1w` vs `zoo:toto-2.0-4m` | 1.123 | [1.062, 1.190] | b better |
-| fr_power 1w: full fine-tuning vs timestral-5m zero-shot: `full_fr_1w` vs `zoo:timestral-5m` | 1.243 | [1.176, 1.317] | b better |
-| fr_power 1m: full vs zero-shot student: `full_fr_1m` vs `zero_shot` | 1.311 | [1.254, 1.381] | b better |
-| fr_power 1m: full_lowlr vs zero-shot student: `full_lowlr_fr_1m` vs `zero_shot` | 1.220 | [1.172, 1.276] | b better |
-| fr_power 1m: full_lowlr vs full fine-tuning: `full_lowlr_fr_1m` vs `full_fr_1m` | 0.930 | [0.918, 0.943] | a better |
-| fr_power 1m: head vs zero-shot student: `head_fr_1m` vs `zero_shot` | 1.023 | [1.006, 1.042] | b better |
-| fr_power 1m: head vs full fine-tuning: `head_fr_1m` vs `full_fr_1m` | 0.780 | [0.743, 0.813] | a better |
-| fr_power 1m: last vs zero-shot student: `last_fr_1m` vs `zero_shot` | 1.217 | [1.168, 1.276] | b better |
-| fr_power 1m: last vs full fine-tuning: `last_fr_1m` vs `full_fr_1m` | 0.928 | [0.897, 0.960] | a better |
-| fr_power 1m: l2sp_s vs zero-shot student: `l2sp_s_fr_1m` vs `zero_shot` | 1.246 | [1.197, 1.305] | b better |
-| fr_power 1m: l2sp_s vs full fine-tuning: `l2sp_s_fr_1m` vs `full_fr_1m` | 0.951 | [0.944, 0.958] | a better |
-| fr_power 1m: l2sp_l vs zero-shot student: `l2sp_l_fr_1m` vs `zero_shot` | 1.165 | [1.126, 1.212] | b better |
-| fr_power 1m: l2sp_l vs full fine-tuning: `l2sp_l_fr_1m` vs `full_fr_1m` | 0.889 | [0.876, 0.901] | a better |
-| fr_power 1m: replay vs zero-shot student: `replay_fr_1m` vs `zero_shot` | 1.190 | [1.158, 1.230] | b better |
-| fr_power 1m: replay vs full fine-tuning: `replay_fr_1m` vs `full_fr_1m` | 0.908 | [0.883, 0.932] | a better |
-| fr_power 1m: kd vs zero-shot student: `kd_fr_1m` vs `zero_shot` | 1.019 | [1.006, 1.034] | b better |
-| fr_power 1m: kd vs full fine-tuning: `kd_fr_1m` vs `full_fr_1m` | 0.778 | [0.747, 0.805] | a better |
-| fr_power 1m: scratch vs zero-shot student: `scratch_fr_1m` vs `zero_shot` | 1.781 | [1.646, 1.930] | b better |
-| fr_power 1m: scratch vs full fine-tuning: `scratch_fr_1m` vs `full_fr_1m` | 1.358 | [1.288, 1.439] | b better |
-| fr_power 1m: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1m` vs `zoo:toto-2.0-4m` | 1.204 | [1.148, 1.264] | b better |
-| fr_power 1m: full fine-tuning vs timestral-5m zero-shot: `full_fr_1m` vs `zoo:timestral-5m` | 1.332 | [1.270, 1.406] | b better |
-| fr_power 1y: full vs zero-shot student: `full_fr_1y` vs `zero_shot` | 1.005 | [0.979, 1.032] | no detectable difference |
-| fr_power 1y: full_lowlr vs zero-shot student: `full_lowlr_fr_1y` vs `zero_shot` | 0.992 | [0.969, 1.018] | no detectable difference |
-| fr_power 1y: full_lowlr vs full fine-tuning: `full_lowlr_fr_1y` vs `full_fr_1y` | 0.987 | [0.977, 0.998] | a better |
-| fr_power 1y: head vs zero-shot student: `head_fr_1y` vs `zero_shot` | 0.984 | [0.972, 0.997] | a better |
-| fr_power 1y: head vs full fine-tuning: `head_fr_1y` vs `full_fr_1y` | 0.979 | [0.952, 1.008] | no detectable difference |
-| fr_power 1y: last vs zero-shot student: `last_fr_1y` vs `zero_shot` | 0.993 | [0.977, 1.010] | no detectable difference |
-| fr_power 1y: last vs full fine-tuning: `last_fr_1y` vs `full_fr_1y` | 0.988 | [0.968, 1.010] | no detectable difference |
-| fr_power 1y: l2sp_s vs zero-shot student: `l2sp_s_fr_1y` vs `zero_shot` | 1.005 | [0.979, 1.031] | no detectable difference |
-| fr_power 1y: l2sp_s vs full fine-tuning: `l2sp_s_fr_1y` vs `full_fr_1y` | 1.000 | [0.999, 1.000] | no detectable difference |
-| fr_power 1y: l2sp_l vs zero-shot student: `l2sp_l_fr_1y` vs `zero_shot` | 0.996 | [0.972, 1.020] | no detectable difference |
-| fr_power 1y: l2sp_l vs full fine-tuning: `l2sp_l_fr_1y` vs `full_fr_1y` | 0.991 | [0.985, 0.997] | a better |
-| fr_power 1y: replay vs zero-shot student: `replay_fr_1y` vs `zero_shot` | 1.016 | [0.985, 1.053] | no detectable difference |
-| fr_power 1y: replay vs full fine-tuning: `replay_fr_1y` vs `full_fr_1y` | 1.011 | [0.992, 1.034] | no detectable difference |
-| fr_power 1y: kd vs zero-shot student: `kd_fr_1y` vs `zero_shot` | 0.992 | [0.975, 1.010] | no detectable difference |
-| fr_power 1y: kd vs full fine-tuning: `kd_fr_1y` vs `full_fr_1y` | 0.987 | [0.970, 1.004] | no detectable difference |
-| fr_power 1y: scratch vs zero-shot student: `scratch_fr_1y` vs `zero_shot` | 1.022 | [1.004, 1.042] | b better |
-| fr_power 1y: scratch vs full fine-tuning: `scratch_fr_1y` vs `full_fr_1y` | 1.017 | [0.992, 1.049] | no detectable difference |
-| fr_power 1y: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1y` vs `zoo:toto-2.0-4m` | 0.923 | [0.897, 0.948] | a better |
-| fr_power 1y: full fine-tuning vs timestral-5m zero-shot: `full_fr_1y` vs `zoo:timestral-5m` | 1.021 | [0.991, 1.052] | no detectable difference |
+| fr_power 1w: full vs zero-shot student: `full_fr_1w` vs `zero_shot` | 1.156 | [1.113, 1.204] | b better |
+| fr_power 1w: full_lowlr vs zero-shot student: `full_lowlr_fr_1w` vs `zero_shot` | 1.050 | [1.025, 1.077] | b better |
+| fr_power 1w: full_lowlr vs full fine-tuning: `full_lowlr_fr_1w` vs `full_fr_1w` | 0.908 | [0.892, 0.923] | a better |
+| fr_power 1w: head vs zero-shot student: `head_fr_1w` vs `zero_shot` | 0.993 | [0.984, 1.005] | no detectable difference |
+| fr_power 1w: head vs full fine-tuning: `head_fr_1w` vs `full_fr_1w` | 0.860 | [0.831, 0.889] | a better |
+| fr_power 1w: last vs zero-shot student: `last_fr_1w` vs `zero_shot` | 1.018 | [1.003, 1.034] | b better |
+| fr_power 1w: last vs full fine-tuning: `last_fr_1w` vs `full_fr_1w` | 0.881 | [0.856, 0.904] | a better |
+| fr_power 1w: l2sp_s vs zero-shot student: `l2sp_s_fr_1w` vs `zero_shot` | 1.156 | [1.116, 1.203] | b better |
+| fr_power 1w: l2sp_s vs full fine-tuning: `l2sp_s_fr_1w` vs `full_fr_1w` | 1.000 | [0.997, 1.005] | no detectable difference |
+| fr_power 1w: l2sp_l vs zero-shot student: `l2sp_l_fr_1w` vs `zero_shot` | 1.103 | [1.076, 1.135] | b better |
+| fr_power 1w: l2sp_l vs full fine-tuning: `l2sp_l_fr_1w` vs `full_fr_1w` | 0.954 | [0.941, 0.968] | a better |
+| fr_power 1w: replay vs zero-shot student: `replay_fr_1w` vs `zero_shot` | 1.091 | [1.059, 1.127] | b better |
+| fr_power 1w: replay vs full fine-tuning: `replay_fr_1w` vs `full_fr_1w` | 0.944 | [0.932, 0.957] | a better |
+| fr_power 1w: kd vs zero-shot student: `kd_fr_1w` vs `zero_shot` | 0.995 | [0.989, 1.002] | no detectable difference |
+| fr_power 1w: kd vs full fine-tuning: `kd_fr_1w` vs `full_fr_1w` | 0.861 | [0.827, 0.893] | a better |
+| fr_power 1w: scratch vs zero-shot student: `scratch_fr_1w` vs `zero_shot` | 1.959 | [1.863, 2.071] | b better |
+| fr_power 1w: scratch vs full fine-tuning: `scratch_fr_1w` vs `full_fr_1w` | 1.695 | [1.590, 1.818] | b better |
+| fr_power 1w: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1w` vs `zoo:toto-2.0-4m` | 1.076 | [1.029, 1.125] | b better |
+| fr_power 1w: full fine-tuning vs timestral-5m zero-shot: `full_fr_1w` vs `zoo:timestral-5m` | 1.197 | [1.150, 1.250] | b better |
+| fr_power 1m: full vs zero-shot student: `full_fr_1m` vs `zero_shot` | 1.191 | [1.151, 1.236] | b better |
+| fr_power 1m: full_lowlr vs zero-shot student: `full_lowlr_fr_1m` vs `zero_shot` | 1.120 | [1.088, 1.158] | b better |
+| fr_power 1m: full_lowlr vs full fine-tuning: `full_lowlr_fr_1m` vs `full_fr_1m` | 0.940 | [0.932, 0.949] | a better |
+| fr_power 1m: head vs zero-shot student: `head_fr_1m` vs `zero_shot` | 1.015 | [1.003, 1.027] | b better |
+| fr_power 1m: head vs full fine-tuning: `head_fr_1m` vs `full_fr_1m` | 0.852 | [0.823, 0.880] | a better |
+| fr_power 1m: last vs zero-shot student: `last_fr_1m` vs `zero_shot` | 1.170 | [1.133, 1.215] | b better |
+| fr_power 1m: last vs full fine-tuning: `last_fr_1m` vs `full_fr_1m` | 0.983 | [0.957, 1.008] | no detectable difference |
+| fr_power 1m: l2sp_s vs zero-shot student: `l2sp_s_fr_1m` vs `zero_shot` | 1.141 | [1.108, 1.180] | b better |
+| fr_power 1m: l2sp_s vs full fine-tuning: `l2sp_s_fr_1m` vs `full_fr_1m` | 0.958 | [0.951, 0.965] | a better |
+| fr_power 1m: l2sp_l vs zero-shot student: `l2sp_l_fr_1m` vs `zero_shot` | 1.085 | [1.059, 1.116] | b better |
+| fr_power 1m: l2sp_l vs full fine-tuning: `l2sp_l_fr_1m` vs `full_fr_1m` | 0.911 | [0.899, 0.923] | a better |
+| fr_power 1m: replay vs zero-shot student: `replay_fr_1m` vs `zero_shot` | 1.112 | [1.092, 1.135] | b better |
+| fr_power 1m: replay vs full fine-tuning: `replay_fr_1m` vs `full_fr_1m` | 0.934 | [0.911, 0.955] | a better |
+| fr_power 1m: kd vs zero-shot student: `kd_fr_1m` vs `zero_shot` | 0.991 | [0.983, 1.001] | no detectable difference |
+| fr_power 1m: kd vs full fine-tuning: `kd_fr_1m` vs `full_fr_1m` | 0.832 | [0.805, 0.858] | a better |
+| fr_power 1m: scratch vs zero-shot student: `scratch_fr_1m` vs `zero_shot` | 1.473 | [1.408, 1.543] | b better |
+| fr_power 1m: scratch vs full fine-tuning: `scratch_fr_1m` vs `full_fr_1m` | 1.237 | [1.194, 1.288] | b better |
+| fr_power 1m: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1m` vs `zoo:toto-2.0-4m` | 1.109 | [1.069, 1.153] | b better |
+| fr_power 1m: full fine-tuning vs timestral-5m zero-shot: `full_fr_1m` vs `zoo:timestral-5m` | 1.234 | [1.180, 1.293] | b better |
+| fr_power 1y: full vs zero-shot student: `full_fr_1y` vs `zero_shot` | 1.010 | [0.994, 1.026] | no detectable difference |
+| fr_power 1y: full_lowlr vs zero-shot student: `full_lowlr_fr_1y` vs `zero_shot` | 1.012 | [0.993, 1.032] | no detectable difference |
+| fr_power 1y: full_lowlr vs full fine-tuning: `full_lowlr_fr_1y` vs `full_fr_1y` | 1.002 | [0.993, 1.011] | no detectable difference |
+| fr_power 1y: head vs zero-shot student: `head_fr_1y` vs `zero_shot` | 0.984 | [0.975, 0.994] | a better |
+| fr_power 1y: head vs full fine-tuning: `head_fr_1y` vs `full_fr_1y` | 0.975 | [0.960, 0.989] | a better |
+| fr_power 1y: last vs zero-shot student: `last_fr_1y` vs `zero_shot` | 0.990 | [0.979, 1.002] | no detectable difference |
+| fr_power 1y: last vs full fine-tuning: `last_fr_1y` vs `full_fr_1y` | 0.981 | [0.970, 0.993] | a better |
+| fr_power 1y: l2sp_s vs zero-shot student: `l2sp_s_fr_1y` vs `zero_shot` | 1.008 | [0.993, 1.025] | no detectable difference |
+| fr_power 1y: l2sp_s vs full fine-tuning: `l2sp_s_fr_1y` vs `full_fr_1y` | 0.999 | [0.998, 1.000] | a better |
+| fr_power 1y: l2sp_l vs zero-shot student: `l2sp_l_fr_1y` vs `zero_shot` | 0.993 | [0.981, 1.007] | no detectable difference |
+| fr_power 1y: l2sp_l vs full fine-tuning: `l2sp_l_fr_1y` vs `full_fr_1y` | 0.984 | [0.979, 0.989] | a better |
+| fr_power 1y: replay vs zero-shot student: `replay_fr_1y` vs `zero_shot` | 1.031 | [1.009, 1.056] | b better |
+| fr_power 1y: replay vs full fine-tuning: `replay_fr_1y` vs `full_fr_1y` | 1.021 | [1.008, 1.035] | b better |
+| fr_power 1y: kd vs zero-shot student: `kd_fr_1y` vs `zero_shot` | 0.979 | [0.969, 0.991] | a better |
+| fr_power 1y: kd vs full fine-tuning: `kd_fr_1y` vs `full_fr_1y` | 0.970 | [0.958, 0.982] | a better |
+| fr_power 1y: scratch vs zero-shot student: `scratch_fr_1y` vs `zero_shot` | 1.031 | [1.013, 1.049] | b better |
+| fr_power 1y: scratch vs full fine-tuning: `scratch_fr_1y` vs `full_fr_1y` | 1.021 | [1.000, 1.047] | no detectable difference |
+| fr_power 1y: full fine-tuning vs toto-2.0-4m zero-shot: `full_fr_1y` vs `zoo:toto-2.0-4m` | 0.940 | [0.923, 0.958] | a better |
+| fr_power 1y: full fine-tuning vs timestral-5m zero-shot: `full_fr_1y` vs `zoo:timestral-5m` | 1.046 | [1.019, 1.072] | b better |
 
 ## multidomain_test (600 windows)  — public datasets: teachers may have seen them in pretraining
 

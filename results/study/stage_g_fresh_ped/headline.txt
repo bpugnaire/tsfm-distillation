@@ -1,0 +1,37 @@
+fresh_mel_ped: 2207 windows; zero-shot student 0.560
+technique   1w      1m      1y     | shapes 1y  public 1y
+full        1.185* 1.052* 0.859* | 2.661*    1.114*
+full_lowlr  1.137* 1.037* 0.859* | 1.897*    1.023 
+head        1.136* 1.007* 0.962* | 1.850*    1.068*
+last        1.244* 1.059* 0.890* | 2.189*    1.063*
+l2sp_s      1.148* 1.046* 0.869* | 1.951*    1.022 
+l2sp_l      1.124* 1.040* 0.900* | 1.220*    0.998 
+replay      1.076* 1.061* 0.860* | 1.018*    1.000 
+kd          1.035* 0.958* 0.950* | 2.258*    1.097*
+scratch     1.439* 1.142* 0.934* |    -          -   
+
+PRE-REGISTERED headline: replay_mel_1y (and full_mel_1y) vs zero-shot models, paired, 3 seeds
+  replay_mel_1y: rel_wql 0.481
+    vs chronos-2          1.082 [1.073, 1.090]
+    vs t0-gamma           1.046 [1.034, 1.058]
+    vs timestral-209m     1.032 [1.022, 1.041]
+    vs chronos-2-small    1.025 [1.012, 1.036]
+    vs chronos-bolt-mini  1.011 [0.995, 1.024]
+    vs toto-2.0-313m      0.996 [0.988, 1.002]
+    vs chronos-bolt-tiny  0.982 [0.963, 0.998]
+    vs timestral-28m      0.947 [0.937, 0.957]
+    vs timestral-5m       0.880 [0.869, 0.890]
+    vs toto-2.0-22m       0.861 [0.845, 0.876]
+    vs toto-2.0-4m        0.737 [0.716, 0.757]
+  full_mel_1y: rel_wql 0.481
+    vs chronos-2          1.080 [1.069, 1.091]
+    vs t0-gamma           1.045 [1.031, 1.058]
+    vs timestral-209m     1.031 [1.021, 1.040]
+    vs chronos-2-small    1.024 [1.010, 1.036]
+    vs chronos-bolt-mini  1.009 [0.992, 1.024]
+    vs toto-2.0-313m      0.994 [0.987, 1.002]
+    vs chronos-bolt-tiny  0.981 [0.961, 0.998]
+    vs timestral-28m      0.946 [0.935, 0.957]
+    vs timestral-5m       0.879 [0.866, 0.891]
+    vs toto-2.0-22m       0.860 [0.843, 0.876]
+    vs toto-2.0-4m        0.736 [0.714, 0.757]

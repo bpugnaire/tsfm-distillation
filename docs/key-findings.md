@@ -112,6 +112,11 @@ Site student, 2 clean domains, 1 week / 1 month / 1 year of history, 9 technique
 - Labels chosen by the realised future help the in-house shapes test and hurt real-world benchmarks, twice: the
   per-source hybrid (C16) and "209M teacher where it beat 5M by 10% on the window" (C18, GIFT 1.027 worse, shapes 0.87).
 
+**Confirmed on fresh data (Stage G, pedestrian counts published after every model's release, arm fixed in advance):**
+the 0.87M student fine-tuned with replay on one year of history beats its teacher Timestral-5M by 12% [11%, 13%],
+every model up to 28M parameters, and ties Toto-2.0-313m (360x its size); Chronos-2, t0-gamma and Timestral-209M stay
+3-8% ahead. Without forgetting (shapes 1.02x, public data 1.00x). `results/study/stage_g_fresh_ped/headline.txt`.
+
 ## 6. Things that did not matter as much as expected
 - **Which teacher, at scale:** Toto-313m, t0-gamma, Timestral-28M and an ensemble of three all within 4% at 1M windows (C3).
   The ensemble gain seen at 30k windows (2%) disappeared.
