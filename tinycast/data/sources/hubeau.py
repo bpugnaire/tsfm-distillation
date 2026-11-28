@@ -71,6 +71,8 @@ def archive(days: int = 3) -> int:
         time.sleep(0.2)
     df = pd.DataFrame(rows)
     out = RAW / f"{datetime.now(UTC):%Y-%m-%d}.parquet"
+    if out.exists():  # a second run on the same day adds to that day's file, never replaces it
+        df = pd.concat([pd.read_parquet(out), df]).drop_duplicates(["code_station", "date_obs"])
     df.to_parquet(out)
     print(
         f"{len(df)} readings from {df['code_station'].nunique() if len(df) else 0} stations -> {out}"
